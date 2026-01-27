@@ -1,5 +1,5 @@
 const passport = require("passport");
-const userModel = require("../models/users models/user");
+const userModel = require("../models/usersModels/user");
 const localStrategy = require("passport-local");
 
 async function passportAuthentication(app) {

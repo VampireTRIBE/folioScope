@@ -18,14 +18,19 @@ sessionConfig(app);
 passportAuth(app);
 dataParser.bodyParser(app);
 
-// for listning all requests
+// !import routes
+const userRoute = require("./routes/userRoutes/userRoute");
+
+// ! for listning all requests
 app.listen(port, async () => {
   log.running(`SERVER PORT : ${port}`);
 });
 
-// Diffrent Routes
+// ! Diffrent Routes
 
-// error handling middleware
+app.use("/", userRoute);
+
+// ! error handling middleware
 app.use((err, req, res, next) => {
   const { status = 500, message = "Some Error" } = err;
   console.log(`Status Code : ${status}\nMessage : ${message}`);
