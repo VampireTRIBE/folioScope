@@ -17,7 +17,6 @@ DB_connect();
 sessionConfig(app);
 passportAuth(app);
 dataParser.bodyParser(app);
-
 // !import routes
 const userRoute = require("./routes/userRoutes/userRoute");
 

@@ -1,0 +1,678 @@
+{
+  "classes": [
+    {
+      "name": "STOCK",
+      "sectorRequired": true,
+      "industryRequired": true,
+      "amcRequired": false,
+      "categories": [
+        {
+          "name": "Large Cap",
+          "subcategories": [
+            "Growth",
+            "Value",
+            "Dividend",
+            "Cyclical",
+            "Defensive"
+          ]
+        },
+        {
+          "name": "Mid Cap",
+          "subcategories": [
+            "Growth",
+            "Value",
+            "Dividend",
+            "Cyclical",
+            "Defensive"
+          ]
+        },
+        {
+          "name": "Small Cap",
+          "subcategories": [
+            "Growth",
+            "Value",
+            "Dividend",
+            "Cyclical",
+            "Defensive"
+          ]
+        },
+        {
+          "name": "Micro Cap",
+          "subcategories": [
+            "Growth",
+            "Value",
+            "Dividend",
+            "Cyclical",
+            "Defensive"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MUTUAL FUND",
+      "sectorRequired": false,
+      "industryRequired": false,
+      "amcRequired": true,
+      "categories": [
+        {
+          "name": "Equity",
+          "subcategories": [
+            "Large Cap Fund",
+            "Large & Mid Cap Fund",
+            "Mid Cap Fund",
+            "Small Cap Fund",
+            "Multi Cap Fund",
+            "Flexi Cap Fund",
+            "Focused Fund",
+            "Dividend Yield Fund",
+            "Value Fund",
+            "Contra Fund",
+            "Sectoral Fund",
+            "Thematic Fund",
+            "ELSS"
+          ]
+        },
+        {
+          "name": "Debt",
+          "subcategories": [
+            "Overnight Fund",
+            "Liquid Fund",
+            "Ultra Short Duration Fund",
+            "Low Duration Fund",
+            "Money Market Fund",
+            "Short Duration Fund",
+            "Medium Duration Fund",
+            "Medium to Long Duration Fund",
+            "Long Duration Fund",
+            "Dynamic Bond Fund",
+            "Corporate Bond Fund",
+            "Credit Risk Fund",
+            "Banking & PSU Fund",
+            "Gilt Fund",
+            "Gilt Fund with 10 year constant duration",
+            "Floater Fund"
+          ]
+        },
+        {
+          "name": "Hybrid",
+          "subcategories": [
+            "Conservative Hybrid Fund",
+            "Balanced Hybrid Fund",
+            "Aggressive Hybrid Fund",
+            "Dynamic Asset Allocation Fund",
+            "Multi Asset Allocation Fund",
+            "Arbitrage Fund",
+            "Equity Savings Fund"
+          ]
+        },
+        {
+          "name": "Solution Oriented",
+          "subcategories": ["Retirement Fund", "Children's Fund"]
+        },
+        {
+          "name": "Other",
+          "subcategories": ["Index Fund", "FoF Domestic", "FoF Overseas"]
+        }
+      ]
+    },
+    {
+      "name": "ETF",
+      "sectorRequired": false,
+      "industryRequired": false,
+      "amcRequired": true,
+      "categories": [
+        {
+          "name": "Equity ETF",
+          "subcategories": [
+            "Nifty 50",
+            "Nifty Next 50",
+            "Nifty 100",
+            "Nifty 200",
+            "Nifty Total Market",
+            "Nifty 500",
+            "Nifty 500 Multicap 50:25:25",
+            "Nifty500 LargeMidSmall Equal-Cap Weighted",
+            "Nifty Midcap150",
+            "Nifty Midcap 50",
+            "Nifty Midcap Select",
+            "Nifty Midcap 100",
+            "Nifty Smallcap 500",
+            "Nifty Smallcap 250",
+            "Nifty Smallcap 50",
+            "Nifty Smallcap 100",
+            "Nifty Microcap 250",
+            "Nifty LargeMidcap 250",
+            "Nifty MidSmallcap 400",
+            "Nifty MidSmallcap400 50:50",
+            "Nifty India FPI 150",
+            "India Vix",
+            "Nifty Bank",
+            "Nifty Cement",
+            "Nifty Auto",
+            "Nifty Chemicals",
+            "Nifty Financial Services",
+            "Nifty Financial Services 25/50",
+            "Nifty Financial Services Ex-Bank",
+            "Nifty FMCG",
+            "Nifty Healthcare",
+            "Nifty IT",
+            "Nifty Media",
+            "Nifty Metal",
+            "Nifty Pharma",
+            "Nifty Private Bank",
+            "Nifty PSU Bank",
+            "Nifty Realty",
+            "Nifty REITs & Realty",
+            "Nifty Consumer Durables",
+            "Nifty Oil and Gas",
+            "Nifty 500 Healthcare",
+            "Nifty MidSmall Financial Services",
+            "Nifty MidSmall Healthcare",
+            "Nifty MidSmall IT & Telecom",
+            "Nifty Capital Markets",
+            "Nifty Conglomerate 50",
+            "Nifty Core Housing",
+            "Nifty CPSE",
+            "Nifty EV & New Age Automotive",
+            "Nifty Housing",
+            "Nifty India Consumption",
+            "Nifty India Defence",
+            "Nifty India Digital",
+            "Nifty India Infrastructure & Logistics",
+            "Nifty India Internet",
+            "Nifty India Manufacturing",
+            "Nifty India New Age Consumption",
+            "Nifty India Railways PSU",
+            "Nifty India Tourism",
+            "Nifty Infrastructure",
+            "Nifty IPO",
+            "Nifty MidSmall India Consumption",
+            "Nifty MNC",
+            "Nifty Mobility",
+            "Nifty PSE",
+            "Nifty REITs & InvITs",
+            "Nifty Rural",
+            "Nifty Non-Cyclical Consumer",
+            "Nifty Services Sector",
+            "Nifty Shariah 25",
+            "Nifty50 Shariah",
+            "Nifty500 Shariah",
+            "Nifty500 Multicap India Manufacturing 50:30:20",
+            "Nifty500 Multicap Infrastructure 50:30:20",
+            "Nifty SME EMERGE",
+            "Nifty Transportation & Logistics",
+            "Nifty Waves",
+            "Nifty100 ESG",
+            "Nifty100 Enhanced ESG",
+            "Nifty100 ESG Sector Leaders"
+          ]
+        },
+        {
+          "name": "Debt ETF",
+          "subcategories": [
+            "Gilt ETF",
+            "10 Year Gilt ETF",
+            "5 Year Gilt ETF",
+            "Corporate Bond ETF",
+            "PSU Bond ETF",
+            "Liquid ETF"
+          ]
+        },
+        {
+          "name": "Commodity ETF",
+          "subcategories": ["Gold ETF", "Silver ETF"]
+        },
+        {
+          "name": "International ETF",
+          "subcategories": ["NASDAQ 100", "S&P 500", "Hang Seng", "Nikkei 225"]
+        },
+        {
+          "name": "Sectoral ETF",
+          "subcategories": [
+            "Nifty Bank",
+            "Nifty Cement",
+            "Nifty Auto",
+            "Nifty Chemicals",
+            "Nifty Financial Services",
+            "Nifty Financial Services 25/50",
+            "Nifty Financial Services Ex-Bank",
+            "Nifty FMCG",
+            "Nifty Healthcare",
+            "Nifty IT",
+            "Nifty Media",
+            "Nifty Metal",
+            "Nifty Pharma",
+            "Nifty Private Bank",
+            "Nifty PSU Bank",
+            "Nifty Realty",
+            "Nifty REITs & Realty",
+            "Nifty Consumer Durables",
+            "Nifty Oil and Gas",
+            "Nifty 500 Healthcare",
+            "Nifty MidSmall Financial Services",
+            "Nifty MidSmall Healthcare",
+            "Nifty MidSmall IT & Telecom"
+          ]
+        },
+        {
+          "name": "Thematic ETF",
+          "subcategories": [
+            "Nifty Capital Markets",
+            "Nifty Commodities",
+            "Nifty Conglomerate 50",
+            "Nifty Core Housing",
+            "Nifty CPSE",
+            "Nifty EV & New Age Automotive",
+            "Nifty Energy",
+            "Nifty Housing",
+            "Nifty India Consumption",
+            "Nifty India Defence",
+            "Nifty India Digital",
+            "Nifty India Infrastructure & Logistics",
+            "Nifty India Internet",
+            "Nifty India Manufacturing",
+            "Nifty India New Age Consumption",
+            "Nifty India Railways PSU",
+            "Nifty India Tourism",
+            "Nifty Infrastructure",
+            "Nifty IPO",
+            "Nifty Midcap Liquid 15",
+            "Nifty MidSmall India Consumption",
+            "Nifty MNC",
+            "Nifty Mobility",
+            "Nifty PSE",
+            "Nifty REITs & InvITs",
+            "Nifty Rural",
+            "Nifty Non-Cyclical Consumer",
+            "Nifty Services Sector",
+            "Nifty Shariah 25",
+            "Nifty100 Liquid 15",
+            "Nifty50 Shariah",
+            "Nifty500 Shariah",
+            "Nifty500 Multicap India Manufacturing 50:30:20",
+            "Nifty500 Multicap Infrastructure 50:30:20",
+            "Nifty SME EMERGE",
+            "Nifty Transportation & Logistics",
+            "Nifty Waves",
+            "Nifty100 ESG",
+            "Nifty100 Enhanced ESG",
+            "Nifty100 ESG Sector Leaders"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "BOND",
+      "sectorRequired": false,
+      "industryRequired": false,
+      "amcRequired": false,
+      "categories": [
+        {
+          "name": "Government",
+          "subcategories": [
+            "Central Government Securities",
+            "State Development Loans",
+            "Treasury Bills",
+            "Sovereign Gold Bond",
+            "Floating Rate Bonds",
+            "Capital Indexed Bonds",
+            "Inflation Indexed Bonds"
+          ]
+        },
+        {
+          "name": "Corporate",
+          "subcategories": [
+            "AAA Rated",
+            "AA Rated",
+            "A Rated",
+            "BBB Rated (Investment Grade)",
+            "BB and Below (High Yield)",
+            "Convertible Debentures",
+            "Non-Convertible Debentures",
+            "Secured Bonds",
+            "Unsecured Bonds",
+            "Subordinated Bonds",
+            "Zero Coupon Bonds",
+            "Perpetual Bonds"
+          ]
+        },
+        {
+          "name": "Municipal",
+          "subcategories": ["General Obligation", "Revenue Bond"]
+        },
+        {
+          "name": "PSU",
+          "subcategories": ["PSU Bonds (Tax-Free)", "PSU Bonds (Taxable)"]
+        },
+        {
+          "name": "International",
+          "subcategories": ["Masala Bonds", "Foreign Currency Bonds"]
+        }
+      ]
+    },
+    {
+      "name": "INDEX",
+      "sectorRequired": false,
+      "industryRequired": false,
+      "amcRequired": false,
+      "categories": [
+        {
+          "name": "Equity Index",
+          "subcategories": [
+            "Broad Market",
+            "Large Cap",
+            "Mid Cap",
+            "Small Cap",
+            "Sectoral",
+            "Thematic"
+          ]
+        },
+        {
+          "name": "Bond Index",
+          "subcategories": [
+            "Government Securities Index",
+            "Corporate Bond Index",
+            "Composite Bond Index"
+          ]
+        },
+        {
+          "name": "Commodity Index",
+          "subcategories": ["Gold", "Silver", "Crude Oil", "Multi Commodity"]
+        },
+        {
+          "name": "International Index",
+          "subcategories": [
+            "MSCI World",
+            "MSCI Emerging Markets",
+            "S&P 500",
+            "NASDAQ 100"
+          ]
+        }
+      ]
+    }
+  ],
+
+  "sectors": [
+    {
+      "name": "Basic Materials",
+      "industries": [
+        "Chemicals",
+        "Construction Materials",
+        "Metals & Mining",
+        "Paper & Forest Products",
+        "Steel",
+        "Aluminum",
+        "Cement"
+      ]
+    },
+    {
+      "name": "Consumer Cyclical",
+      "industries": [
+        "Auto Components",
+        "Automobiles",
+        "Consumer Durables",
+        "Apparel",
+        "Hotels, Restaurants & Leisure",
+        "Household Durables",
+        "Leisure Products",
+        "Textiles",
+        "Retail",
+        "E-commerce"
+      ]
+    },
+    {
+      "name": "Consumer Defensive",
+      "industries": [
+        "Beverages",
+        "Food Products",
+        "Tobacco",
+        "Household Products",
+        "Personal Products",
+        "FMCG"
+      ]
+    },
+    {
+      "name": "Energy",
+      "industries": [
+        "Oil & Gas Exploration & Production",
+        "Oil & Gas Refining & Marketing",
+        "Oil & Gas Equipment & Services",
+        "Coal",
+        "Renewable Energy",
+        "Power Generation",
+        "Power Distribution"
+      ]
+    },
+    {
+      "name": "Financial Services",
+      "industries": [
+        "Banks - Public Sector",
+        "Banks - Private Sector",
+        "Banks - Small Finance",
+        "Non-Banking Financial Companies (NBFC)",
+        "Housing Finance Companies",
+        "Asset Management",
+        "Insurance - Life",
+        "Insurance - General",
+        "Insurance - Health",
+        "Stock Exchanges",
+        "Brokers & Securities",
+        "Financial Conglomerates",
+        "Microfinance"
+      ]
+    },
+    {
+      "name": "Healthcare",
+      "industries": [
+        "Pharmaceuticals",
+        "Biotechnology",
+        "Medical Devices",
+        "Healthcare Providers",
+        "Hospitals",
+        "Diagnostics",
+        "Healthcare Equipment",
+        "Contract Research Organizations (CRO)"
+      ]
+    },
+    {
+      "name": "Industrials",
+      "industries": [
+        "Aerospace & Defense",
+        "Building Products",
+        "Construction & Engineering",
+        "Electrical Equipment",
+        "Industrial Conglomerates",
+        "Machinery",
+        "Trading Companies",
+        "Commercial Services",
+        "Airlines",
+        "Marine",
+        "Road & Rail",
+        "Transportation Infrastructure",
+        "Logistics"
+      ]
+    },
+    {
+      "name": "Real Estate",
+      "industries": [
+        "Real Estate Development",
+        "Real Estate Investment Trusts (REITs)",
+        "Real Estate Services"
+      ]
+    },
+    {
+      "name": "Technology",
+      "industries": [
+        "IT Services",
+        "Software - Application",
+        "Software - Infrastructure",
+        "Semiconductors",
+        "Electronics",
+        "Computer Hardware",
+        "IT Consulting",
+        "Fintech",
+        "Edtech"
+      ]
+    },
+    {
+      "name": "Communication Services",
+      "industries": [
+        "Telecom Services",
+        "Media",
+        "Entertainment",
+        "Broadcasting",
+        "Publishing",
+        "Internet Services"
+      ]
+    },
+    {
+      "name": "Utilities",
+      "industries": [
+        "Electric Utilities",
+        "Gas Utilities",
+        "Water Utilities",
+        "Renewable Utilities"
+      ]
+    }
+  ],
+
+  "EquityIndexSectors": {
+    "BroadMarket": [
+      "Nifty 50",
+      "Nifty Next 50",
+      "Nifty 100",
+      "Nifty 200",
+      "Nifty Total Market",
+      "Nifty 500",
+      "Nifty 500 Multicap 50:25:25",
+      "Nifty500 LargeMidSmall Equal-Cap Weighted"
+    ],
+    "LargeCap": [
+      "Nifty50 Shariah",
+      "Nifty100 Liquid 15",
+      "Nifty100 ESG",
+      "Nifty100 Enhanced ESG"
+    ],
+    "MidCap": [
+      "Nifty Midcap150",
+      "Nifty Midcap 50",
+      "Nifty Midcap Select",
+      "Nifty Midcap 100",
+      "Nifty MidSmallcap 400",
+      "Nifty MidSmallcap400 50:50",
+      "Nifty MidSmall Financial Services",
+      "Nifty MidSmall Healthcare",
+      "Nifty MidSmall IT & Telecom",
+      "Nifty MidSmall India Consumption"
+    ],
+    "SmallCap": [
+      "Nifty Smallcap 500",
+      "Nifty Smallcap 250",
+      "Nifty Smallcap 50",
+      "Nifty Smallcap 100",
+      "Nifty Microcap 250"
+    ],
+    "Sectoral": [
+      "Nifty Bank",
+      "Nifty Cement",
+      "Nifty Auto",
+      "Nifty Chemicals",
+      "Nifty Financial Services",
+      "Nifty Financial Services 25/50",
+      "Nifty Financial Services Ex-Bank",
+      "Nifty FMCG",
+      "Nifty Healthcare",
+      "Nifty IT",
+      "Nifty Media",
+      "Nifty Metal",
+      "Nifty Pharma",
+      "Nifty Private Bank",
+      "Nifty PSU Bank",
+      "Nifty Realty",
+      "Nifty REITs & Realty",
+      "Nifty Consumer Durables",
+      "Nifty Oil and Gas",
+      "Nifty Infrastructure",
+      "Nifty Services Sector",
+      "Nifty Transportation & Logistics"
+    ],
+    "Thematic": [
+      "Nifty Capital Markets",
+      "Nifty Conglomerate 50",
+      "Nifty Core Housing",
+      "Nifty CPSE",
+      "Nifty EV & New Age Automotive",
+      "Nifty Housing",
+      "Nifty India Consumption",
+      "Nifty India Defence",
+      "Nifty India Digital",
+      "Nifty India Infrastructure & Logistics",
+      "Nifty India Internet",
+      "Nifty India Manufacturing",
+      "Nifty India New Age Consumption",
+      "Nifty India Railways PSU",
+      "Nifty India Tourism",
+      "Nifty IPO",
+      "Nifty MNC",
+      "Nifty Mobility",
+      "Nifty PSE",
+      "Nifty REITs & InvITs",
+      "Nifty Rural",
+      "Nifty Non-Cyclical Consumer",
+      "Nifty Shariah 25",
+      "Nifty500 Shariah",
+      "Nifty500 Multicap India Manufacturing 50:30:20",
+      "Nifty500 Multicap Infrastructure 50:30:20",
+      "Nifty SME EMERGE",
+      "Nifty Waves",
+      "Nifty100 ESG Sector Leaders",
+      "India Vix"
+    ]
+  },
+
+  "amcs": [
+    "SBI Mutual Fund",
+    "ICICI Prudential Mutual Fund",
+    "HDFC Mutual Fund",
+    "Nippon India Mutual Fund",
+    "Aditya Birla Sun Life Mutual Fund",
+    "Kotak Mahindra Mutual Fund",
+    "Axis Mutual Fund",
+    "UTI Mutual Fund",
+    "DSP Mutual Fund",
+    "Franklin Templeton Mutual Fund",
+    "IDFC Mutual Fund",
+    "Invesco Mutual Fund",
+    "Mirae Asset Mutual Fund",
+    "Tata Mutual Fund",
+    "Sundaram Mutual Fund",
+    "PGIM India Mutual Fund",
+    "Edelweiss Mutual Fund",
+    "HSBC Mutual Fund",
+    "IDBI Mutual Fund",
+    "LIC Mutual Fund",
+    "Mahindra Manulife Mutual Fund",
+    "Motilal Oswal Mutual Fund",
+    "Navi Mutual Fund",
+    "PPFAS Mutual Fund",
+    "Quantum Mutual Fund",
+    "Quant Mutual Fund",
+    "Shriram Mutual Fund",
+    "Union Mutual Fund",
+    "WhiteOak Capital Mutual Fund",
+    "Zerodha Mutual Fund",
+    "Groww Mutual Fund",
+    "Bajaj Finserv Mutual Fund",
+    "Baroda BNP Paribas Mutual Fund",
+    "Bandhan Mutual Fund",
+    "BOI AXA Mutual Fund",
+    "Canara Robeco Mutual Fund",
+    "JM Financial Mutual Fund",
+    "ITI Mutual Fund",
+    "NJ Mutual Fund",
+    "Old Bridge Mutual Fund",
+    "360 ONE Mutual Fund",
+    "Samco Mutual Fund",
+    "Trust Mutual Fund"
+  ]
+}
