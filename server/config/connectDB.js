@@ -1,3 +1,7 @@
+if (process.env.NODE_ENV != "production") {
+  require("dotenv").config();
+}
+
 const mongoose = require("mongoose");
 const log = require("../utils/console_loggers/consoleLoggers");
 
