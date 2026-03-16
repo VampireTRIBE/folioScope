@@ -19,7 +19,11 @@ async function AssetClassificationSeeder() {
   for (const c of config.classes) {
     const cls = await AssetClassModel.findOneAndUpdate(
       { name: c.name },
-      { name: c.name },
+      {
+        name: c.name,
+        requiredFields: c.requiredFields || [],
+        forbiddenFields: c.forbiddenFields || [],
+      },
       { new: true, upsert: true },
     );
 

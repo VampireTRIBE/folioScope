@@ -11,6 +11,8 @@ const STOCK = {
   "Mid Cap": [...stockCategories],
   "Small Cap": [...stockCategories],
   "Micro Cap": [...stockCategories],
+  requiredFields: ["assetSector", "assetindustry"],
+  forbiddenFields: ["assetIndexName", "assetAMC"],
 };
 
 const MUTUAL_FUND = {
@@ -58,6 +60,8 @@ const MUTUAL_FUND = {
   ],
   "Solution Oriented": ["Retirement Fund", "Children's Fund"],
   Other: ["Index Fund", "FoF Domestic", "FoF Overseas"],
+  requiredFields: ["assetAMC"],
+  forbiddenFields: ["assetIndexName", "assetSector", "assetindustry"],
 };
 
 const INDEX = {
@@ -166,6 +170,8 @@ const INDEX = {
     "S&P 500",
     "NASDAQ 100",
   ],
+  requiredFields: ["assetIndexName"],
+  forbiddenFields: ["assetSector", "assetindustry", "assetAMC"],
 };
 
 const ETF = {
@@ -179,6 +185,8 @@ const ETF = {
   ],
   "Commodity ETF": ["Gold ETF", "Silver ETF"],
   "International ETF": ["NASDAQ 100", "S&P 500", "Hang Seng", "Nikkei 225"],
+  requiredFields: ["assetAMC"],
+  forbiddenFields: ["assetIndexName", "assetSector", "assetindustry"],
 };
 
 const BOND = {
@@ -208,6 +216,13 @@ const BOND = {
   Municipal: ["General Obligation", "Revenue Bond"],
   PSU: ["PSU Bonds (Tax-Free)", "PSU Bonds (Taxable)"],
   International: ["Masala Bonds", "Foreign Currency Bonds"],
+  requiredFields: [],
+  forbiddenFields: [
+    "assetAMC",
+    "assetIndexName",
+    "assetSector",
+    "assetindustry",
+  ],
 };
 
 const SECTORS = {
@@ -371,9 +386,8 @@ const financialData = {
   classes: [
     {
       name: "STOCK",
-      sectorRequired: true,
-      industryRequired: true,
-      amcRequired: false,
+      requiredFields: [...STOCK.requiredFields],
+      forbiddenFields: [...STOCK.forbiddenFields],
       categories: [
         { name: "Large Cap", subcategories: [...STOCK["Large Cap"]] },
         { name: "Mid Cap", subcategories: [...STOCK["Mid Cap"]] },
@@ -383,9 +397,8 @@ const financialData = {
     },
     {
       name: "MUTUAL FUND",
-      sectorRequired: false,
-      industryRequired: false,
-      amcRequired: true,
+      requiredFields: [...MUTUAL_FUND.requiredFields],
+      forbiddenFields: [...MUTUAL_FUND.forbiddenFields],
       categories: [
         { name: "Equity", subcategories: [...MUTUAL_FUND.Equity] },
         { name: "Debt", subcategories: [...MUTUAL_FUND.Debt] },
@@ -399,9 +412,8 @@ const financialData = {
     },
     {
       name: "ETF",
-      sectorRequired: false,
-      industryRequired: false,
-      amcRequired: true,
+      requiredFields: [...ETF.requiredFields],
+      forbiddenFields: [...ETF.forbiddenFields],
       categories: [
         {
           name: "Equity ETF",
@@ -420,15 +432,20 @@ const financialData = {
           name: "International ETF",
           subcategories: [...ETF["International ETF"]],
         },
-        { name: "Sectoral ETF", subcategories: [...INDEX["Equity Index"].Sectoral] },
-        { name: "Thematic ETF", subcategories: [...INDEX["Equity Index"].Thematic] },
+        {
+          name: "Sectoral ETF",
+          subcategories: [...INDEX["Equity Index"].Sectoral],
+        },
+        {
+          name: "Thematic ETF",
+          subcategories: [...INDEX["Equity Index"].Thematic],
+        },
       ],
     },
     {
       name: "BOND",
-      sectorRequired: false,
-      industryRequired: false,
-      amcRequired: false,
+      requiredFields: [...BOND.requiredFields],
+      forbiddenFields: [...BOND.forbiddenFields],
       categories: [
         { name: "Government", subcategories: [...BOND.Government] },
         { name: "Corporate", subcategories: [...BOND.Corporate] },
@@ -439,14 +456,20 @@ const financialData = {
     },
     {
       name: "INDEX",
-      sectorRequired: false,
-      industryRequired: false,
-      amcRequired: false,
+      requiredFields: [...INDEX.requiredFields],
+      forbiddenFields: [...INDEX.forbiddenFields],
       categories: [
-        { 
-          name: "Equity Index", 
-          subcategories: ["BroadMarket", "LargeCap", "MidCap", "SmallCap", "Sectoral", "Thematic"],
-          indexNames: INDEX["Equity Index"]
+        {
+          name: "Equity Index",
+          subcategories: [
+            "BroadMarket",
+            "LargeCap",
+            "MidCap",
+            "SmallCap",
+            "Sectoral",
+            "Thematic",
+          ],
+          indexNames: INDEX["Equity Index"],
         },
         { name: "Bond Index", subcategories: [...INDEX["Bond Index"]] },
         {
