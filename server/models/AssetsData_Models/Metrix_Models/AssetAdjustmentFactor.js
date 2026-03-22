@@ -6,7 +6,7 @@ const Schema = mongoose.Schema;
 // 2. Automatic
 // ==========================================
 
-const AdjustmentFactorSchema = new Schema(
+const AssetAdjustmentFactorSchema = new Schema(
   {
     assetId: {
       type: Schema.Types.ObjectId,
@@ -20,6 +20,12 @@ const AdjustmentFactorSchema = new Schema(
   { timestamps: true },
 );
 
-AdjustmentFactorSchema.index({ assetId: 1, actiondate: 1 }, { unique: true });
+AssetAdjustmentFactorSchema.index(
+  { assetId: 1, actiondate: 1 },
+  { unique: true },
+);
 
-module.exports = mongoose.model("AdjustmentFactor", AdjustmentFactorSchema);
+module.exports = mongoose.model(
+  "AssetAdjustmentFactor",
+  AssetAdjustmentFactorSchema,
+);

@@ -9,6 +9,7 @@ const passportAuth = require("./middlewares/authentication");
 const sessionConfig = require("./middlewares/seasson");
 const dataParser = require("./middlewares/dataParser");
 const log = require("./utils/console_loggers/consoleLoggers");
+const { initCacheMaster } = require("./middlewares/initCache");
 const app = express();
 let port = 3000;
 
@@ -18,11 +19,31 @@ sessionConfig(app);
 passportAuth(app);
 dataParser.bodyParser(app);
 // !import routes
+
 const userRoute = require("./routes/userRoutes/userRoute");
 
 // ! for listning all requests
-app.listen(port, async () => {
+app.listen(port, async (req, res) => {
   log.running(`SERVER PORT : ${port}`);
+});
+
+// ! init Cache
+async function initCache() {
+  const {result} = await initCacheMaster();
+  result
+    ? log.success("Init Cache SuccessFull")
+    : log.error("Init Cache Failed");
+}
+initCache();
+
+const {
+  seedAssetMetadata,
+} = require("./config/Database/data_Seeders/AssetMetaDataSeeder");
+app.use("/test", async (req, res) => {
+  const doc1 = await seedAssetMetadata();
+  res.status(200).json({
+    success: "successful",
+  });
 });
 
 // ! Diffrent Routes

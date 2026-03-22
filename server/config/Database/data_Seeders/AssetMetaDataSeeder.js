@@ -1,22 +1,13 @@
-const mongoose = require("mongoose");
-const AssetMetaData = require("./path/to/models/AssetMetaData");
-const AssetClass = require("./path/to/models/AssetClass");
-const AssetCategory = require("./path/to/models/AssetCategory");
-const AssetSubCategory = require("./path/to/models/AssetSubCategory");
-const AssetIndexName = require("./path/to/models/AssetIndexName");
-const AssetSector = require("./path/to/models/AssetSector");
-const AssetIndustry = require("./path/to/models/AssetIndustry");
-const AssetAMC = require("./path/to/models/AssetAMC");
+const log = require("../../../utils/console_loggers/consoleLoggers");
+const AssetMetaDataModel = require("../../../models/AssetsData_Models/Central_Models/AssetsMetaData");
+const assetMetadata = require("../rawdata/AssetMetadata");
+const {
+  validateAssetMetaData,
+} = require("../../../utils/validations/DataInsertion_Validations/assetMetaDataModel");
 
-// Import the exported data
-const assetMetadata = require("./AssetMetadata");
-
-async function seedAssetMetadata() {
+module.exports.seedAssetMetadata = async () => {
   try {
-    await mongoose.connect(
-      process.env.MONGODB_URI || "mongodb://localhost:27017/your-db-name",
-    );
-    console.log("Connected to MongoDB");
+    log.running("Asset Metadata Seeding Start...");
 
     const results = {
       success: [],
@@ -26,187 +17,62 @@ async function seedAssetMetadata() {
 
     for (let i = 0; i < assetMetadata.length; i++) {
       const record = assetMetadata[i];
-      const recordNum = i + 1;
+      const { result, message, statusCode, data } =
+        await validateAssetMetaData(record,"name");
+
+      if (!result) {
+        results.skipped.push({
+          recordIndex: i + 1,
+          recordData: record,
+          message,
+          statusCode,
+        });
+        continue;
+      }
 
       try {
-        // Validate required fields
-        if (
-          !record.isin ||
-          !record.name ||
-          !record.currency ||
-          !record.assetClass ||
-          !record.assetCategory ||
-          !record.assetSubCategory
-        ) {
-          results.skipped.push({
-            record: recordNum,
-            data: record,
-            reason:
-              "Missing required fields (isin, name, currency, assetClass, assetCategory, or assetSubCategory)",
-          });
-          continue;
-        }
-
-        // Find ObjectIds by name
-        const assetClass = await AssetClass.findOne({
-          name: record.assetClass,
-        });
-        if (!assetClass) {
-          results.failed.push({
-            record: recordNum,
-            data: record,
-            error: `AssetClass "${record.assetClass}" not found`,
-          });
-          continue;
-        }
-
-        const assetCategory = await AssetCategory.findOne({
-          name: record.assetCategory,
-        });
-        if (!assetCategory) {
-          results.failed.push({
-            record: recordNum,
-            data: record,
-            error: `AssetCategory "${record.assetCategory}" not found`,
-          });
-          continue;
-        }
-
-        const assetSubCategory = await AssetSubCategory.findOne({
-          name: record.assetSubCategory,
-        });
-        if (!assetSubCategory) {
-          results.failed.push({
-            record: recordNum,
-            data: record,
-            error: `AssetSubCategory "${record.assetSubCategory}" not found`,
-          });
-          continue;
-        }
-
-        // Build document with ObjectIds
-        const doc = {
-          isin: record.isin,
-          tickerCode: {
-            nse: record.tickerCode.nse || undefined,
-            bse: record.tickerCode.bse || undefined,
-          },
-          name: record.name,
-          overview: record.overview || undefined,
-          currency: record.currency,
-          assetClass: assetClass._id,
-          assetCategory: assetCategory._id,
-          assetSubCategory: assetSubCategory._id,
-        };
-
-        // Handle optional fields with ObjectId lookups
-        if (record.assetIndexName) {
-          const assetIndexName = await AssetIndexName.findOne({
-            name: record.assetIndexName,
-          });
-          if (!assetIndexName) {
-            results.failed.push({
-              record: recordNum,
-              data: record,
-              error: `AssetIndexName "${record.assetIndexName}" not found`,
-            });
-            continue;
-          }
-          doc.assetIndexName = assetIndexName._id;
-        }
-
-        if (record.assetSector) {
-          const assetSector = await AssetSector.findOne({
-            name: record.assetSector,
-          });
-          if (!assetSector) {
-            results.failed.push({
-              record: recordNum,
-              data: record,
-              error: `AssetSector "${record.assetSector}" not found`,
-            });
-            continue;
-          }
-          doc.assetSector = assetSector._id;
-        }
-
-        if (record.assetIndustry) {
-          const assetIndustry = await AssetIndustry.findOne({
-            name: record.assetIndustry,
-          });
-          if (!assetIndustry) {
-            results.failed.push({
-              record: recordNum,
-              data: record,
-              error: `AssetIndustry "${record.assetIndustry}" not found`,
-            });
-            continue;
-          }
-          doc.assetIndustry = assetIndustry._id;
-        }
-
-        if (record.assetAMC) {
-          const assetAMC = await AssetAMC.findOne({ name: record.assetAMC });
-          if (!assetAMC) {
-            results.failed.push({
-              record: recordNum,
-              data: record,
-              error: `AssetAMC "${record.assetAMC}" not found`,
-            });
-            continue;
-          }
-          doc.assetAMC = assetAMC._id;
-        }
-
-        // Insert into database
-        const created = await AssetMetaData.create(doc);
+        const created = await AssetMetaDataModel.create(data);
         results.success.push({
-          record: recordNum,
+          recordIndex: i + 1,
           isin: created.isin,
           name: created.name,
           id: created._id,
+          message,
+          statusCode,
         });
 
-        console.log(`✓ Record ${recordNum}: ${created.name} (${created.isin})`);
+        log.done(`✓ Record ${i + 1}: ${created.name} (${created.isin})`);
       } catch (error) {
         results.failed.push({
-          record: recordNum,
-          data: record,
-          error: error.message,
+          recordIndex: i + 1,
+          recordData: record,
+          message: error.message || "Database Error",
+          statusCode: 500,
         });
-        console.error(`✗ Record ${recordNum}: ${error.message}`);
+        log.error(`✗ Record ${i + 1}: ${error.message}`);
       }
     }
 
-    // Summary
-    console.log("\n========== SEEDING SUMMARY ==========");
-    console.log(`Total records: ${assetMetadata.length}`);
-    console.log(`Successfully inserted: ${results.success.length}`);
-    console.log(`Failed: ${results.failed.length}`);
-    console.log(`Skipped: ${results.skipped.length}`);
+    log.info("\n========== SEEDING SUMMARY ==========");
+    log.info(`Total records: ${assetMetadata.length}`);
+    log.info(`Successfully inserted: ${results.success.length}`);
+    log.info(`Failed: ${results.failed.length}`);
+    log.info(`Skipped: ${results.skipped.length}`);
 
     if (results.failed.length > 0) {
-      console.log("\nFailed records:");
+      log.info("\nFailed records:");
       results.failed.forEach((f) => {
-        console.log(`  Record ${f.record}: ${f.error}`);
+        log.info(`  Record ${f.recordData}: ${f.message}`);
       });
     }
 
     if (results.skipped.length > 0) {
-      console.log("\nSkipped records:");
+      log.info("\nSkipped records:");
       results.skipped.forEach((s) => {
-        console.log(`  Record ${s.record}: ${s.reason}`);
+        log.info(`  Record ${s.recordData}: ${s.message}`);
       });
     }
-
-    await mongoose.disconnect();
-    console.log("\nDisconnected from MongoDB");
   } catch (error) {
-    console.error("Seeding failed:", error);
-    await mongoose.disconnect();
-    process.exit(1);
+    log.error("Seeding failed:", error);
   }
-}
-
-// Run seeder
-seedAssetMetadata();
+};

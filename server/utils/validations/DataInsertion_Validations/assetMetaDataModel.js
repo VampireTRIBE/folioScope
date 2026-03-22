@@ -1,150 +1,225 @@
-const customError = require("../../errorClass/customError");
-
-const { getCachedId } = require("../../cache/assetHierarchyCache");
+const classificationCache = require("../../cache/assetClassificationCache");
 
 module.exports.validateAssetMetaData = async (
   data = null,
   dataType = "id",
-  validateOnly = false
+  validateOnly = false,
 ) => {
-  try {
-    if (
-      !data ||
-      !data.name ||
-      !data.currency ||
-      !data.assetClass ||
-      !data.assetCategory ||
-      !data.assetSubCategory
-    ) {
-      throw new customError("Insufficient Data", 422);
-    }
+  const isId = dataType === "id";
 
-    const AssetClassModel = require("../../../models/AssetsData_Models/Classification_Models/AssetClass");
-    const AssetCategoryModel = require("../../../models/AssetsData_Models/Classification_Models/AssetCategory");
-    const AssetSubCategoryModel = require("../../../models/AssetsData_Models/Classification_Models/AssetSubcategory");
-    const AssetIndexNameModel = require("../../../models/AssetsData_Models/Classification_Models/AssetIndexName");
-    const AssetSectorModel = require("../../../models/AssetsData_Models/Classification_Models/AssetSector");
-    const AssetIndustryModel = require("../../../models/AssetsData_Models/Classification_Models/AssetIndustry");
-    const AssetAMCModel = require("../../../models/AssetsData_Models/Classification_Models/AssetAMC");
+  const baseFields = [
+    "name",
+    "currency",
+    "assetClass",
+    "assetCategory",
+    "assetSubCategory",
+  ];
 
-    let document = { ...data };
+  const ASSET_CLASSIFICATION = isId
+    ? classificationCache.getAssetClassificationStructureID()
+    : classificationCache.getAssetClassificationStructureName();
 
-    let assetClassID = data.assetClass;
-    let assetCategoryID = data.assetCategory;
-    let assetSubCategoryID = data.assetSubCategory;
+  const SECTOR_CLASSIFICATION = isId
+    ? classificationCache.getSectorClasificationStructureID()
+    : classificationCache.getSectorClassificationStructureName();
 
-    if (dataType !== "id") {
-      assetClassID = await getCachedId(AssetClassModel, data.assetClass);
+  const AMC_CLASSIFICATION = isId
+    ? classificationCache.getAMCClasificationStructureID()
+    : classificationCache.getAMCClassificationStructureName();
 
-      if (!assetClassID) throw new customError("AssetClass Not Found", 404);
+  // -------------------- BASIC VALIDATION --------------------
 
-      assetCategoryID = await getCachedId(
-        AssetCategoryModel,
-        data.assetCategory,
-        assetClassID,
-        "assetClass"
-      );
-
-      if (!assetCategoryID)
-        throw new customError("AssetCategory Not Found", 404);
-
-      assetSubCategoryID = await getCachedId(
-        AssetSubCategoryModel,
-        data.assetSubCategory,
-        assetCategoryID,
-        "assetCategory"
-      );
-
-      if (!assetSubCategoryID)
-        throw new customError("AssetSubCategory Not Found", 404);
-    }
-
-    document.assetClass = assetClassID;
-    document.assetCategory = assetCategoryID;
-    document.assetSubCategory = assetSubCategoryID;
-
-    // STOCK
-    if (
-      data.assetClass === "STOCK" &&
-      data.assetSector &&
-      data.assetIndustry &&
-      !data.assetIndexName &&
-      !data.assetAMC
-    ) {
-      const assetSectorID = await getCachedId(
-        AssetSectorModel,
-        data.assetSector
-      );
-
-      const assetIndustryID = await getCachedId(
-        AssetIndustryModel,
-        data.assetIndustry,
-        assetSectorID,
-        "assetSector"
-      );
-
-      if (!assetSectorID || !assetIndustryID)
-        throw new customError("Invalid Sector/Industry", 404);
-
-      document.assetSector = assetSectorID;
-      document.assetIndustry = assetIndustryID;
-
-      return validateOnly === false ? document : true;
-    }
-
-    // MUTUAL FUND / ETF
-    if (
-      (data.assetClass === "MUTUAL FUND" || data.assetClass === "ETF") &&
-      !data.assetSector &&
-      !data.assetIndustry &&
-      !data.assetIndexName &&
-      data.assetAMC
-    ) {
-      const assetAMCID = await getCachedId(AssetAMCModel, data.assetAMC);
-
-      if (!assetAMCID) throw new customError("AMC Not Found", 404);
-
-      document.assetAMC = assetAMCID;
-
-      return validateOnly === false ? document : true;
-    }
-
-    // INDEX
-    if (
-      data.assetClass === "INDEX" &&
-      !data.assetSector &&
-      !data.assetIndustry &&
-      data.assetIndexName &&
-      !data.assetAMC
-    ) {
-      const assetIndexNameID = await getCachedId(
-        AssetIndexNameModel,
-        data.assetIndexName,
-        assetSubCategoryID,
-        "assetSubCategory"
-      );
-
-      if (!assetIndexNameID)
-        throw new customError("IndexName Not Found", 404);
-
-      document.assetIndexName = assetIndexNameID;
-
-      return validateOnly === false ? document : true;
-    }
-
-    // BOND
-    if (
-      data.assetClass === "BOND" &&
-      !data.assetSector &&
-      !data.assetIndustry &&
-      !data.assetIndexName &&
-      !data.assetAMC
-    ) {
-      return validateOnly === false ? document : true;
-    }
-
-    throw new customError("Invalid Insert", 400);
-  } catch (error) {
-    throw new customError(error.message, error.statuscode || 500);
+  if (!data) {
+    return { result: false, message: "Insufficient Data", statusCode: 422 };
   }
+
+  for (const field of baseFields) {
+    if (!(field in data) || data[field] == null) {
+      return { result: false, message: "Insufficient Data", statusCode: 422 };
+    }
+  }
+
+  // -------------------- HIERARCHY EXTRACTION --------------------
+  const assetClassObj = ASSET_CLASSIFICATION[data.assetClass];
+  if (!assetClassObj) {
+    return { result: false, message: "Invalid AssetClass", statusCode: 422 };
+  }
+
+  const categoryObj = assetClassObj.category?.[data.assetCategory];
+  if (!categoryObj) {
+    return {
+      result: false,
+      message: "Invalid Asset Category",
+      statusCode: 422,
+    };
+  }
+
+  const subCategoryObj = categoryObj.subcategory?.[data.assetSubCategory];
+  if (!subCategoryObj) {
+    return {
+      result: false,
+      message: "Invalid Asset SubCategory",
+      statusCode: 422,
+    };
+  }
+
+  const requiredFields = assetClassObj.requiredFields || [];
+  const forbiddenFields = assetClassObj.forbiddenFields || [];
+
+  // -------------------- REQUIRED FIELDS --------------------
+
+  for (const field of requiredFields) {
+    if (!(field in data) || data[field] == null) {
+      return {
+        result: false,
+        message: `Missing ${field} Field for ${data.assetClass}`,
+        statusCode: 422,
+      };
+    }
+  }
+
+  // -------------------- INDEX VALIDATION --------------------
+
+  const indexMap = subCategoryObj.indexName || {};
+  const hasIndex = Object.keys(indexMap).length > 0;
+  const indexObj = data.assetIndexName ? indexMap[data.assetIndexName] : null;
+
+  if (hasIndex) {
+    if (!data.assetIndexName) {
+      if (requiredFields.includes("assetIndexName")) {
+        return {
+          result: false,
+          message: "Missing assetIndexName",
+          statusCode: 422,
+        };
+      }
+    } else if (!indexObj) {
+      return {
+        result: false,
+        message: "Invalid Index Name",
+        statusCode: 422,
+      };
+    }
+  } else {
+    if (data.assetIndexName != null) {
+      return {
+        result: false,
+        message: "assetIndexName not allowed for this subcategory",
+        statusCode: 422,
+      };
+    }
+  }
+
+  // -------------------- SECTOR VALIDATION --------------------
+
+  let sectorObj = null;
+  let industryObj = null;
+
+  if (requiredFields.includes("assetSector")) {
+    if (
+      !("assetSector" in data) ||
+      data.assetSector == null ||
+      !("assetIndustry" in data) ||
+      data.assetIndustry == null
+    ) {
+      return {
+        result: false,
+        message: "Missing Sector or Industry",
+        statusCode: 422,
+      };
+    }
+
+    sectorObj = SECTOR_CLASSIFICATION[data.assetSector];
+    industryObj = sectorObj?.industry?.[data.assetIndustry];
+
+    if (!sectorObj || !industryObj) {
+      return {
+        result: false,
+        message: "Invalid Sector Hierarchy",
+        statusCode: 422,
+      };
+    }
+  }
+
+  // -------------------- AMC VALIDATION --------------------
+
+  let amcObj = null;
+
+  if (requiredFields.includes("assetAMC")) {
+    if (!("assetAMC" in data) || data.assetAMC == null) {
+      return {
+        result: false,
+        message: "Missing assetAMC",
+        statusCode: 422,
+      };
+    }
+
+    amcObj = AMC_CLASSIFICATION[data.assetAMC];
+
+    if (!amcObj) {
+      return {
+        result: false,
+        message: "Invalid AMC NAME",
+        statusCode: 422,
+      };
+    }
+  }
+
+  // -------------------- FORBIDDEN FIELDS --------------------
+
+  for (const field of forbiddenFields) {
+    if (field in data && data[field] != null) {
+      return {
+        result: false,
+        message: `Forbidden ${field} Field for ${data.assetClass}`,
+        statusCode: 422,
+      };
+    }
+  }
+
+  // -------------------- BUILD FINAL DOC (ONLY IDS) --------------------
+
+  const doc = {
+    isin: data.isin || null,
+    tickerCode: {
+      nse: data.tickerCode?.nse ?? null,
+      bse: data.tickerCode?.bse ?? null,
+    },
+    name: data.name,
+    overview: data.overview || null,
+    currency: data.currency,
+
+    assetClass: isId ? data.assetClass : assetClassObj._id,
+    assetCategory: isId ? data.assetCategory : categoryObj._id,
+    assetSubCategory: isId ? data.assetSubCategory : subCategoryObj._id,
+  };
+
+  // indexName
+  if (hasIndex && data.assetIndexName) {
+    doc.assetIndexName = isId ? data.assetIndexName : indexObj._id;
+  }
+
+  // sector + industry
+  if (requiredFields.includes("assetSector")) {
+    doc.assetSector = isId ? data.assetSector : sectorObj._id;
+    doc.assetIndustry = isId ? data.assetIndustry : industryObj._id;
+  }
+
+  // AMC
+  if (requiredFields.includes("assetAMC")) {
+    doc.assetAMC = isId ? data.assetAMC : amcObj._id;
+  }
+
+  return validateOnly === false
+    ? {
+        result: true,
+        message: "Validation Complete",
+        statusCode: 200,
+        data: doc,
+      }
+    : {
+        result: true,
+        message: "Validation Complete",
+        statusCode: 200,
+      };
 };

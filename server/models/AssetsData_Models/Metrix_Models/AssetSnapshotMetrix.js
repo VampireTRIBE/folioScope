@@ -7,18 +7,15 @@ const Schema = mongoose.Schema;
 // ==========================================
 const AssetMetrixSnapshotSchema = new Schema(
   {
-    assetId: {
-      type: Schema.Types.ObjectId,
-      ref: "AssetsMetaData",
-      required: true,
-      index: true,
-    },
-    date: { type: Date, required: true, default: Date.now, index: true },
+    assetId: { type: ObjectId, ref: "AssetsMetaData", required: true },
+    date: { type: Date, required: true },
     rawClose: { type: Number, required: true, min: 0 },
-    eps: { type: Number, required: true, min: 0 },
-    bookValuePerShare: { type: Number, min: 0 },
-    dividendPerShare: { type: Number, min: 0 },
-    sharesOutstanding: { type: Number, min: 0, max: 100 },
+    adjustedClose: { type: Number, required: true, min: 0 },
+    fundamentalMatrixId: { type: ObjectId, ref: "AssetFundamentalMetrix" },
+    pe: { type: Number },
+    pb: { type: Number },
+    dividendYield: { type: Number },
+    marketCap: { type: Number },
     expenseRatio: { type: Number, default: 0 },
   },
   { timestamps: true },

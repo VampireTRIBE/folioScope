@@ -9,11 +9,13 @@ const AssetMetaDataSchema = new Schema(
   {
     isin: {
       type: String,
-      required: true,
       uppercase: true,
       trim: true,
       validate: {
-        validator: validateISIN,
+        validator: function (v) {
+          if (!v) return true;
+          return validateISIN(v);
+        },
         message: "Invalid ISIN",
       },
     },
@@ -84,13 +86,31 @@ const AssetMetaDataSchema = new Schema(
 );
 
 AssetMetaDataSchema.index(
-  { "tickerCode.nse": 1 },
-  { unique: true, sparse: true },
+  { isin: 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      isin: { $type: "string" },
+    },
+  },
 );
-AssetMetaDataSchema.index({ isin: 1 }, { unique: true, sparse: true });
+AssetMetaDataSchema.index(
+  { "tickerCode.nse": 1 },
+  {
+    unique: true,
+    partialFilterExpression: {
+      "tickerCode.nse": { $type: "string" },
+    },
+  },
+);
 AssetMetaDataSchema.index(
   { "tickerCode.bse": 1 },
-  { unique: true, sparse: true },
+  {
+    unique: true,
+    partialFilterExpression: {
+      "tickerCode.bse": { $type: "string" },
+    },
+  },
 );
 
 AssetMetaDataSchema.index({ assetClass: 1 });
@@ -103,7 +123,7 @@ AssetMetaDataSchema.index({ assetAMC: 1 });
 
 AssetMetaDataSchema.pre("validate", async function (next) {
   try {
-    await validateAssetMetaData(this, true);
+    await validateAssetMetaData(this, "id", true);
     next();
   } catch (err) {
     next(err);

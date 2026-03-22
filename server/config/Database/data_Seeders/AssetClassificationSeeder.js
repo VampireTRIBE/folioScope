@@ -15,7 +15,6 @@ async function AssetClassificationSeeder() {
   await DB_connect();
   log.running("Asset Classification Seeding Start...");
 
-  log.running("AssetClass Seeding Start...");
   for (const c of config.classes) {
     const cls = await AssetClassModel.findOneAndUpdate(
       { name: c.name },

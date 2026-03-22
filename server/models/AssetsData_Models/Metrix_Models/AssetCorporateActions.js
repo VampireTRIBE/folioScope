@@ -6,7 +6,7 @@ const Schema = mongoose.Schema;
 // 2. Modification Only Done by Admin
 // ==========================================
 
-const CorporateActionSchema = new Schema(
+const AssetCorporateActionSchema = new Schema(
   {
     assetId: {
       type: Schema.Types.ObjectId,
@@ -29,6 +29,6 @@ const CorporateActionSchema = new Schema(
   { timestamps: true },
 );
 
-CorporateActionSchema.index({ assetId: 1, exDate: 1 });
+AssetCorporateActionSchema.index({ assetId: 1, exDate: 1 });
 
-module.exports = mongoose.model("CorporateAction", CorporateActionSchema);
+module.exports = mongoose.model("AssetCorporateAction", AssetCorporateActionSchema);
