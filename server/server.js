@@ -18,9 +18,10 @@ DB_connect();
 sessionConfig(app);
 passportAuth(app);
 dataParser.bodyParser(app);
-// !import routes
 
+// !import routes
 const userRoute = require("./routes/userRoutes/userRoute");
+const adminRoute = require("./routes/adminRoutes/adminRoutes");
 
 // ! for listning all requests
 app.listen(port, async (req, res) => {
@@ -29,10 +30,10 @@ app.listen(port, async (req, res) => {
 
 // ! init Cache
 async function initCache() {
-  const {result} = await initCacheMaster();
+  const { result } = await initCacheMaster();
   result
-    ? log.success("Init Cache SuccessFull")
-    : log.error("Init Cache Failed");
+    ? log.success("INIT CACHE SUCCESSFUL...")
+    : log.error("INIT CACHE FAILED...");
 }
 initCache();
 
@@ -49,6 +50,9 @@ app.use("/test", async (req, res) => {
 // ! Diffrent Routes
 
 app.use("/", userRoute);
+
+// ! Admin Routes
+app.use("/admin/dataseeders", adminRoute);
 
 // ! error handling middleware
 app.use((err, req, res, next) => {
