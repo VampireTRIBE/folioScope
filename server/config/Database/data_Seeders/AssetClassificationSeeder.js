@@ -14,14 +14,14 @@ const customError = require("../../../utils/errorClass/customError");
 
 module.exports.AssetClassificationSeeder = async () => {
   try {
-    log.running("Fetching Classification From Google Sheets");
+    log.running("FETCHING CLASSIFICATION FROM GOOGLE SHEETS...");
     const res = await callAppsScript(
       process.env.APPSCRIPT_SEEDER_URL,
       process.env.APPSCRIPT_SEEDER_API_KEY,
       "getClassification",
     );
-    log.success("Fetching Classification From Google Sheets Success");
-    log.running("Asset Classification Seeding Start...");
+    log.success("FETCHING CLASSIFICATION FROM GOOGLE SHEETS SUCCESS...");
+    log.running("ASSET CLASSIFICATION SEEDING STARTED...");
     for (const c of res.classes) {
       const cls = await AssetClassModel.findOneAndUpdate(
         { name: c.name },
@@ -47,7 +47,6 @@ module.exports.AssetClassificationSeeder = async () => {
             { new: true, upsert: true },
           );
 
-          // Special handling for INDEX > Equity Index
           if (
             c.name === "INDEX" &&
             cat.name === "Equity Index" &&
@@ -67,9 +66,9 @@ module.exports.AssetClassificationSeeder = async () => {
         }
       }
     }
-    log.success("AssetClass Seeding End...");
+    log.success("ASSET CLASSIFICATION SEEDING SUCESSFUL...");
 
-    log.running("Sectors Seeding Start...");
+    log.running("ASSET SECTOR SEEDING STARTED...");
     for (const s of res.sectors) {
       const sector = await AssetSectorModel.findOneAndUpdate(
         { name: s.name },
@@ -85,9 +84,9 @@ module.exports.AssetClassificationSeeder = async () => {
         );
       }
     }
-    log.success("Sectors Seeding End...");
+    log.success("ASSET SECTOR SEEDING ENDED SUCESSFUL...");
 
-    log.running("AMC Seeding Start...");
+    log.running("ASSET AMC SEEDING STARTED...");
     for (const name of res.amcs) {
       await AssetAMCModel.findOneAndUpdate(
         { name },
@@ -95,9 +94,9 @@ module.exports.AssetClassificationSeeder = async () => {
         { new: true, upsert: true },
       );
     }
-    log.success("AMC Seeding End...");
-    log.success("All Seeders Finished.");
+    log.success("ASSET AMC SEEDING ENDED SUCESSFUL...");
+    log.success("ASSET CLASSIFICATION SEEDING SUCESSFUL...");
   } catch (error) {
-    throw new customError(error.message, 500);
+    throw new customError("ASSET CLASSIFICATION SEEDING FIALDED...", 500);
   }
 };

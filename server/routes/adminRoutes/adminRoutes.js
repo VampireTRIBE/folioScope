@@ -4,7 +4,8 @@ const router = express.Router();
 
 // routes
 
-router.route("/classification").post(adminControllers.updateClassification);
-router.route("/assetmetadata").post(adminControllers.updateAssetMetaData);
+router.route("/seedclassification").post(adminControllers.updateClassification);
+router.route("/seedassetmetadata").post(adminControllers.updateAssetMetaData);
+router.route("/seedpricehistory").post(adminControllers.insertPriceHistory);
 
 module.exports = router;

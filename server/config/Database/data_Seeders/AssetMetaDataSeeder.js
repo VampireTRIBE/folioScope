@@ -6,18 +6,19 @@ const {
 const {
   validateAssetMetaData,
 } = require("../../../utils/validations/DataInsertion_Validations/assetMetaDataModel");
+const customError = require("../../../utils/errorClass/customError");
 
 module.exports.seedAssetMetadata = async () => {
   try {
-    log.running("Fetching Classification From Google Sheets");
+    log.running("FETCHING ASSETMETADATA FROM GOOGLE SHEETS STARTED...");
     const res = await callAppsScript(
       process.env.APPSCRIPT_SEEDER_URL,
       process.env.APPSCRIPT_SEEDER_API_KEY,
       "getAssetMetaData",
     );
-    log.success("Fetching Classification From Google Sheets Success");
+    log.success("FETCHING ASSETMETADATA FROM GOOGLE SHEETS SUCCESS...");
 
-    log.running("Asset Metadata Seeding Start...");
+    log.running("ASSETMETADATA SEEDING STARTED...");
     const results = {
       success: [],
       failed: [],
@@ -52,7 +53,7 @@ module.exports.seedAssetMetadata = async () => {
           statusCode,
         });
 
-        log.done(`✓ Record ${i + 1}: ${created.name} (${created.isin})`);
+        log.done(`✓ RECORD ${i + 1}: ${created.name} (${created.isin})`);
       } catch (error) {
         results.failed.push({
           recordIndex: i + 1,
@@ -60,30 +61,26 @@ module.exports.seedAssetMetadata = async () => {
           message: error.message || "Database Error",
           statusCode: 500,
         });
-        log.error(`✗ Record ${i + 1}: ${error.message}`);
+        log.error(`✗ RECORD ${i + 1}: ${error.message}`);
       }
     }
 
-    log.info("\n========== SEEDING SUMMARY ==========");
-    log.info(`Total records: ${res.length}`);
-    log.info(`Successfully inserted: ${results.success.length}`);
-    log.info(`Failed: ${results.failed.length}`);
-    log.info(`Skipped: ${results.skipped.length}`);
+    log.info("========== SEEDING SUMMARY ==========");
+    log.info(`TOTAL RECORDS : ${res.length}`);
+    log.info(`SUCCESSFULL RECORDS : ${results.success.length}`);
+    log.info(`FAILED RECORDS : ${results.failed.length}`);
+    log.info(`SKIPPED RECORDS : ${results.skipped.length}`);
 
-    if (results.failed.length > 0) {
-      log.info("\nFailed records:");
-      results.failed.forEach((f) => {
-        log.info(`  Record ${f.recordData}: ${f.message}`);
-      });
-    }
-
-    if (results.skipped.length > 0) {
-      log.info("\nSkipped records:");
-      results.skipped.forEach((s) => {
-        log.info(`  Record ${s.recordData}: ${s.message}`);
-      });
-    }
+    return {
+      results,
+      summary: {
+        totalRecords: res.length,
+        successfullRecords: results.success.length,
+        failedRecords: results.failed.length,
+        skippedRecords: results.skipped.length,
+      },
+    };
   } catch (error) {
-    log.error("Seeding failed:", error);
+    throw new customError(error.message, 404);
   }
 };

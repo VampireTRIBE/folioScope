@@ -37,13 +37,10 @@ async function initCache() {
 }
 initCache();
 
-const {
-  seedAssetMetadata,
-} = require("./config/Database/data_Seeders/AssetMetaDataSeeder");
 app.use("/test", async (req, res) => {
-  const doc1 = await seedAssetMetadata();
   res.status(200).json({
     success: "successful",
+    doc1,
   });
 });
 

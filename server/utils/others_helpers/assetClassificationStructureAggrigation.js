@@ -69,6 +69,17 @@ module.exports.assetAMCClassificationStructureID = async (result) => {
   );
 };
 
+module.exports.assetMetaDataID = async (result) => {
+  return Object.fromEntries(
+    result.map((cls) => [
+      cls._id,
+      {
+        ...cls,
+      },
+    ]),
+  );
+};
+
 module.exports.assetClassClassificationStructureName = async (result) => {
   return Object.fromEntries(
     result.map((cls) => [
@@ -135,6 +146,17 @@ module.exports.assetAMCClassificationStructureName = async (result) => {
       {
         _id: cls._id,
         name: cls.name,
+      },
+    ]),
+  );
+};
+
+module.exports.assetMetaDataName = async (result) => {
+  return Object.fromEntries(
+    result.map((cls) => [
+      cls.name,
+      {
+        ...cls,
       },
     ]),
   );
