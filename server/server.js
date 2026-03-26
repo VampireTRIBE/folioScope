@@ -22,6 +22,10 @@ dataParser.bodyParser(app);
 // !import routes
 const userRoute = require("./routes/userRoutes/userRoute");
 const adminRoute = require("./routes/adminRoutes/adminRoutes");
+const {
+  getAssetMetadatalist,
+  getAssetMetaDataID,
+} = require("./utils/cache/assetMetaDataCache");
 
 // ! for listning all requests
 app.listen(port, async (req, res) => {
@@ -38,6 +42,7 @@ async function initCache() {
 initCache();
 
 app.use("/test", async (req, res) => {
+  const doc1 = getAssetMetadatalist();
   res.status(200).json({
     success: "successful",
     doc1,

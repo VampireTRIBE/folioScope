@@ -1,26 +1,33 @@
 let assetMetaDataCache = {
   assetMetaDataID: null,
   assetMetaDataName: null,
+  assetMetaDataList: null,
 };
 
 module.exports.setAssetMetaDataCache = (assetmetadataID, assetmetadataName) => {
   assetMetaDataCache.assetMetaDataID = assetmetadataID;
   assetMetaDataCache.assetMetaDataName = assetmetadataName;
+  assetMetaDataCache.assetMetaDataList = Object.freeze(
+    Object.keys(assetmetadataName),
+  );
 };
 
 module.exports.getAssetMetaDataID = () => {
-  return Object.freeze(assetMetaDataCache.assetMetaDataID);
+  return assetMetaDataCache.assetMetaDataID;
 };
 
 module.exports.getAssetMetaDataName = () => {
-  return Object.freeze(assetMetaDataCache.assetMetaDataName);
+  return assetMetaDataCache.assetMetaDataName;
 };
 
 module.exports.getSingleAssetMetaDataID = (id) => {
-  console.log("id");
-  return Object.freeze(assetMetaDataCache.assetMetaDataID?.[id]);
+  return assetMetaDataCache.assetMetaDataID?.[id];
 };
 
 module.exports.getSingleAssetMetaDataName = (name) => {
-  return Object.freeze(assetMetaDataCache.assetMetaDataName?.[name]);
+  return assetMetaDataCache.assetMetaDataName?.[name];
+};
+
+module.exports.getAssetMetadatalist = () => {
+  return assetMetaDataCache.assetMetaDataList;
 };
