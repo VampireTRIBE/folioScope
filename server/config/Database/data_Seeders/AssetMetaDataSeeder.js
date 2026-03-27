@@ -72,7 +72,6 @@ module.exports.seedAssetMetadata = async () => {
     log.info(`SKIPPED RECORDS : ${results.skipped.length}`);
 
     return {
-      results,
       summary: {
         totalRecords: res.length,
         successfullRecords: results.success.length,

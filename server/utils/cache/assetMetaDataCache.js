@@ -1,15 +1,23 @@
 let assetMetaDataCache = {
   assetMetaDataID: null,
   assetMetaDataName: null,
-  assetMetaDataList: null,
+  AssetMetaDataGFTickerName: {},
+  AssetMetaDataGFTickerID: {},
 };
 
 module.exports.setAssetMetaDataCache = (assetmetadataID, assetmetadataName) => {
   assetMetaDataCache.assetMetaDataID = assetmetadataID;
   assetMetaDataCache.assetMetaDataName = assetmetadataName;
-  assetMetaDataCache.assetMetaDataList = Object.freeze(
-    Object.keys(assetmetadataName),
-  );
+
+  for (const obj of Object.keys(assetmetadataName)) {
+    assetMetaDataCache.AssetMetaDataGFTickerName[obj] =
+      assetmetadataName[obj].GF_TickerCode;
+  }
+
+  for (const obj of Object.keys(assetmetadataID)) {
+    assetMetaDataCache.AssetMetaDataGFTickerID[obj] =
+      assetmetadataID[obj].GF_TickerCode;
+  }
 };
 
 module.exports.getAssetMetaDataID = () => {
@@ -28,6 +36,17 @@ module.exports.getSingleAssetMetaDataName = (name) => {
   return assetMetaDataCache.assetMetaDataName?.[name];
 };
 
-module.exports.getAssetMetadatalist = () => {
-  return assetMetaDataCache.assetMetaDataList;
+module.exports.getAssetMetaDataGFTickerName = () => {
+  return assetMetaDataCache.AssetMetaDataGFTickerName;
+};
+module.exports.getAssetMetaDataGFTickerID = () => {
+  return assetMetaDataCache.AssetMetaDataGFTickerID;
+};
+
+module.exports.getSingleAssetMetaDataGFTickerName = (name) => {
+  return assetMetaDataCache.AssetMetaDataGFTickerName?.[name];
+};
+
+module.exports.getSingleAssetMetaDataGFTickerID = (id) => {
+  return assetMetaDataCache.AssetMetaDataGFTickerName?.[id];
 };

@@ -10,6 +10,7 @@ const sessionConfig = require("./middlewares/seasson");
 const dataParser = require("./middlewares/dataParser");
 const log = require("./utils/console_loggers/consoleLoggers");
 const { initCacheMaster } = require("./middlewares/initCache");
+const { initAppscriptMaster } = require("./middlewares/initAppscript");
 const app = express();
 let port = 3000;
 
@@ -22,10 +23,6 @@ dataParser.bodyParser(app);
 // !import routes
 const userRoute = require("./routes/userRoutes/userRoute");
 const adminRoute = require("./routes/adminRoutes/adminRoutes");
-const {
-  getAssetMetadatalist,
-  getAssetMetaDataID,
-} = require("./utils/cache/assetMetaDataCache");
 
 // ! for listning all requests
 app.listen(port, async (req, res) => {
@@ -33,19 +30,26 @@ app.listen(port, async (req, res) => {
 });
 
 // ! init Cache
-async function initCache() {
+(async function () {
   const { result } = await initCacheMaster();
   result
     ? log.success("INIT CACHE SUCCESSFUL...")
     : log.error("INIT CACHE FAILED...");
-}
-initCache();
+
+  // ! INIT APPSCRIPT SERVICES
+  (async function () {
+    const { result } = await initAppscriptMaster();
+    result
+      ? log.success("INIT APPSCRIPT SUCCESSFUL...")
+      : log.error("INIT APPSCRIPT FAILED...");
+  })();
+})();
 
 app.use("/test", async (req, res) => {
-  const doc1 = getAssetMetadatalist();
+  const result = await initLivePrice();
   res.status(200).json({
     success: "successful",
-    doc1,
+    result,
   });
 });
 

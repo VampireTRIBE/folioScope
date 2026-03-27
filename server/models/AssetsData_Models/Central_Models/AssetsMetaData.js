@@ -32,6 +32,13 @@ const AssetMetaDataSchema = new Schema(
       maxlength: 100,
       trim: true,
     },
+    GF_TickerCode: {
+      type: String,
+      required: true,
+      minlength: 3,
+      maxlength: 100,
+      trim: true,
+    },
 
     overview: {
       type: String,

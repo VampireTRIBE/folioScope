@@ -186,6 +186,7 @@ module.exports.validateAssetMetaData = async (
       bse: data.tickerCode?.bse ?? null,
     },
     name: data.name,
+    GF_TickerCode:data?.GF_TickerCode ?? null,
     overview: data.overview || null,
     currency: data.currency,
 

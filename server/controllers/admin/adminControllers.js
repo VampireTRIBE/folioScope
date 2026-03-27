@@ -22,10 +22,10 @@ const adminControllers = {
 
   async updateAssetMetaData(req, res, next) {
     try {
-      const result = await seedAssetMetadata();
+      const { summary } = await seedAssetMetadata();
       return res.status(200).json({
         success: "AssetMetaData Update SuccessFull",
-        summery: result,
+        summary,
       });
     } catch (error) {
       return res.status(500).json({ error: error.message });
@@ -34,10 +34,11 @@ const adminControllers = {
 
   async insertPriceHistory(req, res, next) {
     try {
-      const result = await seedPriceHistory();
+      const { name } = req.body;
+      const { summary } = await seedPriceHistory(name);
       return res.status(200).json({
         success: "Price History Insertion is Successful",
-        summery: result,
+        summary,
       });
     } catch (error) {
       return res.status(500).json({ error: error.message });

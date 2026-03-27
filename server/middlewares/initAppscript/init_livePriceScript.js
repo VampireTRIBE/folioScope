@@ -1,40 +1,43 @@
-const log = require("../../../utils/console_loggers/consoleLoggers");
-const AssetPriceHistoryModel = require("../../../models/AssetsData_Models/Metrix_Models/AssetPriceHistory");
 const {
   callAppsScript,
-} = require("../../../services/appsScript/appsScriptService");
+} = require("../../services/appsScript/appsScriptService");
+const {
+  getAssetMetaDataGFTickerName,
+} = require("../../utils/cache/assetMetaDataCache");
+const log = require("../../utils/console_loggers/consoleLoggers");
+const customError = require("../../utils/errorClass/customError");
 const {
   validateAssetPriceHistory,
-} = require("../../../utils/validations/DataInsertion_Validations/assetPriceHistoryModel");
-const customError = require("../../../utils/errorClass/customError");
-const {
-  getSingleAssetMetaDataGFTickerName,
-} = require("../../../utils/cache/assetMetaDataCache");
+} = require("../../utils/validations/DataInsertion_Validations/assetPriceHistoryModel");
+const AssetPriceHistoryModel = require("../../models/AssetsData_Models/Metrix_Models/AssetPriceHistory");
 
-module.exports.seedPriceHistory = async (name = null) => {
+module.exports.initLivePrice = async () => {
   try {
-    log.running("SETTING TICKER TO GOOGLE SHEETS STARTED...");
-    const GF_ticker = getSingleAssetMetaDataGFTickerName(name);
-    if (!GF_ticker) throw new customError("Invalid Ticker Requet", 404);
-    const { success } = await callAppsScript(
-      process.env.APPSCRIPT_SEEDER_URL,
-      process.env.APPSCRIPT_SEEDER_API_KEY,
-      "postPriceHistoryTicker",
-      { [name]: GF_ticker },
-    );
-    if (!success)
-      throw new customError("SETTING TICKER TO GOOGLE SHEETS Failed...");
-    log.success("SETTING TICKER TO GOOGLE SHEETS SUCCESS...");
-    log.running("FETCHING PRICE HISTORY FROM GOOGLE SHEETS STARTED...");
-
+    const GF_ticker = getAssetMetaDataGFTickerName();
+    log.running("INSERTING LIVE TICKER TO GOOGLE SHEETS STARTED...");
     const res = await callAppsScript(
       process.env.APPSCRIPT_SEEDER_URL,
       process.env.APPSCRIPT_SEEDER_API_KEY,
-      "getPriceHistory",
+      "postLiveTicker",
+      GF_ticker,
     );
+    log.success("INSERTING LIVE TICKER TO GOOGLE SHEETS SUCCESS...");
+    return res;
+  } catch (error) {
+    throw new customError(error.message, 500);
+  }
+};
 
-    log.success("FETCHING PRICE HISTORY FROM GOOGLE SHEETS SUCCESS...");
-    log.running("ASSET PRICE HISTORY SEEDING STARTED...");
+module.exports.initPastPrice = async () => {
+  try {
+    log.running("FETCHING PAST PRICE STARTED...");
+    const res = await callAppsScript(
+      process.env.APPSCRIPT_SEEDER_URL,
+      process.env.APPSCRIPT_SEEDER_API_KEY,
+      "getpastPrice",
+    );
+    log.success("FETCHING PAST PRICE SUCCESS...");
+    log.running("SEEDING PAST PRICE STARTED...");
     const results = {
       success: [],
       failed: [],
@@ -45,7 +48,6 @@ module.exports.seedPriceHistory = async (name = null) => {
       const record = res[i];
       const { result, message, statusCode, data } =
         await validateAssetPriceHistory(record, "name");
-
       if (!result) {
         results.skipped.push({
           recordIndex: i + 1,
@@ -91,6 +93,6 @@ module.exports.seedPriceHistory = async (name = null) => {
       },
     };
   } catch (error) {
-    throw new customError("Internal Server Error", 404);
+    throw new customError(error.message, 500);
   }
 };
