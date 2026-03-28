@@ -3,7 +3,7 @@ if (process.env.NODE_ENV != "production") {
 }
 
 const mongoose = require("mongoose");
-const log = require("../utils/console_loggers/consoleLoggers");
+const log = require("../utils/shared_Utils/console_loggers/consoleLoggers");
 
 async function DB_connect() {
   try {

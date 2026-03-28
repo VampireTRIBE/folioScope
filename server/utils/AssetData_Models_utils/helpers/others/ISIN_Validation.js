@@ -1,6 +1,6 @@
 const ISIN_REGEX = /^[A-Z]{2}[A-Z0-9]{9}[0-9]$/;
 
-function validateISIN(isin) {
+module.exports.validate_ISIN = (isin) => {
   if (!isin || typeof isin !== "string") return false;
 
   if (!ISIN_REGEX.test(isin)) return false;
@@ -31,6 +31,4 @@ function validateISIN(isin) {
   }
 
   return sum % 10 === 0;
-}
-
-module.exports = validateISIN;
+};

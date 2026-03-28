@@ -1,4 +1,4 @@
-module.exports.assetClassClassificationStructureID = async (result) => {
+module.exports.assetClassClassification_StructureID = async (result) => {
   return Object.fromEntries(
     result.map((cls) => [
       cls._id,
@@ -36,7 +36,7 @@ module.exports.assetClassClassificationStructureID = async (result) => {
   );
 };
 
-module.exports.assetSectorClassificationStructureID = async (result) => {
+module.exports.assetSectorClassification_StructureID = async (result) => {
   return Object.fromEntries(
     result.map((cls) => [
       cls._id,
@@ -57,7 +57,7 @@ module.exports.assetSectorClassificationStructureID = async (result) => {
   );
 };
 
-module.exports.assetAMCClassificationStructureID = async (result) => {
+module.exports.assetAMCClassification_StructureID = async (result) => {
   return Object.fromEntries(
     result.map((cls) => [
       cls._id,
@@ -80,7 +80,7 @@ module.exports.assetMetaDataID = async (result) => {
   );
 };
 
-module.exports.assetClassClassificationStructureName = async (result) => {
+module.exports.assetClassClassification_StructureName = async (result) => {
   return Object.fromEntries(
     result.map((cls) => [
       cls.name,
@@ -118,7 +118,7 @@ module.exports.assetClassClassificationStructureName = async (result) => {
   );
 };
 
-module.exports.assetSectorClassificationStructureName = async (result) => {
+module.exports.assetSectorClassification_StructureName = async (result) => {
   return Object.fromEntries(
     result.map((cls) => [
       cls.name,
@@ -139,7 +139,7 @@ module.exports.assetSectorClassificationStructureName = async (result) => {
   );
 };
 
-module.exports.assetAMCClassificationStructureName = async (result) => {
+module.exports.assetAMCClassification_StructureName = async (result) => {
   return Object.fromEntries(
     result.map((cls) => [
       cls.name,

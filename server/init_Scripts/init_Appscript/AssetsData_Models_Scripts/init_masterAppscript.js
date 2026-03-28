@@ -1,14 +1,13 @@
 const {
-  initLivePrice,
+  initLivePriceTicker,
   initPastPrice,
-} = require("./initAppscript/init_livePriceScript");
+} = require("./init_appscriptFiles/init_livePriceTicker");
 
 module.exports.initAppscriptMaster = async () => {
   try {
-    await Promise.all([initLivePrice(), initPastPrice()]);
+    await Promise.all([initLivePriceTicker(), initPastPrice()]);
     return { result: true };
   } catch (error) {
-    console.log(error);
     return { result: false };
   }
 };

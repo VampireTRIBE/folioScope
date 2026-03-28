@@ -1,17 +1,26 @@
 const {
-  AssetClassificationSeeder,
-} = require("../../config/Database/data_Seeders/AssetClassificationSeeder");
+  initLivePriceTicker,
+} = require("../../init_Scripts/init_Appscript/AssetsData_Models_Scripts/init_appscriptFiles/init_livePriceTicker");
 const {
-  seedAssetMetadata,
-} = require("../../config/Database/data_Seeders/AssetMetaDataSeeder");
+  initCacheAssetDataStructure,
+  initCacheAssetMetaData,
+} = require("../../init_Scripts/init_Cache/AssetsData_Models_Cache/Init_masterCache");
 const {
-  seedPriceHistory,
-} = require("../../config/Database/data_Seeders/AssetPriceHistorySeeder");
+  AssetClassification_Seeder,
+} = require("./adminControllersActions/AssetClassificationSeeder");
+const {
+  AssetMetadata_Seeder,
+} = require("./adminControllersActions/AssetMetaDataSeeder");
+const {
+  PriceHistory_Seeder,
+} = require("./adminControllersActions/AssetPriceHistorySeeder");
+
 
 const adminControllers = {
   async updateClassification(req, res, next) {
     try {
-      await AssetClassificationSeeder();
+      await AssetClassification_Seeder();
+      await initCacheAssetDataStructure();
       return res.status(200).json({
         success: "Classification Seeding SuccessFull",
       });
@@ -22,7 +31,9 @@ const adminControllers = {
 
   async updateAssetMetaData(req, res, next) {
     try {
-      const { summary } = await seedAssetMetadata();
+      const { summary } = await AssetMetadata_Seeder();
+      await initCacheAssetMetaData();
+      await initLivePriceTicker();
       return res.status(200).json({
         success: "AssetMetaData Update SuccessFull",
         summary,
@@ -35,7 +46,7 @@ const adminControllers = {
   async insertPriceHistory(req, res, next) {
     try {
       const { name } = req.body;
-      const { summary } = await seedPriceHistory(name);
+      const { summary } = await PriceHistory_Seeder(name);
       return res.status(200).json({
         success: "Price History Insertion is Successful",
         summary,

@@ -1,5 +1,3 @@
-const log = require("../../../utils/console_loggers/consoleLoggers");
-
 const AssetClassModel = require("../../../models/AssetsData_Models/Classification_Models/AssetClass");
 const AssetCategoryModel = require("../../../models/AssetsData_Models/Classification_Models/AssetCategory");
 const AssetSubCategoryModel = require("../../../models/AssetsData_Models/Classification_Models/AssetSubcategory");
@@ -10,9 +8,10 @@ const AssetAMCModel = require("../../../models/AssetsData_Models/Classification_
 const {
   callAppsScript,
 } = require("../../../services/appsScript/appsScriptService");
-const customError = require("../../../utils/errorClass/customError");
+const log = require("../../../utils/shared_Utils/console_loggers/consoleLoggers");
+const customError = require("../../../utils/shared_Utils/error_Class/customError");
 
-module.exports.AssetClassificationSeeder = async () => {
+module.exports.AssetClassification_Seeder = async () => {
   try {
     log.running("FETCHING CLASSIFICATION FROM GOOGLE SHEETS...");
     const res = await callAppsScript(
@@ -66,7 +65,7 @@ module.exports.AssetClassificationSeeder = async () => {
         }
       }
     }
-    log.success("ASSET CLASSIFICATION SEEDING SUCESSFUL...");
+    log.success("ASSET CLASSIFICATION SEEDING SUCESSFULL...");
 
     log.running("ASSET SECTOR SEEDING STARTED...");
     for (const s of res.sectors) {

@@ -1,5 +1,5 @@
 const axios = require("axios");
-const customError = require("../../utils/errorClass/customError");
+const customError = require("../../utils/shared_Utils/error_Class/customError");
 
 module.exports.callAppsScript = async (
   BASE_URL,

@@ -36,6 +36,6 @@ const AssetPriceHistorySchema = new Schema(
   { timestamps: true },
 );
 
-AssetPriceHistorySchema.index({ assetId: 1, date: -1 }, { unique: true });
+AssetPriceHistorySchema.index({ assetId: 1, date: 1 }, { unique: true });
 
 module.exports = mongoose.model("AssetPriceHistory", AssetPriceHistorySchema);

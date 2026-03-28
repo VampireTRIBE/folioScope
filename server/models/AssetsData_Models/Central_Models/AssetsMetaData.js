@@ -1,9 +1,7 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
-const validateISIN = require("../../../utils/helpers_validaters/ISIN_Validation");
-const {
-  validateAssetMetaData,
-} = require("../../../utils/validations/DataInsertion_Validations/assetMetaDataModel");
+const { validate_ISIN } = require("../../../utils/AssetData_Models_utils/helpers/others/ISIN_Validation");
+const { validate_AssetMetaData } = require("../../../utils/AssetData_Models_utils/validations/validateData/assetMetaData_Validate");
 
 const AssetMetaDataSchema = new Schema(
   {
@@ -14,7 +12,7 @@ const AssetMetaDataSchema = new Schema(
       validate: {
         validator: function (v) {
           if (!v) return true;
-          return validateISIN(v);
+          return validate_ISIN(v);
         },
         message: "Invalid ISIN",
       },
@@ -31,6 +29,7 @@ const AssetMetaDataSchema = new Schema(
       minlength: 3,
       maxlength: 100,
       trim: true,
+      unique: true,
     },
     GF_TickerCode: {
       type: String,
@@ -130,7 +129,7 @@ AssetMetaDataSchema.index({ assetAMC: 1 });
 
 AssetMetaDataSchema.pre("validate", async function (next) {
   try {
-    await validateAssetMetaData(this, "id", true);
+    await validate_AssetMetaData(this, "id", true);
     next();
   } catch (err) {
     next(err);

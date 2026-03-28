@@ -1,6 +1,13 @@
-const classificationCache = require("../../cache/assetClassificationCache");
+const {
+  getAssetClassificationStructureID,
+  getAssetClassificationStructureName,
+  getSectorClasificationStructureID,
+  getSectorClassificationStructureName,
+  getAMCClasificationStructureID,
+  getAMCClassificationStructureName,
+} = require("../../../../init_Scripts/init_Cache/AssetsData_Models_Cache/init_cacheFiles/assetClassificationCache");
 
-module.exports.validateAssetMetaData = async (
+module.exports.validate_AssetMetaData = async (
   data = null,
   dataType = "id",
   validateOnly = false,
@@ -16,16 +23,16 @@ module.exports.validateAssetMetaData = async (
   ];
 
   const ASSET_CLASSIFICATION = isId
-    ? classificationCache.getAssetClassificationStructureID()
-    : classificationCache.getAssetClassificationStructureName();
+    ? getAssetClassificationStructureID()
+    : getAssetClassificationStructureName();
 
   const SECTOR_CLASSIFICATION = isId
-    ? classificationCache.getSectorClasificationStructureID()
-    : classificationCache.getSectorClassificationStructureName();
+    ? getSectorClasificationStructureID()
+    : getSectorClassificationStructureName();
 
   const AMC_CLASSIFICATION = isId
-    ? classificationCache.getAMCClasificationStructureID()
-    : classificationCache.getAMCClassificationStructureName();
+    ? getAMCClasificationStructureID()
+    : getAMCClassificationStructureName();
 
   // -------------------- BASIC VALIDATION --------------------
 
@@ -186,7 +193,7 @@ module.exports.validateAssetMetaData = async (
       bse: data.tickerCode?.bse ?? null,
     },
     name: data.name,
-    GF_TickerCode:data?.GF_TickerCode ?? null,
+    GF_TickerCode: data?.GF_TickerCode ?? null,
     overview: data.overview || null,
     currency: data.currency,
 

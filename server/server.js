@@ -8,9 +8,17 @@ const DB_connect = require("./config/connectDB");
 const passportAuth = require("./middlewares/authentication");
 const sessionConfig = require("./middlewares/seasson");
 const dataParser = require("./middlewares/dataParser");
-const log = require("./utils/console_loggers/consoleLoggers");
-const { initCacheMaster } = require("./middlewares/initCache");
-const { initAppscriptMaster } = require("./middlewares/initAppscript");
+const log = require("./utils/shared_Utils/console_loggers/consoleLoggers");
+const {
+  initCacheMaster,
+} = require("./init_Scripts/init_Cache/AssetsData_Models_Cache/Init_masterCache");
+const {
+  initAppscriptMaster,
+} = require("./init_Scripts/init_Appscript/AssetsData_Models_Scripts/init_masterAppscript");
+const {
+  fetchCurrentPrice,
+} = require("./init_Scripts/init_Appscript/AssetsData_Models_Scripts/init_appscriptFiles/fetch_CurrentPriceScript");
+
 const app = express();
 let port = 3000;
 
@@ -29,24 +37,31 @@ app.listen(port, async (req, res) => {
   log.running(`SERVER PORT : ${port}`);
 });
 
-// ! init Cache
 (async function () {
+  // ! init Cache
   const { result } = await initCacheMaster();
   result
     ? log.success("INIT CACHE SUCCESSFUL...")
     : log.error("INIT CACHE FAILED...");
 
   // ! INIT APPSCRIPT SERVICES
-  (async function () {
-    const { result } = await initAppscriptMaster();
-    result
-      ? log.success("INIT APPSCRIPT SUCCESSFUL...")
-      : log.error("INIT APPSCRIPT FAILED...");
-  })();
+  // (async function () {
+  //   const { result } = await initAppscriptMaster();
+  //   result
+  //     ? log.success("INIT APPSCRIPT SUCCESSFUL...")
+  //     : log.error("INIT APPSCRIPT FAILED...");
+  // })();
 })();
 
+// const TIME_INTERVEL = 10000;
+// const init_FetchCurrentPrice = async () => {
+//   await fetchCurrentPrice();
+//   setTimeout(init_FetchCurrentPrice, TIME_INTERVEL);
+// };
+// setTimeout(init_FetchCurrentPrice, TIME_INTERVEL);
+
 app.use("/test", async (req, res) => {
-  const result = await initLivePrice();
+  // const result = await fetchCurrentPrice();
   res.status(200).json({
     success: "successful",
     result,

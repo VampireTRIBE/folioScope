@@ -1,10 +1,12 @@
 const {
   getSingleAssetMetaDataID,
   getSingleAssetMetaDataName,
-} = require("../../cache/assetMetaDataCache");
-const { parseISODate } = require("../../helpers_validaters/validateDate");
+} = require("../../../../init_Scripts/init_Cache/AssetsData_Models_Cache/init_cacheFiles/assetMetaDataCache");
+const {
+  parseISODate,
+} = require("../../../shared_Utils/helpers/DateValidation");
 
-module.exports.validateAssetPriceHistory = async (
+module.exports.validate_AssetPriceHistory = async (
   data = null,
   dataType = "id",
   validateOnly = false,
@@ -14,7 +16,7 @@ module.exports.validateAssetPriceHistory = async (
     return { result: false, message: "AssetName is Empty", statusCode: 422 };
   }
   if (!data?.open || !data?.high || !data?.low || !data?.close) {
-    return { result: false, message: "Missing Field", statusCode: 422 };
+    return { result: false, message: "Missing Field value", statusCode: 422 };
   }
   const date = await parseISODate(data?.date);
 
@@ -31,13 +33,9 @@ module.exports.validateAssetPriceHistory = async (
   return validateOnly === false
     ? {
         result: true,
-        message: "Validation Complete",
-        statusCode: 200,
         data: data,
       }
     : {
         result: true,
-        message: "Validation Complete",
-        statusCode: 200,
       };
 };

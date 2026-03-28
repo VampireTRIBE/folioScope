@@ -2,9 +2,10 @@ const AssetClassModel = require("../../../models/AssetsData_Models/Classificatio
 const AssetSectorModel = require("../../../models/AssetsData_Models/Classification_Models/AssetSector");
 const AssetAMCModel = require("../../../models/AssetsData_Models/Classification_Models/AssetAMC");
 const AssetMetaDataModel = require("../../../models/AssetsData_Models/Central_Models/AssetsMetaData");
-const customError = require("../../errorClass/customError");
+const customError = require("../../shared_Utils/error_Class/customError");
 
-module.exports.buildAssetClassTreeStructure = async () => {
+
+module.exports.buildAssetClass_TreeStructure = async () => {
   try {
     const result = await AssetClassModel.aggregate([
       {
@@ -83,7 +84,7 @@ module.exports.buildAssetClassTreeStructure = async () => {
   }
 };
 
-module.exports.buildAssetSectorTreeStructure = async () => {
+module.exports.buildAssetSector_TreeStructure = async () => {
   try {
     const result = await AssetSectorModel.aggregate([
       {
@@ -120,7 +121,7 @@ module.exports.buildAssetSectorTreeStructure = async () => {
   }
 };
 
-module.exports.buildAssetAMCTreeStructure = async () => {
+module.exports.buildAssetAMC_TreeStructure = async () => {
   try {
     const result = await AssetAMCModel.find().select("name").lean();
     return result;
