@@ -2,10 +2,10 @@ const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
 // ==========================================
-// 1. FundamentalMatrixSchema Model (Fundamental Raw DATA)
+// 1. AssetFundamentalMatrixSchema Model (Fundamental Raw DATA)
 // 2. Modification Done by Admin only Quaterly or if any change in asset fundamentals.
 // ==========================================
-const FundamentalMatrixSchema = new Schema(
+const AssetFundamentalMatrixSchema = new Schema(
   {
     assetId: {
       type: Schema.Types.ObjectId,
@@ -22,11 +22,11 @@ const FundamentalMatrixSchema = new Schema(
   { timestamps: true },
 );
 
-FundamentalMatrixSchema.index({ assetId: 1, reportDate: 1 }, { unique: true });
+AssetFundamentalMatrixSchema.index({ assetId: 1, reportDate: 1 }, { unique: true });
 
 const AssetFundamentalMetrix = mongoose.model(
   "AssetFundamentalMetrix",
-  FundamentalMatrixSchema,
+  AssetFundamentalMatrixSchema,
 );
 
 // ==========================================

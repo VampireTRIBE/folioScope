@@ -13,6 +13,8 @@ const AssetClassSchema = new Schema(
       enum: ["INDEX", "ETF", "MUTUAL FUND", "BOND", "STOCK"],
       unique: true,
     },
+    requiredFields: [String],
+    forbiddenFields: [String],
   },
   { timestamps: true },
 );
