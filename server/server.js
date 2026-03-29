@@ -31,6 +31,7 @@ dataParser.bodyParser(app);
 // !import routes
 const userRoute = require("./routes/userRoutes/userRoute");
 const adminRoute = require("./routes/adminRoutes/adminRoutes");
+const portfolioRoute = require("./routes/portfolioRoutes/portfolioRoutes");
 
 // ! for listning all requests
 app.listen(port, async (req, res) => {
@@ -53,7 +54,7 @@ app.listen(port, async (req, res) => {
   // })();
 })();
 
-// const TIME_INTERVEL = 10000;
+// const TIME_INTERVEL = 5*60*1000;
 // const init_FetchCurrentPrice = async () => {
 //   await fetchCurrentPrice();
 //   setTimeout(init_FetchCurrentPrice, TIME_INTERVEL);
@@ -70,10 +71,14 @@ app.use("/test", async (req, res) => {
 
 // ! Diffrent Routes
 
+// ! login/signup Routes
 app.use("/", userRoute);
 
 // ! Admin Routes
 app.use("/admin/dataseeders", adminRoute);
+
+// ! Portfolio Routes
+app.use("/portfolio/", portfolioRoute);
 
 // ! error handling middleware
 app.use((err, req, res, next) => {
