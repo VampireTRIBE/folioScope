@@ -29,7 +29,7 @@ const financialAssetSchema = new Schema(
 
     totalQty: { type: Number, default: 0, required: true },
     buyAVG: { type: Number, default: 0, required: true },
-    dateAdded: { type: Date, default: Date.now, required: true },
+    dateAdded: { type: Date, required: true },
 
     status: {
       type: Boolean,
@@ -40,7 +40,10 @@ const financialAssetSchema = new Schema(
 );
 
 // -------- Indexes --------
-financialAssetSchema.index({ assetMetadataId: 1 });
+financialAssetSchema.index(
+  { assetMetadataId: 1, portfolioGroupId: 1 },
+  { unique: true },
+);
 financialAssetSchema.index({ portfolioGroupId: 1 });
 financialAssetSchema.index({ userId: 1 });
 financialAssetSchema.index({ dateAdded: 1 });

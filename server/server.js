@@ -78,7 +78,7 @@ app.use("/", userRoute);
 app.use("/admin/dataseeders", adminRoute);
 
 // ! Portfolio Routes
-app.use("/portfolio/", portfolioRoute);
+app.use("/portfolio", portfolioRoute);
 
 // ! error handling middleware
 app.use((err, req, res, next) => {

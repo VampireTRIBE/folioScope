@@ -28,7 +28,6 @@ module.exports.addGroup = async (req, res) => {
     if (parent.level >= 4) {
       return res.status(400).json({ error: "Max depth reached" });
     }
-
     const doc = new PortfolioGroupModel({
       name: name.trim(),
       description,

@@ -22,8 +22,8 @@ const groupStatementSchema = new Schema(
       required: true,
     },
 
-    date: { type: Date, default: Date.now, required: true },
-    amount: { type: Number, default: 0, required: true },
+    date: { type: Date, required: true },
+    amount: { type: Number, min: 0.000001, required: true },
   },
   { timestamps: true },
 );

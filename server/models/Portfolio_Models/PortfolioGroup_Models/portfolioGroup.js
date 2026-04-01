@@ -32,13 +32,6 @@ const portfolioGroupSchema = new Schema(
     description: { type: String },
 
     // -------- Financial Fields --------
-    standaloneInvestmentValue: { type: Number, default: 0 },
-    standaloneCurrentValue: { type: Number, default: 0 },
-    standaloneRealizedGain: { type: Number, default: 0 },
-    standaloneUnrealizedGain: { type: Number, default: 0 },
-    standaloneCurrentYearGain: { type: Number, default: 0 },
-    standaloneCash: { type: Number, default: 0 },
-    standaloneIRR: { type: Number, default: 0 },
 
     consolidatedInvestmentValue: { type: Number, default: 0 },
     consolidatedCurrentValue: { type: Number, default: 0 },
@@ -68,7 +61,7 @@ portfolioGroupSchema.index(
   { name: 1, userId: 1, parentId: 1 },
   { unique: true },
 );
-
+portfolioGroupSchema.index({ parentId: 1, isDeleted: 1 });
 portfolioGroupSchema.index({ parentId: 1 });
 portfolioGroupSchema.index({ path: 1 });
 portfolioGroupSchema.index({ userId: 1 });
@@ -110,28 +103,27 @@ portfolioGroupSchema.pre("validate", async function (next) {
     }
 
     this.path = [...parent.path, parent._id];
-    console.log(this.doc);
     return next();
   } catch (err) {
     return next(err);
   }
 });
 
-// -------- BLOCK STRUCTURAL UPDATES --------
-portfolioGroupSchema.pre("findOneAndUpdate", function () {
-  const update = this.getUpdate();
+// // -------- BLOCK STRUCTURAL UPDATES --------
+// portfolioGroupSchema.pre("findOneAndUpdate", function () {
+//   const update = this.getUpdate();
 
-  if (update.parentId || update.level || update.path || update.userId) {
-    throw new Error("Structural updates are not allowed");
-  }
-});
+//   if (update.parentId || update.level || update.path || update.userId) {
+//     throw new Error("Structural updates are not allowed");
+//   }
+// });
 
-portfolioGroupSchema.pre("updateOne", function () {
-  throw new Error("Direct updates not allowed");
-});
+// portfolioGroupSchema.pre("updateOne", function () {
+//   throw new Error("Direct updates not allowed");
+// });
 
-portfolioGroupSchema.pre("updateMany", function () {
-  throw new Error("Direct updates not allowed");
-});
+// portfolioGroupSchema.pre("updateMany", function () {
+//   throw new Error("Direct updates not allowed");
+// });
 
 module.exports = mongoose.model("portfolioGroup", portfolioGroupSchema);

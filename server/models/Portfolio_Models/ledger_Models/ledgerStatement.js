@@ -1,3 +1,4 @@
+const { required } = require("joi");
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
@@ -7,7 +8,7 @@ const ledgerStatementSchema = new Schema(
       type: String,
       required: true,
       trim: true,
-      enum: ["buy", "sell","dividend"],
+      enum: ["buy", "sell", "dividend"],
     },
 
     financialAssetId: {
@@ -27,11 +28,11 @@ const ledgerStatementSchema = new Schema(
       ref: "users",
       required: true,
     },
-    qty: { type: Number, default: 0 },
-    price: { type: Number, default: 0 },
-    amount: { type: Number, default: 0 },
-    dividendAmount: { type: Number, default: 0 },
-    date: { type: Date, default: Date.now, required: true },
+    qty: { type: Number },
+    price: { type: Number },
+    amount: { type: Number },
+    dividendAmount: { type: Number },
+    date: { type: Date, required: true },
   },
   { timestamps: true },
 );
