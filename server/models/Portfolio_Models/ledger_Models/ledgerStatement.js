@@ -1,4 +1,3 @@
-const { required } = require("joi");
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
@@ -31,6 +30,10 @@ const ledgerStatementSchema = new Schema(
     qty: { type: Number },
     price: { type: Number },
     amount: { type: Number },
+    cost: Number,
+    profit: Number,
+    STCG: Number,
+    LTCG: Number,
     dividendAmount: { type: Number },
     date: { type: Date, required: true },
   },

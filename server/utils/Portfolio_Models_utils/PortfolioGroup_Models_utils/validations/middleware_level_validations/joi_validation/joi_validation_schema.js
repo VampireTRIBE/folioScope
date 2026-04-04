@@ -53,15 +53,15 @@ const tradeValidation = Joi.object({
       "any.unknown": "price is not allowed for dividend",
     }),
 
-  amount: Joi.number()
+  dividendAmount: Joi.number()
     .when("type", {
       is: "dividend",
       then: Joi.required(),
       otherwise: Joi.forbidden(),
     })
     .messages({
-      "any.required": "amount is required for dividend",
-      "any.unknown": "amount is only allowed for dividend",
+      "any.required": "dividendAmount is required for dividend",
+      "any.unknown": "dividendAmount is only allowed for dividend",
     }),
 });
 

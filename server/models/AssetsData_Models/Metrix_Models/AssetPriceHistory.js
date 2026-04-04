@@ -17,16 +17,6 @@ const AssetPriceHistorySchema = new Schema(
       type: Date,
       required: true,
       index: true,
-      set: function (val) {
-        if (val instanceof Date) {
-          const d = new Date(val);
-          d.setUTCHours(0, 0, 0, 0);
-          return d;
-        }
-        const parsed = new Date(val);
-        parsed.setUTCHours(0, 0, 0, 0);
-        return parsed;
-      },
     },
     open: { type: Number, min: 0, required: true },
     high: { type: Number, min: 0, required: true },

@@ -1,6 +1,20 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
+const snapshotSchema = new Schema(
+  {
+    totalQty: { type: Number, required: true, default: 0 },
+    investmentValue: { type: Number, required: true, default: 0 },
+    currentValue: { type: Number, required: true, default: 0 },
+    realizedGain: { type: Number, required: true, default: 0 },
+    dividendGain: { type: Number, required: true, default: 0 },
+    STCG: { type: Number, required: true, default: 0 },
+    LTCG: { type: Number, required: true, default: 0 },
+    irr: { type: Number, default: 0 },
+  },
+  { _id: false },
+);
+
 const financialAssetSchema = new Schema(
   {
     name: {
@@ -27,13 +41,19 @@ const financialAssetSchema = new Schema(
       required: true,
     },
 
-    totalQty: { type: Number, default: 0, required: true },
-    buyAVG: { type: Number, default: 0, required: true },
-    dateAdded: { type: Date, required: true },
+    snapshot: {
+      type: snapshotSchema,
+      default: () => ({}),
+    },
 
+    dateAdded: { type: Date, required: true },
     status: {
       type: Boolean,
       default: true,
+    },
+    lock: {
+      isLocked: Boolean,
+      lockedAt: Date,
     },
   },
   { timestamps: true },
@@ -41,12 +61,10 @@ const financialAssetSchema = new Schema(
 
 // -------- Indexes --------
 financialAssetSchema.index(
-  { assetMetadataId: 1, portfolioGroupId: 1 },
+  { assetMetadataId: 1, portfolioGroupId: 1, userId: 1 },
   { unique: true },
 );
+financialAssetSchema.index({ portfolioGroupId: 1, dateAdded: 1 });
 financialAssetSchema.index({ portfolioGroupId: 1 });
 financialAssetSchema.index({ userId: 1 });
-financialAssetSchema.index({ dateAdded: 1 });
-financialAssetSchema.index({ status: 1 });
-
 module.exports = mongoose.model("financialAsset", financialAssetSchema);
