@@ -1,8 +1,7 @@
-const { tradeTransaction } = require("./tradeActions/trade");
-const { updatePortfolioSnapshot } = require("./tradeActions/updatePortfolioSnapshots");
 const {
-  updateFinancialAssetSnapshot,
-} = require("./tradeActions/updateSnapshots");
+  syncPortfolio,
+} = require("../../services/syncPortfolio/updatePortfolio");
+const { tradeTransaction } = require("./tradeActions/trade");
 
 // =====================================================
 // 🔴 CONTROLLER
@@ -17,27 +16,17 @@ module.exports.trade = async (req, res) => {
       });
     }
 
-    const updateFinancialAssetSnapshotResult =
-      await updateFinancialAssetSnapshot(req, res);
-    if (!updateFinancialAssetSnapshotResult) {
+    const { success } = await syncPortfolio(req.user.id);
+    if (!success && transactionResult.success) {
       return res.status(400).json({
-        message: "Financial Asset Update Failed",
         error: transactionResult.message,
-      });
-    }
-
-    const updatePortfolioSnapshotResult =
-      await updatePortfolioSnapshot(req, res);
-    if (!updatePortfolioSnapshotResult) {
-      return res.status(400).json({
-        message: "Financial Asset Update Failed",
-        error: transactionResult.message,
+        message: "Transaction Successfull but syncPortfolio Failed",
       });
     }
 
     return res.status(200).json({
       success: true,
-      message: "Trade Completed Successfully",
+      message: "Trade & Sync Portfolio Completed Successfully",
     });
   } catch (error) {
     return res.status(400).json({ error: error.message });

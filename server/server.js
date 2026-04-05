@@ -18,6 +18,7 @@ const {
 const {
   fetchCurrentPrice,
 } = require("./init_Scripts/init_Appscript/AssetsData_Models_Scripts/init_appscriptFiles/fetch_CurrentPriceScript");
+const { syncPortfolio } = require("./services/syncPortfolio/updatePortfolio");
 
 const app = express();
 let port = 3000;
@@ -32,12 +33,6 @@ dataParser.bodyParser(app);
 const userRoute = require("./routes/userRoutes/userRoute");
 const adminRoute = require("./routes/adminRoutes/adminRoutes");
 const portfolioRoute = require("./routes/portfolioRoutes/portfolioRoutes");
-const {
-  getLeafNodes,
-} = require("./utils/Portfolio_Models_utils/aggregationPipeline/getAll_LeafNodes");
-const {
-  updatePortfolioGroupTree,
-} = require("./utils/Portfolio_Models_utils/aggregationPipeline/updatePortfolioGroupSnapshot");
 
 // ! for listning all requests
 app.listen(port, async (req, res) => {
@@ -52,29 +47,35 @@ app.listen(port, async (req, res) => {
     : log.error("INIT CACHE FAILED...");
 
   // ! INIT APPSCRIPT SERVICES
-  // (async function () {
-  //   const { result } = await initAppscriptMaster();
-  //   result
-  //     ? log.success("INIT APPSCRIPT SUCCESSFUL...")
-  //     : log.error("INIT APPSCRIPT FAILED...");
-  // })();
+  (async function () {
+    const { result } = await initAppscriptMaster();
+    result
+      ? log.success("INIT APPSCRIPT SUCCESSFUL...")
+      : log.error("INIT APPSCRIPT FAILED...");
+  })();
 })();
 
-// const TIME_INTERVEL = 5*60*1000;
-// const init_FetchCurrentPrice = async () => {
-//   await fetchCurrentPrice();
-//   setTimeout(init_FetchCurrentPrice, TIME_INTERVEL);
-// };
-// setTimeout(init_FetchCurrentPrice, TIME_INTERVEL);
+const TIME_INTERVEL = 5*60*1000;
+const init_FetchCurrentPrice = async () => {
+  await fetchCurrentPrice();
+  setTimeout(init_FetchCurrentPrice, TIME_INTERVEL);
+};
+setTimeout(init_FetchCurrentPrice, TIME_INTERVEL);
+
+const init_PortfolioSync = async () => {
+  await syncPortfolio();
+  setTimeout(init_PortfolioSync, TIME_INTERVEL);
+};
+setTimeout(init_PortfolioSync, TIME_INTERVEL);
 
 app.use("/test", async (req, res) => {
-  const leafGroupIds = await getLeafNodes(req.user._id);
-  const result = await updatePortfolioGroupTree(leafGroupIds, req.user._id);
-  res.status(200).json({
-    success: "successful",
-    leafGroupIds,
-    result,
-  });
+  // const leafGroupIds = await getLeafNodes(req.user._id);
+  // const result = await updatePortfolioGroupTree(leafGroupIds, req.user._id);
+  // res.status(200).json({
+  //   success: "successful",
+  //   leafGroupIds,
+  //   result,
+  // });
 });
 
 // ! Diffrent Routes

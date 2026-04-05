@@ -1,26 +1,29 @@
 const mongoose = require("mongoose");
 
-const PortfolioGroupModel = mongoose.model("portfolioGroup");
-const FinancialAssetModel = mongoose.model("financialAsset");
-
 /**
  * Updates the entire portfolio group tree snapshots starting from leaf nodes.
- * 
+ *
  * @param {string[]} leafIds - Array of leaf portfolio group IDs
  * @param {string} userId - User ID
  * @param {object} session - Mongoose session for transactions
  */
-module.exports.updatePortfolioGroupTree = async (leafIds, userId, session = null) => {
+module.exports.updatePortfolioGroupTree = async (
+  leafIds,
+  userId,
+  session = null,
+) => {
   if (!leafIds || leafIds.length === 0) {
     throw new Error("No leaf IDs provided");
   }
+  const PortfolioGroupModel = mongoose.model("portfolioGroup");
+  const FinancialAssetModel = mongoose.model("financialAsset");
 
   // =========================
   // 1. GET ALL GROUPS FOR USER
   // =========================
   const allGroups = await PortfolioGroupModel.find(
     { userId: new mongoose.Types.ObjectId(userId), isDeleted: false },
-    { _id: 1, parentId: 1, path: 1, consolidatedCash: 1 }
+    { _id: 1, parentId: 1, path: 1, consolidatedCash: 1 },
   )
     .lean()
     .session(session);
@@ -38,7 +41,9 @@ module.exports.updatePortfolioGroupTree = async (leafIds, userId, session = null
   const assetAgg = await FinancialAssetModel.aggregate([
     {
       $match: {
-        portfolioGroupId: { $in: leafIds.map(id => new mongoose.Types.ObjectId(id)) },
+        portfolioGroupId: {
+          $in: leafIds.map((id) => new mongoose.Types.ObjectId(id)),
+        },
         userId: new mongoose.Types.ObjectId(userId),
       },
     },
@@ -57,13 +62,17 @@ module.exports.updatePortfolioGroupTree = async (leafIds, userId, session = null
         lifetime_dividend: { $sum: "$snapshot.lifetime.dividend" },
         // Financial Year (only active assets)
         fy_realizedGain: {
-          $sum: { $cond: ["$status", "$snapshot.financialYear.realizedGain", 0] },
+          $sum: {
+            $cond: ["$status", "$snapshot.financialYear.realizedGain", 0],
+          },
         },
         fy_dividend: {
           $sum: { $cond: ["$status", "$snapshot.financialYear.dividend", 0] },
         },
         fy_unrealizedGain: {
-          $sum: { $cond: ["$status", "$snapshot.financialYear.unrealizedGain", 0] },
+          $sum: {
+            $cond: ["$status", "$snapshot.financialYear.unrealizedGain", 0],
+          },
         },
         fy_startDate: { $first: "$snapshot.financialYear.startDate" },
       },
@@ -143,7 +152,7 @@ module.exports.updatePortfolioGroupTree = async (leafIds, userId, session = null
 
       // Find all children of this node
       const children = allGroups.filter(
-        g => g.parentId && g.parentId.toString() === nodeId
+        (g) => g.parentId && g.parentId.toString() === nodeId,
       );
 
       if (children.length === 0) {
@@ -223,7 +232,8 @@ module.exports.updatePortfolioGroupTree = async (leafIds, userId, session = null
 
     if (!snapshot) continue;
 
-    const consolidatedCurrentValue = snapshot.currentValue + (group.consolidatedCash || 0);
+    const consolidatedCurrentValue =
+      snapshot.currentValue + (group.consolidatedCash || 0);
 
     bulkOps.push({
       updateOne: {

@@ -3,23 +3,12 @@ const { Schema } = mongoose;
 
 const snapshotSchema = new Schema(
   {
-    // =====================
-    // POSITION
-    // =====================
-    // this is sum of all financilAssets current investmentvalue
     investmentValue: { type: Number, default: 0 },
-    // this is sum of all financilAssets current currentvalue
     currentValue: { type: Number, default: 0 },
-    // =====================
-    // LIFETIME PERFORMANCE
-    // =====================
     lifetime: {
       realizedGain: { type: Number, default: 0 },
       dividend: { type: Number, default: 0 },
     },
-    // =====================
-    // FINANCIAL YEAR PERFORMANCE
-    // =====================
     financialYear: {
       startDate: { type: Date },
       realizedGain: { type: Number, default: 0 },
@@ -138,22 +127,5 @@ portfolioGroupSchema.pre("validate", async function (next) {
     return next(err);
   }
 });
-
-// // -------- BLOCK STRUCTURAL UPDATES --------
-// portfolioGroupSchema.pre("findOneAndUpdate", function () {
-//   const update = this.getUpdate();
-
-//   if (update.parentId || update.level || update.path || update.userId) {
-//     throw new Error("Structural updates are not allowed");
-//   }
-// });
-
-// portfolioGroupSchema.pre("updateOne", function () {
-//   throw new Error("Direct updates not allowed");
-// });
-
-// portfolioGroupSchema.pre("updateMany", function () {
-//   throw new Error("Direct updates not allowed");
-// });
 
 module.exports = mongoose.model("portfolioGroup", portfolioGroupSchema);
