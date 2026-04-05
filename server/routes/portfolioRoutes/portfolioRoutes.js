@@ -18,7 +18,9 @@ const {
   validate_GroupStatementData,
   validate_tradeData,
 } = require("../../utils/Portfolio_Models_utils/PortfolioGroup_Models_utils/validations/middleware_level_validations/joi_validation/validate_joi_schema");
-const { tradeTransaction } = require("../../controllers/portfolio/portfolioTradeControllers");
+const {
+  trade,
+} = require("../../controllers/portfolio/portfolioTradeControllers");
 
 // routes
 
@@ -46,7 +48,7 @@ router
     validateID("pg_id"),
     validateID("a_id"),
     validate_tradeData,
-    tradeTransaction,
+    trade,
   );
 
 module.exports = router;

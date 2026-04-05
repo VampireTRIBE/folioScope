@@ -18,6 +18,9 @@ const {
   setAssetClassificationCache,
 } = require("./init_cacheFiles/assetClassificationCache");
 const {
+  setAssetMetadataLivePriceCache,
+} = require("./init_cacheFiles/assetLivePriceCache");
+const {
   setAssetMetaDataCache,
 } = require("./init_cacheFiles/assetMetaDataCache");
 
@@ -72,6 +75,7 @@ module.exports.initCacheMaster = async () => {
   try {
     await this.initCacheAssetDataStructure();
     await this.initCacheAssetMetaData();
+    // await setAssetMetadataLivePriceCache();
     return { result: true };
   } catch (error) {
     return { result: false };

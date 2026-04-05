@@ -1,6 +1,37 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
+const snapshotSchema = new Schema(
+  {
+    // =====================
+    // POSITION
+    // =====================
+    // this is sum of all financilAssets current investmentvalue
+    investmentValue: { type: Number, default: 0 },
+    // this is sum of all financilAssets current currentvalue
+    currentValue: { type: Number, default: 0 },
+    // =====================
+    // LIFETIME PERFORMANCE
+    // =====================
+    lifetime: {
+      realizedGain: { type: Number, default: 0 },
+      dividend: { type: Number, default: 0 },
+    },
+    // =====================
+    // FINANCIAL YEAR PERFORMANCE
+    // =====================
+    financialYear: {
+      startDate: { type: Date },
+      realizedGain: { type: Number, default: 0 },
+      dividend: { type: Number, default: 0 },
+      unrealizedGain: { type: Number, default: 0 },
+      totalGain: { type: Number, default: 0 },
+    },
+    irr: { type: Number, default: 0 },
+  },
+  { _id: false },
+);
+
 const portfolioGroupSchema = new Schema(
   {
     name: {
@@ -32,14 +63,13 @@ const portfolioGroupSchema = new Schema(
     description: { type: String },
 
     // -------- Financial Fields --------
+    groupSnapshot: {
+      type: snapshotSchema,
+      default: () => ({}),
+    },
 
-    consolidatedInvestmentValue: { type: Number, default: 0 },
-    consolidatedCurrentValue: { type: Number, default: 0 },
-    consolidatedRealizedGain: { type: Number, default: 0 },
-    consolidatedUnrealizedGain: { type: Number, default: 0 },
-    consolidatedCurrentYearGain: { type: Number, default: 0 },
     consolidatedCash: { type: Number, default: 0 },
-    consolidatedIRR: { type: Number, default: 0 },
+    consolidatedCurrentValue: { type: Number, default: 0 },
 
     // -------- Soft Delete --------
     isDeleted: {

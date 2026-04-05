@@ -1,13 +1,3 @@
-// const {
-//   callAppsScript,
-// } = require("../../services/appsScript/appsScriptService");
-// const log = require("../../utils/console_loggers/consoleLoggers");
-// const customError = require("../../utils/errorClass/customError");
-// const {
-//   validateAssetPriceHistory,
-// } = require("../../utils/validations/DataInsertion_Validations/assetPriceHistoryModel");
-// const AssetPriceHistoryModel = require("../../models/AssetsData_Models/Metrix_Models/AssetPriceHistory");
-
 const AssetPriceHistoryModel = require("../../../../models/AssetsData_Models/Metrix_Models/AssetPriceHistory");
 const {
   callAppsScript,

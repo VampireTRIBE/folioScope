@@ -3,13 +3,36 @@ const { Schema } = mongoose;
 
 const snapshotSchema = new Schema(
   {
-    totalQty: { type: Number, required: true, default: 0 },
-    investmentValue: { type: Number, required: true, default: 0 },
-    currentValue: { type: Number, required: true, default: 0 },
-    realizedGain: { type: Number, required: true, default: 0 },
-    dividendGain: { type: Number, required: true, default: 0 },
-    STCG: { type: Number, required: true, default: 0 },
-    LTCG: { type: Number, required: true, default: 0 },
+    // =====================
+    // POSITION
+    // =====================
+    totalQty: { type: Number, default: 0 },
+    investmentValue: { type: Number, default: 0 },
+    currentValue: { type: Number, default: 0 },
+    // =====================
+    // LIFETIME PERFORMANCE
+    // =====================
+    lifetime: {
+      realizedGain: { type: Number, default: 0 },
+      dividend: { type: Number, default: 0 },
+    },
+    // =====================
+    // FINANCIAL YEAR PERFORMANCE
+    // =====================
+    financialYear: {
+      startDate: { type: Date },
+      realizedGain: { type: Number, default: 0 },
+      dividend: { type: Number, default: 0 },
+      unrealizedGain: { type: Number, default: 0 },
+      totalGain: { type: Number, default: 0 },
+    },
+    // =====================
+    // OPTIONAL (KEEP IF YOU REALLY NEED TAX)
+    // =====================
+    tax: {
+      STCG: { type: Number, default: 0 },
+      LTCG: { type: Number, default: 0 },
+    },
     irr: { type: Number, default: 0 },
   },
   { _id: false },

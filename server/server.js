@@ -32,6 +32,12 @@ dataParser.bodyParser(app);
 const userRoute = require("./routes/userRoutes/userRoute");
 const adminRoute = require("./routes/adminRoutes/adminRoutes");
 const portfolioRoute = require("./routes/portfolioRoutes/portfolioRoutes");
+const {
+  getLeafNodes,
+} = require("./utils/Portfolio_Models_utils/aggregationPipeline/getAll_LeafNodes");
+const {
+  updatePortfolioGroupTree,
+} = require("./utils/Portfolio_Models_utils/aggregationPipeline/updatePortfolioGroupSnapshot");
 
 // ! for listning all requests
 app.listen(port, async (req, res) => {
@@ -62,9 +68,11 @@ app.listen(port, async (req, res) => {
 // setTimeout(init_FetchCurrentPrice, TIME_INTERVEL);
 
 app.use("/test", async (req, res) => {
-  // const result = await fetchCurrentPrice();
+  const leafGroupIds = await getLeafNodes(req.user._id);
+  const result = await updatePortfolioGroupTree(leafGroupIds, req.user._id);
   res.status(200).json({
     success: "successful",
+    leafGroupIds,
     result,
   });
 });

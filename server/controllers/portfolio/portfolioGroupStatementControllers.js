@@ -24,6 +24,10 @@ module.exports.groupstatementTransaction = async (req, res) => {
         throw new Error("Allowed only on leaf nodes");
       }
 
+      if (path.length <= 0) {
+        throw new Error("Transaction not allowed in Default Group");
+      }
+
       if (userId.toString() !== u_id.toString()) {
         throw new Error("Unauthorized");
       }
