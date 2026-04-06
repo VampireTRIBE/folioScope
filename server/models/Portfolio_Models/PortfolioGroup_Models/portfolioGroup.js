@@ -56,7 +56,7 @@ const portfolioGroupSchema = new Schema(
       type: snapshotSchema,
       default: () => ({}),
     },
-
+    consolidatedTax: { type: Number, default: 0 },
     consolidatedCash: { type: Number, default: 0 },
     consolidatedCurrentValue: { type: Number, default: 0 },
 

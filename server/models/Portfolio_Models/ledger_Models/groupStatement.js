@@ -7,7 +7,7 @@ const groupStatementSchema = new Schema(
       type: String,
       required: true,
       trim: true,
-      enum: ["deposit", "withdrawal"],
+      enum: ["deposit", "withdrawal", "tax"],
     },
 
     portfolioGroupId: {

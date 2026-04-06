@@ -41,7 +41,6 @@ module.exports.AssetMetadata_Seeder = async () => {
 
       if (!result) {
         summary.skippedRecords++;
-        console.log(message)
         continue;
       }
       summary.validRecords++;

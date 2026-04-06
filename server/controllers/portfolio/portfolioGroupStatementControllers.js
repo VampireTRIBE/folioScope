@@ -1,9 +1,14 @@
 const mongoose = require("mongoose");
 const PortfolioGroupModel = require("../../models/Portfolio_Models/PortfolioGroup_Models/portfolioGroup");
 const PortfolioGroupStatementModel = require("../../models/Portfolio_Models/ledger_Models/groupStatement");
+
 const {
   is_Leaf,
 } = require("../../utils/Portfolio_Models_utils/aggregationPipeline/IsLeaf");
+
+const {
+  upsertNavPerformance,
+} = require("../../services/syncPortfolio/updateGroup_NAV");
 
 module.exports.groupstatementTransaction = async (req, res) => {
   const session = await mongoose.startSession();
@@ -14,6 +19,7 @@ module.exports.groupstatementTransaction = async (req, res) => {
     let { type, date, amount } = req.body;
 
     await session.withTransaction(async () => {
+      // ---------------- VALIDATION ----------------
       const { userId, isLeaf, path, consolidatedCash } = await is_Leaf(
         PortfolioGroupModel,
         pg_id,
@@ -36,6 +42,7 @@ module.exports.groupstatementTransaction = async (req, res) => {
         throw new Error("Insufficient Funds");
       }
 
+      // ---------------- LEDGER ENTRY ----------------
       await PortfolioGroupStatementModel.create(
         [
           {
@@ -49,11 +56,40 @@ module.exports.groupstatementTransaction = async (req, res) => {
         { session },
       );
 
-      const signedAmount = type === "withdrawal" ? -amount : amount;
+      // ---------------- CASH UPDATE ----------------
+      const signedAmount =
+        type === "withdrawal" || type === "tax" ? -amount : amount;
+
       await PortfolioGroupModel.updateMany(
         { _id: { $in: [...path, pg_id] } },
-        { $inc: { consolidatedCash: signedAmount } },
+        {
+          $inc:
+            type === "tax"
+              ? {
+                  consolidatedCash: signedAmount,
+                  consolidatedTax: amount,
+                }
+              : {
+                  consolidatedCash: signedAmount,
+                },
+        },
         { session },
+      );
+
+      // ---------------- NAV UPDATE ----------------
+      const groupAffectedIds = [...path, pg_id];
+      
+      await Promise.all(
+        groupAffectedIds.map((id) =>
+          upsertNavPerformance({
+            session,
+            portfolioGroupId: id,
+            userId: u_id,
+            date,
+            type,
+            amount: Number(amount),
+          }),
+        ),
       );
     });
 

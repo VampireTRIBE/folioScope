@@ -27,7 +27,7 @@ const snapshotSchema = new Schema(
       totalGain: { type: Number, default: 0 },
     },
     // =====================
-    // OPTIONAL (KEEP IF YOU REALLY NEED TAX)
+    // OPTIONAL
     // =====================
     tax: {
       STCG: { type: Number, default: 0 },

@@ -1,9 +1,9 @@
 const Joi = require("joi");
 
 const groupStatementValidation = Joi.object({
-  type: Joi.string().valid("deposit", "withdrawal").required().messages({
+  type: Joi.string().valid("deposit", "withdrawal", "tax").required().messages({
     "string.base": "type must be a string",
-    "any.only": "Transaction must be 'deposit' or 'withdrawal'",
+    "any.only": "Transaction must be 'deposit' or 'withdrawal' or 'tax'",
     "any.required": "type is required",
   }),
 

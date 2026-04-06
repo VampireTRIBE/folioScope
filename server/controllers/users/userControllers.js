@@ -1,28 +1,60 @@
+const mongoose = require("mongoose");
 const userModel = require("../../models/users_Models/user");
 const PortfolioGroup_Model = require("../../models/Portfolio_Models/PortfolioGroup_Models/portfolioGroup");
+const NavSystem_Model = require("../../models/Portfolio_Models/PortfolioMetrix_Models/navSystem");
 const passport = require("passport");
 
 module.exports.register_NewUser = async (req, res, next) => {
+  const session = await mongoose.startSession();
+
   try {
+    session.startTransaction();
     const { newUser, password } = req.body;
     const new_user = await userModel.register(new userModel(newUser), password);
 
-    await PortfolioGroup_Model.create({
-      name: "NET PORTFOLIO",
-      parentId: null,
-      description: "Top level default Group",
-      level:1,
-      userId: new_user._id,
-    });
+    await PortfolioGroup_Model.create(
+      [
+        {
+          name: "NET PORTFOLIO",
+          parentId: null,
+          description: "Top level default Group",
+          level: 1,
+          userId: new_user._id,
+        },
+      ],
+      { session },
+    );
+    
+    await NavSystem_Model.create(
+      [
+        {
+          name: "NET PORTFOLIO",
+          parentId: null,
+          description: "Top level default Group",
+          level: 1,
+          userId: new_user._id,
+        },
+      ],
+      { session },
+    );
 
-    req.login(new_user, async (err) => {
-      if (err) return next();
+    await session.commitTransaction();
+    session.endSession();
+
+    req.login(new_user, (err) => {
+      if (err) return next(err);
+
       return res.status(200).json({
         success: "Login successful",
       });
     });
   } catch (error) {
-    return res.status(500).json({ error: error.message });
+    await session.abortTransaction();
+    session.endSession();
+
+    return res.status(500).json({
+      error: error.message,
+    });
   }
 };
 

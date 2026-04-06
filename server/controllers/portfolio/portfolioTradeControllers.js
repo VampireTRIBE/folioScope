@@ -20,7 +20,7 @@ module.exports.trade = async (req, res) => {
     if (!success && transactionResult.success) {
       return res.status(400).json({
         error: transactionResult.message,
-        message: "Transaction Successfull but syncPortfolio Failed",
+        message: "Transaction Successfull but syncPortfolio Failed Your Portolio Will sync in 7 minutes.",
       });
     }
 
