@@ -24,19 +24,6 @@ module.exports.register_NewUser = async (req, res, next) => {
       ],
       { session },
     );
-    
-    await NavSystem_Model.create(
-      [
-        {
-          name: "NET PORTFOLIO",
-          parentId: null,
-          description: "Top level default Group",
-          level: 1,
-          userId: new_user._id,
-        },
-      ],
-      { session },
-    );
 
     await session.commitTransaction();
     session.endSession();

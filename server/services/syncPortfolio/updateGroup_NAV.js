@@ -1,13 +1,18 @@
 const mongoose = require("mongoose");
+const {
+  normalizeToIST5PM,
+} = require("../../utils/shared_Utils/helpers/getCurrentFinacialyear");
 
 module.exports.upsertNavPerformance = async ({
-  session,
+  session = null,
   portfolioGroupId,
   userId,
   date,
   type,
   amount,
+  job = false,
 }) => {
+  date = normalizeToIST5PM(date);
   const Nav = mongoose.model("navPerformence");
   const last = await Nav.findOne({
     portfolioGroupId,
@@ -17,7 +22,7 @@ module.exports.upsertNavPerformance = async ({
     .sort({ date: -1 })
     .session(session);
   if (!last) {
-    if (type !== "deposit") {
+    if (type !== "deposit" && !job) {
       throw new Error("First transaction must be a deposit");
     }
 
@@ -61,7 +66,7 @@ module.exports.upsertNavPerformance = async ({
   } else if (type === "tax") {
     value -= amount;
   } else if (type === "market") {
-    value += amount;
+    value = amount;
   }
   if (units > 0) {
     nav = value / units;

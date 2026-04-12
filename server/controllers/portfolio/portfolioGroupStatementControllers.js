@@ -12,6 +12,7 @@ const {
 
 module.exports.groupstatementTransaction = async (req, res) => {
   const session = await mongoose.startSession();
+  const NAV_Performance_Model = mongoose.model("navPerformence");
 
   try {
     const u_id = req.user._id;
@@ -40,6 +41,27 @@ module.exports.groupstatementTransaction = async (req, res) => {
 
       if (type === "withdrawal" && consolidatedCash < amount) {
         throw new Error("Insufficient Funds");
+      }
+
+      const groupLastStatement = await PortfolioGroupStatementModel.findOne()
+        .sort({ date: -1 })
+        .session(session);
+
+      const navLastStatement = await NAV_Performance_Model.findOne()
+        .sort({ date: -1 })
+        .session(session);
+
+      console.log(navLastStatement);
+
+      // Fill nav Gap
+
+      return;
+
+      if (
+        groupLastStatement &&
+        new Date(date) <= new Date(groupLastStatement.date)
+      ) {
+        throw new Error("Backdated or same timestamp transaction not allowed");
       }
 
       // ---------------- LEDGER ENTRY ----------------
@@ -78,7 +100,7 @@ module.exports.groupstatementTransaction = async (req, res) => {
 
       // ---------------- NAV UPDATE ----------------
       const groupAffectedIds = [...path, pg_id];
-      
+
       await Promise.all(
         groupAffectedIds.map((id) =>
           upsertNavPerformance({

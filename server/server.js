@@ -34,6 +34,13 @@ const userRoute = require("./routes/userRoutes/userRoute");
 const adminRoute = require("./routes/adminRoutes/adminRoutes");
 const portfolioRoute = require("./routes/portfolioRoutes/portfolioRoutes");
 const { getGroupValues } = require("./services/syncPortfolio/updateGroup_NAV");
+const {
+  updatePastNAV,
+} = require("./services/syncPortfolio/updateDailyPast_NAV");
+const {
+  getAllUserIds,
+} = require("./utils/Portfolio_Models_utils/aggregationPipeline/getAll_userIds");
+const { Fill_PastNAV } = require("./services/syncPortfolio/fill_nav_Gap");
 
 // ! for listning all requests
 app.listen(port, async (req, res) => {
@@ -41,22 +48,96 @@ app.listen(port, async (req, res) => {
 });
 
 (async function () {
-  // ! init Cache
-  const { result } = await initCacheMaster();
-  result
-    ? log.success("INIT CACHE SUCCESSFUL...")
-    : log.error("INIT CACHE FAILED...");
+  const delay = (ms) => new Promise((res) => setTimeout(res, ms));
+  const runWithRetry = async (fn, label, maxRetries = 3) => {
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        const res = await fn();
+        if (res?.result === false) {
+          throw new Error(`${label} returned false`);
+        }
+        return res;
+      } catch (error) {
+        if (attempt < maxRetries) {
+          await delay(500 * attempt);
+        } else {
+          throw new Error(
+            `${label} failed after ${maxRetries} attempts: ${error.message}`,
+          );
+        }
+      }
+    }
+  };
 
-  // ! INIT APPSCRIPT SERVICES
-  // (async function () {
-  //   const { result } = await initAppscriptMaster();
-  //   result
-  //     ? log.success("INIT APPSCRIPT SUCCESSFUL...")
-  //     : log.error("INIT APPSCRIPT FAILED...");
-  // })();
+  try {
+    // =========================
+    // 1. INIT CACHE
+    // =========================
+    await runWithRetry(() => initCacheMaster(), "INIT CACHE");
+    log.success("INIT CACHE SUCCESSFUL...");
+
+    // // =========================
+    // // 2. INIT APPSCRIPT
+    // // =========================
+    // await runWithRetry(() => initAppscriptMaster(), "INIT APPSCRIPT");
+    // log.success("INIT APPSCRIPT SUCCESSFUL...");
+
+    // // =========================
+    // // 3. UPDATE NAV
+    // // =========================
+    // const userIds = await getAllUserIds();
+    // if (!userIds.length) {
+    //   log.error("No UserId Found...");
+    //   log.success("BOOTSTRAP COMPLETED SUCCESSFULLY");
+    //   return;
+    // }
+    // const BATCH_SIZE = 10;
+    // const MAX_RETRIES = 3;
+    // const retryUpdate = async (userId, attempt = 1) => {
+    //   try {
+    //     await updatePastNAV(userId);
+    //     return { userId, success: true };
+    //   } catch (error) {
+    //     if (attempt < MAX_RETRIES) {
+    //       await delay(300 * attempt);
+    //       return retryUpdate(userId, attempt + 1);
+    //     }
+    //     return { userId, success: false, error };
+    //   }
+    // };
+    // let success = 0;
+    // let failed = [];
+    // for (let i = 0; i < userIds.length; i += BATCH_SIZE) {
+    //   const batch = userIds.slice(i, i + BATCH_SIZE);
+    //   const results = await Promise.all(
+    //     batch.map((userId) => retryUpdate(userId)),
+    //   );
+    //   results.forEach((r) => {
+    //     if (r.success) success++;
+    //     else failed.push(r);
+    //   });
+    // }
+    // if (failed.length > 0) {
+    //   failed.forEach((f) =>
+    //     log.error(`Failed userId: ${f.userId}, error: ${f.error?.message}`),
+    //   );
+    //   throw new Error(
+    //     `NAV UPDATE FAILED: ${failed.length} users failed, ${success} succeeded`,
+    //   );
+    // }
+    // log.success("Past Nav Update successful for all users");
+
+    // // =========================
+    // // DONE
+    // // =========================
+    log.success("BOOTSTRAP COMPLETED SUCCESSFULLY");
+  } catch (err) {
+    console.error("FATAL ERROR:", err.message);
+    // process.exit(1);
+  }
 })();
 
-// const TIME_INTERVEL = 5*60*1000;
+// const TIME_INTERVEL = 60 * 1000;
 // const init_FetchCurrentPrice = async () => {
 //   await fetchCurrentPrice();
 //   setTimeout(init_FetchCurrentPrice, TIME_INTERVEL);
@@ -65,12 +146,12 @@ app.listen(port, async (req, res) => {
 
 // const init_PortfolioSync = async () => {
 //   await syncPortfolio();
-//   setTimeout(init_PortfolioSync, TIME_INTERVEL);
+//   setTimeout(init_PortfolioSync, TIME_INTERVEL + 10000);
 // };
-// setTimeout(init_PortfolioSync, TIME_INTERVEL);
+// setTimeout(init_PortfolioSync, TIME_INTERVEL + 10000);
 
 app.use("/test", async (req, res) => {
-  const leafGroupIds = await getGroupValues(req.user._id);
+  const leafGroupIds = await Fill_PastNAV(req.user._id, null, new Date());
   res.status(200).json({
     success: "successful",
     leafGroupIds,

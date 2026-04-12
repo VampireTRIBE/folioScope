@@ -14,6 +14,7 @@ const { getLatestCloses } = require("./getMarketPrice");
 module.exports.updatefinancialSnapshotsBulk = async (
   userId,
   session = null,
+  assetobj = null,
 ) => {
   const start = new Date(getCurrentFinancialDate());
 
@@ -22,7 +23,7 @@ module.exports.updatefinancialSnapshotsBulk = async (
 
   if (assetIds.length === 0) return;
 
-  const priceMap = await getLatestCloses(start);
+  const priceMap = assetobj ? assetobj : await getLatestCloses(start);
 
   // =====================================================
   // FY REALIZED + DIVIDEND ONLY
@@ -149,5 +150,36 @@ module.exports.updatefinancialSnapshotsBulk = async (
   if (bulkOps.length > 0) {
     await FinantialAssetModel.bulkWrite(bulkOps, { session });
   }
-  return { result: ture };
+  return { result: true };
+};
+
+module.exports.updatefinancial_SnapshotsBulk = async (
+  userId,
+  session = null,
+  assetobj = null,
+) => {
+  const FinancialAsset_Model = mongoose.model("financialAsset");
+  const assets = await FinancialAsset_Model.find({
+    userId: new mongoose.Types.ObjectId(userId),
+    status: true,
+  })
+    .lean()
+    .session(session);
+
+  let assetsObj = {};
+  for (const asset of assets) {
+    if (!assetsObj?.group?.currentValue) {
+      assetsObj.group = {
+        groupId: asset.portfolioGroupId.toString(),
+        currentValue:
+          asset.snapshot.totalQty *
+          assetobj[asset.assetMetadataId.toString()]?.cmp,
+      };
+    } else {
+      assetsObj.group.currentValue +=
+        asset.snapshot.totalQty *
+        assetobj[asset.assetMetadataId.toString()]?.cmp;
+    }
+  }
+  return assetsObj;
 };

@@ -140,9 +140,7 @@ module.exports.tradeTransaction = async (req, res) => {
     }
 
     // ================= BACKDATED CHECK =================
-    const lastTx = await LedgerStatementModel.findOne({
-      financialAssetId: asset._id,
-    })
+    const lastTx = await LedgerStatementModel.findOne()
       .sort({ date: -1 })
       .session(session);
 
@@ -326,7 +324,7 @@ module.exports.tradeTransaction = async (req, res) => {
 
     // 🔓 RELEASE LOCK
     await releaseLock(asset._id);
-    return { success: true, message: "Transaction Completed" };
+    return { success: true, message: "Transaction Completed", date };
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
