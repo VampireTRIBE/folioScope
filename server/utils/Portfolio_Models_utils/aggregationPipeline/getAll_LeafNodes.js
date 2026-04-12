@@ -20,7 +20,7 @@ module.exports.getLeafNodes = async (userId, session = null) => {
   return leafs.map((doc) => doc._id.toString());
 };
 
-module.exports.getGroupToDescendantsMap = async (userId, session = null) => {
+module.exports.getGroupPathMap = async (userId, session = null) => {
   const PortfolioGroup = mongoose.model("portfolioGroup");
 
   const groups = await PortfolioGroup.find(
@@ -33,18 +33,12 @@ module.exports.getGroupToDescendantsMap = async (userId, session = null) => {
   const map = {};
 
   for (const doc of groups) {
-    const childId = doc._id.toString();
-
-    for (const parentId of doc.path) {
-      const pid = parentId.toString();
-
-      if (!map[pid]) {
-        map[pid] = [];
-      }
-
-      map[pid].push(childId);
+    if (doc.path.length === 0) {
+      continue;
     }
+    map[doc._id.toString()] = {
+      path: doc.path,
+    };
   }
-
   return map;
 };

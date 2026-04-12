@@ -9,10 +9,10 @@ const {
 const {
   upsertNavPerformance,
 } = require("../../services/syncPortfolio/updateGroup_NAV");
+const { Fill_PastNAV } = require("../../services/syncPortfolio/fill_nav_Gap");
 
 module.exports.groupstatementTransaction = async (req, res) => {
   const session = await mongoose.startSession();
-  const NAV_Performance_Model = mongoose.model("navPerformence");
 
   try {
     const u_id = req.user._id;
@@ -46,16 +46,6 @@ module.exports.groupstatementTransaction = async (req, res) => {
       const groupLastStatement = await PortfolioGroupStatementModel.findOne()
         .sort({ date: -1 })
         .session(session);
-
-      const navLastStatement = await NAV_Performance_Model.findOne()
-        .sort({ date: -1 })
-        .session(session);
-
-      console.log(navLastStatement);
-
-      // Fill nav Gap
-
-      return;
 
       if (
         groupLastStatement &&
@@ -113,6 +103,7 @@ module.exports.groupstatementTransaction = async (req, res) => {
           }),
         ),
       );
+      await Fill_PastNAV(userId, session, date);
     });
 
     return res.status(201).json({

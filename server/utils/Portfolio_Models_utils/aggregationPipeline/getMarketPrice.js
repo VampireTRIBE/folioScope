@@ -161,31 +161,19 @@ module.exports.getPastClosePrices = async (
 ) => {
   startDate = normalizeToIST330PM(startDate);
   endDate = normalizeToIST330PM(endDate);
-
   const AssetPriceHistory = mongoose.model("AssetPriceHistory");
-
   const data = await AssetPriceHistory.find({
     date: { $gte: startDate, $lte: endDate },
   })
     .sort({ date: 1, assetId: 1 })
     .session(session)
     .lean();
-
   const grouped = {};
-
   for (const doc of data) {
     const d = doc.date.toISOString();
     const assetId = doc.assetId.toString();
-
     if (!grouped[d]) grouped[d] = {};
-
-    grouped[d][assetId] = {
-      cmp: doc.close,
-    };
+    grouped[d][assetId] = { cmp: doc.close };
   }
-
-  return Object.entries(grouped).map(([date, assets]) => ({
-    date,
-    assets,
-  }));
+  return Object.entries(grouped).map(([date, assets]) => ({ date, assets }));
 };

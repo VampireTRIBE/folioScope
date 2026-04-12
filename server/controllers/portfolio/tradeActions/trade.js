@@ -15,6 +15,7 @@ const {
 const {
   getNAMEIDMAP,
 } = require("../../../init_Scripts/init_Cache/AssetsData_Models_Cache/init_cacheFiles/assetClassificationCache");
+const { Fill_PastNAV } = require("../../../services/syncPortfolio/fill_nav_Gap");
 
 // =====================================================
 // 🔴 CONFIG
@@ -75,6 +76,8 @@ module.exports.tradeTransaction = async (req, res) => {
     const { type, date, qty, price, dividendAmount } = req.body;
 
     const txDate = new Date(date);
+
+    await Fill_PastNAV(u_id, session, date);
 
     // ================= VALIDATION =================
     if (!["buy", "sell", "dividend"].includes(type)) {

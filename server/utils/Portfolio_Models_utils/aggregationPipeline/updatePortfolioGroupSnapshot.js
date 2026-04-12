@@ -1,4 +1,10 @@
 const mongoose = require("mongoose");
+const {
+  normalizeToIST5PM,
+} = require("../../shared_Utils/helpers/getCurrentFinacialyear");
+const {
+  upsertNavPerformance,
+} = require("../../../services/syncPortfolio/updateGroup_NAV");
 
 /**
  * Updates the entire portfolio group tree snapshots starting from leaf nodes.
@@ -253,4 +259,59 @@ module.exports.updatePortfolioGroupTree = async (
   }
 
   return { success: true, updatedCount: bulkOps.length };
+};
+
+module.exports.rollupNavBottomToTop = async ({
+  userId,
+  date,
+  session,
+  group,
+}) => {
+  const NAV_Model = mongoose.model("navPerformence");
+  date = normalizeToIST5PM(date);
+  for (const [key, value] of Object.entries(group)) {
+    const navdoc = await NAV_Model.find({
+      userId,
+      date,
+      portfolioGroupId: { $in: value.childrens },
+    })
+      .select("value")
+      .session(session)
+      .lean();
+
+    const lastNavDoc = await NAV_Model.findOne({
+      userId,
+      portfolioGroupId: key,
+    })
+      .select("units")
+      .sort({ date: -1 })
+      .session(session)
+      .lean();
+
+    const totalValue = navdoc.reduce((acc, doc) => acc + (doc.value || 0), 0);
+
+    let units = Number(lastNavDoc.units);
+    let nav = Number(totalValue / units);
+
+    await NAV_Model.findOneAndUpdate(
+      {
+        portfolioGroupId: key,
+        userId,
+        date,
+      },
+      {
+        $set: {
+          units,
+          value: totalValue,
+          nav,
+          messege: "market",
+        },
+      },
+      {
+        upsert: true,
+        new: true,
+        session,
+      },
+    );
+  }
 };

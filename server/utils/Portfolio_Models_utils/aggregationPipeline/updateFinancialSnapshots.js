@@ -183,3 +183,5 @@ module.exports.updatefinancial_SnapshotsBulk = async (
   }
   return assetsObj;
 };
+
+
