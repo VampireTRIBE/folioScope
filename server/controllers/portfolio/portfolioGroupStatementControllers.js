@@ -9,16 +9,17 @@ const {
 const {
   upsertNavPerformance,
 } = require("../../services/syncPortfolio/updateGroup_NAV");
-const { Fill_PastNAV } = require("../../services/syncPortfolio/fill_nav_Gap");
+const {
+  Fill_PastNAV_Redesign,
+} = require("../../services/syncPortfolio/fill_nav_GapV2");
 
 module.exports.groupstatementTransaction = async (req, res) => {
   const session = await mongoose.startSession();
-
   try {
     const u_id = req.user._id;
     const { pg_id } = req.params;
     let { type, date, amount } = req.body;
-
+    let result = null;
     await session.withTransaction(async () => {
       // ---------------- VALIDATION ----------------
       const { userId, isLeaf, path, consolidatedCash } = await is_Leaf(
@@ -53,6 +54,8 @@ module.exports.groupstatementTransaction = async (req, res) => {
       ) {
         throw new Error("Backdated or same timestamp transaction not allowed");
       }
+
+      result = await Fill_PastNAV_Redesign(u_id, session, new Date(date));
 
       // ---------------- LEDGER ENTRY ----------------
       await PortfolioGroupStatementModel.create(
@@ -103,13 +106,14 @@ module.exports.groupstatementTransaction = async (req, res) => {
           }),
         ),
       );
-      await Fill_PastNAV(userId, session, date);
     });
 
     return res.status(201).json({
       success: "Transaction completed successfully",
+      result,
     });
   } catch (error) {
+    console.log(error);
     return res.status(400).json({ error: error.message });
   } finally {
     session.endSession();

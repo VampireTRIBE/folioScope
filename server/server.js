@@ -33,7 +33,7 @@ dataParser.bodyParser(app);
 const userRoute = require("./routes/userRoutes/userRoute");
 const adminRoute = require("./routes/adminRoutes/adminRoutes");
 const portfolioRoute = require("./routes/portfolioRoutes/portfolioRoutes");
-const { getGroupValues } = require("./services/syncPortfolio/updateGroup_NAV");
+
 const {
   updatePastNAV,
 } = require("./services/syncPortfolio/updateDailyPast_NAV");
@@ -41,6 +41,9 @@ const {
   getAllUserIds,
 } = require("./utils/Portfolio_Models_utils/aggregationPipeline/getAll_userIds");
 const { Fill_PastNAV } = require("./services/syncPortfolio/fill_nav_Gap");
+const {
+  Fill_PastNAV_Redesign,
+} = require("./services/syncPortfolio/fill_nav_GapV2");
 
 // ! for listning all requests
 app.listen(port, async (req, res) => {
@@ -137,7 +140,7 @@ app.listen(port, async (req, res) => {
   }
 })();
 
-// const TIME_INTERVEL = 60 * 1000;
+// const TIME_INTERVEL = 2*60 * 1000;
 // const init_FetchCurrentPrice = async () => {
 //   await fetchCurrentPrice();
 //   setTimeout(init_FetchCurrentPrice, TIME_INTERVEL);
@@ -151,10 +154,14 @@ app.listen(port, async (req, res) => {
 // setTimeout(init_PortfolioSync, TIME_INTERVEL + 10000);
 
 app.use("/test", async (req, res) => {
-  const leafGroupIds = await Fill_PastNAV(req.user._id, null, new Date());
+  const leafGroupIds = await Fill_PastNAV_Redesign(
+    req.user._id,
+    null,
+    new Date(),
+  );
   res.status(200).json({
     success: "successful",
-    leafGroupIds,
+    data: leafGroupIds,
   });
 });
 

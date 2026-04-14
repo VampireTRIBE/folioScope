@@ -14,6 +14,16 @@ module.exports.toISTMidnight = (date = null) => {
   return new Date(ist.getTime() - IST_OFFSET * 60000);
 };
 
+module.exports.normalizeToISTEndOfDay = (inputDate) => {
+  const date = new Date(inputDate);
+  const istOffset = 5.5 * 60 * 60 * 1000;
+  const istTime = new Date(date.getTime() + istOffset);
+  const year = istTime.getUTCFullYear();
+  const month = istTime.getUTCMonth();
+  const day = istTime.getUTCDate();
+  return new Date(Date.UTC(year, month, day, 18, 29, 59, 999));
+};
+
 module.exports.normalizeToIST5PM = (inputDate) => {
   const date = new Date(inputDate);
   const istOffset = 5.5 * 60 * 60 * 1000;

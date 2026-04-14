@@ -1,26 +1,31 @@
 const mongoose = require("mongoose");
 
-module.exports.getGroupChildrenMap = async (userId, session) => {
+module.exports.get_AllChildrenMap = async (userId, session = null) => {
   const PortfolioGroup = mongoose.model("portfolioGroup");
 
   const groups = await PortfolioGroup.find({ userId })
-    .select("_id parentId level")
+    .select("_id path")
     .session(session)
     .lean();
 
-  const childrenMap = {};
-  for (const group of groups) {
-    childrenMap[group._id.toString()] = {
-      childrens: [],
-      level: group.level,
-    };
+  const result = {};
+
+  // initialize all keys
+  for (const g of groups) {
+    result[g._id.toString()] = [];
   }
 
-  for (const group of groups) {
-    if (group.parentId) {
-      const parentKey = group.parentId.toString();
-      childrenMap[parentKey].childrens.push(group._id.toString());
+  // build descendants using path
+  for (const g of groups) {
+    const childId = g._id.toString();
+
+    for (const ancestor of g.path) {
+      const parentId = ancestor.toString();
+      if (result[parentId]) {
+        result[parentId].push(childId);
+      }
     }
   }
-  return childrenMap;
+
+  return result;
 };
