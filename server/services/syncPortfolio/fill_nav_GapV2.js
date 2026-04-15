@@ -5,15 +5,21 @@ const {
 const {
   normalizeToIST5PM,
   normalizeToISTEndOfDay,
+  normalizeToIST330PM,
 } = require("../../utils/shared_Utils/helpers/getCurrentFinacialyear");
 const {
   get_NavMeta,
+  get_GroupAssetQtyMap,
+  get_GroupWithCurrentValueMap,
 } = require("../../utils/Portfolio_Models_utils/aggregationPipeline/get_DataFromDatabase");
 const {} = require("../../utils/Portfolio_Models_utils/aggregationPipeline/IsLeaf");
 const {} = require("../../utils/Portfolio_Models_utils/aggregationPipeline/getAll_LeafNodes");
 const {
   get_AllChildrenMap,
 } = require("../../utils/Portfolio_Models_utils/aggregationPipeline/getAll_NonLeafNodes");
+const {
+  getPastClosePrices,
+} = require("../../utils/Portfolio_Models_utils/aggregationPipeline/getMarketPrice");
 
 module.exports.getSortedLeafToRoot = (parentChilds) => {
   const depthMap = {};
@@ -56,6 +62,7 @@ module.exports.getSortedLeafToRoot = (parentChilds) => {
 module.exports.Fill_PastNAV_Redesign = async (
   userId,
   session = null,
+  startDate = null,
   endDate = null,
 ) => {
   if (!session) throw new Error("session required");
@@ -64,11 +71,17 @@ module.exports.Fill_PastNAV_Redesign = async (
     if (!endDate) {
       throw new Error("End date is missing");
     }
+    if (!startDate) {
+      throw new Error("End date is missing");
+    }
+    startDate = normalizeToIST5PM(startDate);
+    const lastNAVdateDocMap = await get_NavMeta(userId, startDate, session);
+    startDate.setUTCDate(startDate.getUTCDate() + 1);
+
     endDate = normalizeToISTEndOfDay(endDate);
     const lastDate = normalizeToIST5PM(new Date(endDate));
 
-    const lastNAVdateDocMap = await get_NavMeta(userId);
-    if (lastNAVdateDocMap.length === 0) {
+    if (!lastNAVdateDocMap.lastDate) {
       const allGroupIds = await getAllGroupIdsByUser({ userId, session });
 
       const bulkOps = allGroupIds.map((groupId) => ({
@@ -82,12 +95,19 @@ module.exports.Fill_PastNAV_Redesign = async (
         },
       }));
       await NAV_Model.bulkWrite(bulkOps, { session });
-      return;
+      return "no Single nav Doc Found";
     }
 
     const newGroupIds = lastNAVdateDocMap?.nullDate;
     const oldGroupIds = lastNAVdateDocMap?.nonNullDate;
-    const startDate = new Date(lastNAVdateDocMap?.lastDate);
+    const leafGroupIds = lastNAVdateDocMap?.leafGroup;
+
+    const [pastCloses, leafGroupQtyMap, leafGroupCurrentValueMap] =
+      await Promise.all([
+        getPastClosePrices(new Date(startDate), endDate, session),
+        get_GroupAssetQtyMap(userId, session),
+        get_GroupWithCurrentValueMap(leafGroupIds, userId, session),
+      ]);
 
     if (newGroupIds.length !== 0) {
       const bulkOps = newGroupIds.map((groupId) => ({
@@ -120,8 +140,9 @@ module.exports.Fill_PastNAV_Redesign = async (
 
     while (startDate < endDate) {
       const navDate = normalizeToIST5PM(new Date(startDate));
+      const priceDate = normalizeToIST330PM(new Date(startDate));
       for (const key of leafToBotton) {
-        if (!currentState[key] && lastDate.toString() !== navDate.toString()) {
+        if (!currentState[key]) {
           continue;
         }
 
@@ -129,21 +150,23 @@ module.exports.Fill_PastNAV_Redesign = async (
 
         let nav = 100;
         let units = 0;
-
-        if (currentState[key]) {
-          nav = currentState[key].nav;
-          units = currentState[key].units;
-        }
-
         let totalValue = 0;
         let totalUnits = 0;
 
         if (children.length === 0) {
           // LEAF NODE
-          nav = currentState[key]?.nav || 100;
           units = currentState[key]?.units || 0;
-
-          totalValue = nav * units;
+          totalValue = leafGroupCurrentValueMap[key] || 0;
+          let totalmarketValue = 0;
+          const assetListObj = leafGroupQtyMap?.[key];
+          if (assetListObj) {
+            for (const [assetId, qty] of Object.entries(assetListObj)) {
+              let cmp = pastCloses[priceDate.toISOString()][assetId];
+              totalmarketValue += Number(qty * cmp);
+            }
+          }
+          totalValue += totalmarketValue;
+          nav = units !== 0 ? totalValue / units : 100;
         } else {
           // PARENT NODE
           for (const child of children) {
@@ -201,11 +224,14 @@ module.exports.Fill_PastNAV_Redesign = async (
 
     return {
       lastNAVdateDocMap,
+      pastCloses,
+      leafGroupQtyMap,
+      leafGroupCurrentValueMap,
+      oldGroupIds,
       parentChilds,
       leafToBotton,
       lastNavData,
       currentState,
-      lastDate,
     };
   } catch (err) {
     throw err;

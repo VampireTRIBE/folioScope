@@ -65,6 +65,7 @@ module.exports.trade = async (req, res) => {
       portfolioGroups,
     });
   } catch (error) {
+    console.log(error)
     return res.status(400).json({
       error: error.message,
     });

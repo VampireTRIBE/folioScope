@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 
 const PortfolioGroupModel = require("../../../models/Portfolio_Models/PortfolioGroup_Models/portfolioGroup");
+const PortfolioGroupStatementModel = require("../../../models/Portfolio_Models/ledger_Models/groupStatement");
 const FinantialAssetModel = require("../../../models/Portfolio_Models/PortfolioMetrix_Models/finantialAsset");
 const LedgerStatementModel = require("../../../models/Portfolio_Models/ledger_Models/ledgerStatement");
 const FifoLotModel = require("../../../models/Portfolio_Models/ledger_Models/fifoLedgerStatement");
@@ -15,7 +16,10 @@ const {
 const {
   getNAMEIDMAP,
 } = require("../../../init_Scripts/init_Cache/AssetsData_Models_Cache/init_cacheFiles/assetClassificationCache");
-const { Fill_PastNAV } = require("../../../services/syncPortfolio/fill_nav_Gap");
+const {
+  Fill_PastNAV,
+} = require("../../../services/syncPortfolio/fill_nav_Gap");
+const { Fill_PastNAV_Redesign } = require("../../../services/syncPortfolio/fill_nav_GapV2");
 
 // =====================================================
 // 🔴 CONFIG
@@ -77,7 +81,7 @@ module.exports.tradeTransaction = async (req, res) => {
 
     const txDate = new Date(date);
 
-    await Fill_PastNAV(u_id, session, date);
+    // await Fill_PastNAV(u_id, session, date);
 
     // ================= VALIDATION =================
     if (!["buy", "sell", "dividend"].includes(type)) {
@@ -147,8 +151,48 @@ module.exports.tradeTransaction = async (req, res) => {
       .sort({ date: -1 })
       .session(session);
 
+    const groupLastStatement = await PortfolioGroupStatementModel.findOne()
+      .sort({ date: -1 })
+      .session(session);
+
     if (lastTx && txDate <= new Date(lastTx.date)) {
       throw new Error("Backdated or same timestamp transaction not allowed");
+    }
+    if (groupLastStatement && txDate <= new Date(groupLastStatement.date)) {
+      throw new Error("Backdated or same timestamp transaction not allowed");
+    }
+
+    let startDate = null;
+
+    const groupDate = groupLastStatement
+      ? new Date(groupLastStatement.date)
+      : null;
+
+    const tradeDate = lastTx
+      ? new Date(lastTx.date)
+      : null;
+
+    if (groupDate && tradeDate) {
+      startDate = groupDate > tradeDate ? groupDate : tradeDate;
+    } else if (groupDate) {
+      startDate = groupDate;
+    } else if (tradeDate) {
+      startDate = tradeDate;
+    }
+    if (startDate) {
+      result = await Fill_PastNAV_Redesign(
+        u_id,
+        session,
+        startDate,
+        new Date(date),
+      );
+    } else {
+      result = await Fill_PastNAV_Redesign(
+        u_id,
+        session,
+        new Date(date),
+        new Date(date),
+      );
     }
 
     // =====================================================
@@ -331,6 +375,7 @@ module.exports.tradeTransaction = async (req, res) => {
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
+    console.log(error);
     // 🔓 ENSURE UNLOCK
     if (asset?._id) {
       await releaseLock(asset._id);

@@ -159,21 +159,74 @@ module.exports.getPastClosePrices = async (
   endDate,
   session = null,
 ) => {
+  const AssetPriceHistory = mongoose.model("AssetPriceHistory");
+
   startDate = normalizeToIST330PM(startDate);
   endDate = normalizeToIST330PM(endDate);
-  const AssetPriceHistory = mongoose.model("AssetPriceHistory");
-  const data = await AssetPriceHistory.find({
+
+  // Needed to seed previous prices before start date
+  const seedData = await AssetPriceHistory.aggregate([
+    {
+      $match: {
+        date: { $lt: startDate },
+      },
+    },
+    {
+      $sort: { date: -1 },
+    },
+    {
+      $group: {
+        _id: "$assetId",
+        close: { $first: "$close" },
+      },
+    },
+  ]).session(session);
+
+  const rangeData = await AssetPriceHistory.find({
     date: { $gte: startDate, $lte: endDate },
   })
     .sort({ date: 1, assetId: 1 })
     .session(session)
     .lean();
-  const grouped = {};
-  for (const doc of data) {
-    const d = doc.date.toISOString();
-    const assetId = doc.assetId.toString();
-    if (!grouped[d]) grouped[d] = {};
-    grouped[d][assetId] = { cmp: doc.close };
+
+  // latest known prices
+  const latestPrice = {};
+
+  for (const row of seedData) {
+    latestPrice[row._id.toString()] = row.close;
   }
-  return Object.entries(grouped).map(([date, assets]) => ({ date, assets }));
+
+  // group actual rows by date
+  const byDate = {};
+
+  for (const row of rangeData) {
+    const dateKey = row.date.toISOString();
+    const assetId = row.assetId.toString();
+
+    if (!byDate[dateKey]) byDate[dateKey] = [];
+    byDate[dateKey].push(row);
+  }
+
+  const result = {};
+
+  let current = new Date(startDate);
+
+  while (current <= endDate) {
+    const dateKey = current.toISOString();
+
+    // update latest known prices if rows exist today
+    if (byDate[dateKey]) {
+      for (const row of byDate[dateKey]) {
+        latestPrice[row.assetId.toString()] = row.close;
+      }
+    }
+
+    // snapshot today's prices
+    result[dateKey] = { ...latestPrice };
+
+    current.setDate(current.getDate() + 1);
+    current = normalizeToIST330PM(current);
+  }
+
+  return result;
 };

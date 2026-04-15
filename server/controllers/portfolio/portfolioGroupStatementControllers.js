@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const PortfolioGroupModel = require("../../models/Portfolio_Models/PortfolioGroup_Models/portfolioGroup");
 const PortfolioGroupStatementModel = require("../../models/Portfolio_Models/ledger_Models/groupStatement");
+const LedgerStatementModel = require("../../models/Portfolio_Models/ledger_Models/ledgerStatement");
 
 const {
   is_Leaf,
@@ -43,8 +44,19 @@ module.exports.groupstatementTransaction = async (req, res) => {
       if (type === "withdrawal" && consolidatedCash < amount) {
         throw new Error("Insufficient Funds");
       }
+      if (type === "tax" && consolidatedCash < amount) {
+        throw new Error("Insufficient Funds For Paying Tax");
+      }
 
-      const groupLastStatement = await PortfolioGroupStatementModel.findOne()
+      const groupLastStatement = await PortfolioGroupStatementModel.findOne({
+        userId: u_id,
+      })
+        .sort({ date: -1 })
+        .session(session);
+
+      const tradeLastStatement = await LedgerStatementModel.findOne({
+        userId: u_id,
+      })
         .sort({ date: -1 })
         .session(session);
 
@@ -55,7 +67,45 @@ module.exports.groupstatementTransaction = async (req, res) => {
         throw new Error("Backdated or same timestamp transaction not allowed");
       }
 
-      result = await Fill_PastNAV_Redesign(u_id, session, new Date(date));
+      if (
+        tradeLastStatement &&
+        new Date(date) <= new Date(tradeLastStatement.date)
+      ) {
+        throw new Error("Backdated or same timestamp transaction not allowed");
+      }
+
+      let startDate = null;
+
+      const groupDate = groupLastStatement
+        ? new Date(groupLastStatement.date)
+        : null;
+
+      const tradeDate = tradeLastStatement
+        ? new Date(tradeLastStatement.date)
+        : null;
+
+      if (groupDate && tradeDate) {
+        startDate = groupDate > tradeDate ? groupDate : tradeDate;
+      } else if (groupDate) {
+        startDate = groupDate;
+      } else if (tradeDate) {
+        startDate = tradeDate;
+      }
+      if (startDate) {
+        result = await Fill_PastNAV_Redesign(
+          u_id,
+          session,
+          startDate,
+          new Date(date),
+        );
+      } else {
+        result = await Fill_PastNAV_Redesign(
+          u_id,
+          session,
+          new Date(date),
+          new Date(date),
+        );
+      }
 
       // ---------------- LEDGER ENTRY ----------------
       await PortfolioGroupStatementModel.create(
