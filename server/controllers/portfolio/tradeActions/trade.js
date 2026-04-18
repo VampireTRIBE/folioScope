@@ -19,7 +19,9 @@ const {
 const {
   Fill_PastNAV,
 } = require("../../../services/syncPortfolio/fill_nav_Gap");
-const { Fill_PastNAV_Redesign } = require("../../../services/syncPortfolio/fill_nav_GapV2");
+const {
+  Fill_PastNAV_Redesign,
+} = require("../../../services/syncPortfolio/fill_nav_GapV2");
 
 // =====================================================
 // 🔴 CONFIG
@@ -68,7 +70,7 @@ const releaseLock = async (assetId) => {
 // =====================================================
 // 🔴 Trade Execution
 // =====================================================
-module.exports.tradeTransaction = async (req, res) => {
+module.exports.tradeTransaction = async (req) => {
   const session = await mongoose.startSession();
   let asset = null;
 
@@ -80,8 +82,6 @@ module.exports.tradeTransaction = async (req, res) => {
     const { type, date, qty, price, dividendAmount } = req.body;
 
     const txDate = new Date(date);
-
-    // await Fill_PastNAV(u_id, session, date);
 
     // ================= VALIDATION =================
     if (!["buy", "sell", "dividend"].includes(type)) {
@@ -147,11 +147,13 @@ module.exports.tradeTransaction = async (req, res) => {
     }
 
     // ================= BACKDATED CHECK =================
-    const lastTx = await LedgerStatementModel.findOne()
+    const lastTx = await LedgerStatementModel.findOne({ userId: u_id })
       .sort({ date: -1 })
       .session(session);
 
-    const groupLastStatement = await PortfolioGroupStatementModel.findOne()
+    const groupLastStatement = await PortfolioGroupStatementModel.findOne({
+      userId: u_id,
+    })
       .sort({ date: -1 })
       .session(session);
 
@@ -162,15 +164,14 @@ module.exports.tradeTransaction = async (req, res) => {
       throw new Error("Backdated or same timestamp transaction not allowed");
     }
 
+    // ========== FILL PRIVIEWS MISSING NAV =================
     let startDate = null;
 
     const groupDate = groupLastStatement
       ? new Date(groupLastStatement.date)
       : null;
 
-    const tradeDate = lastTx
-      ? new Date(lastTx.date)
-      : null;
+    const tradeDate = lastTx ? new Date(lastTx.date) : null;
 
     if (groupDate && tradeDate) {
       startDate = groupDate > tradeDate ? groupDate : tradeDate;
@@ -180,14 +181,9 @@ module.exports.tradeTransaction = async (req, res) => {
       startDate = tradeDate;
     }
     if (startDate) {
-      result = await Fill_PastNAV_Redesign(
-        u_id,
-        session,
-        startDate,
-        new Date(date),
-      );
+      await Fill_PastNAV_Redesign(u_id, session, startDate, new Date(date));
     } else {
-      result = await Fill_PastNAV_Redesign(
+      await Fill_PastNAV_Redesign(
         u_id,
         session,
         new Date(date),
@@ -205,41 +201,55 @@ module.exports.tradeTransaction = async (req, res) => {
         throw new Error("Insufficient funds");
       }
 
-      await FifoLotModel.create(
-        [
-          {
-            financialAssetId: asset._id,
-            userId: u_id,
-            buyQty: qty,
-            remainingQty: qty,
-            buyPrice: price,
-            buyDate: txDate,
-          },
-        ],
-        { session },
-      );
+      await Promise.all([
+        FifoLotModel.create(
+          [
+            {
+              financialAssetId: asset._id,
+              userId: u_id,
+              buyQty: qty,
+              remainingQty: qty,
+              buyPrice: price,
+              buyDate: txDate,
+            },
+          ],
+          { session },
+        ),
 
-      await LedgerStatementModel.create(
-        [
+        LedgerStatementModel.create(
+          [
+            {
+              type: "buy",
+              financialAssetId: asset._id,
+              portfolioGroupId: pg_id,
+              userId: u_id,
+              qty,
+              price,
+              amount: totalAmount,
+              date: txDate,
+            },
+          ],
+          { session },
+        ),
+
+        PortfolioGroupModel.updateMany(
+          { _id: { $in: [...path, pg_id] } },
+          { $inc: { consolidatedCash: -totalAmount } },
+          { session },
+        ),
+
+        FinantialAssetModel.findOneAndUpdate(
           {
-            type: "buy",
-            financialAssetId: asset._id,
+            assetMetadataId: a_id,
             portfolioGroupId: pg_id,
             userId: u_id,
-            qty,
-            price,
-            amount: totalAmount,
-            date: txDate,
           },
-        ],
-        { session },
-      );
-
-      await PortfolioGroupModel.updateMany(
-        { _id: { $in: [...path, pg_id] } },
-        { $inc: { consolidatedCash: -totalAmount } },
-        { session },
-      );
+          {
+            $inc: { "snapshot.totalQty": qty },
+          },
+          { session },
+        ),
+      ]);
     }
 
     // =====================================================
@@ -271,6 +281,8 @@ module.exports.tradeTransaction = async (req, res) => {
         const holdingDays =
           (txDate - new Date(lot.buyDate)) / (1000 * 60 * 60 * 24);
 
+        // the hardcoded 365 is needed to handle on the bases of assets category.
+
         if (holdingDays > 365) totalLTCG += profit;
         else totalSTCG += profit;
 
@@ -286,84 +298,96 @@ module.exports.tradeTransaction = async (req, res) => {
 
       const totalSellAmount = qty * price;
 
-      await LedgerStatementModel.create(
-        [
+      await Promise.all([
+        LedgerStatementModel.create(
+          [
+            {
+              type: "sell",
+              financialAssetId: asset._id,
+              portfolioGroupId: pg_id,
+              userId: u_id,
+              qty,
+              price,
+              amount: totalSellAmount,
+
+              cost: totalCost,
+              profit: totalSTCG + totalLTCG,
+              STCG: totalSTCG,
+              LTCG: totalLTCG,
+
+              date: txDate,
+            },
+          ],
+          { session },
+        ),
+
+        PortfolioGroupModel.updateMany(
+          { _id: { $in: [...path, pg_id] } },
           {
-            type: "sell",
-            financialAssetId: asset._id,
-            portfolioGroupId: pg_id,
-            userId: u_id,
-            qty,
-            price,
-            amount: totalSellAmount,
-
-            cost: totalCost,
-            profit: totalSTCG + totalLTCG,
-            STCG: totalSTCG,
-            LTCG: totalLTCG,
-
-            date: txDate,
+            $inc: {
+              consolidatedCash: totalSellAmount,
+              "groupSnapshot.lifetime.realizedGain": totalSTCG + totalLTCG,
+            },
           },
-        ],
-        { session },
-      );
+          { session },
+        ),
 
-      await PortfolioGroupModel.updateMany(
-        { _id: { $in: [...path, pg_id] } },
-        { $inc: { consolidatedCash: totalSellAmount } },
-        { session },
-      );
-
-      await FinantialAssetModel.updateOne(
-        { _id: asset._id },
-        {
-          $inc: {
-            // LIFETIME (REAL SOURCE OF TRUTH)
-            "snapshot.lifetime.realizedGain": totalSTCG + totalLTCG,
-
-            // TAX
-            "snapshot.tax.STCG": totalSTCG,
-            "snapshot.tax.LTCG": totalLTCG,
+        FinantialAssetModel.updateOne(
+          { _id: asset._id },
+          {
+            $inc: {
+              "snapshot.lifetime.realizedGain": totalSTCG + totalLTCG,
+              "snapshot.tax.STCG": totalSTCG,
+              "snapshot.tax.LTCG": totalLTCG,
+              "snapshot.totalQty": -qty,
+            },
           },
-        },
-        { session },
-      );
+          { session },
+        ),
+      ]);
     }
 
     // =====================================================
     // DIVIDEND
     // =====================================================
     if (type === "dividend") {
-      await LedgerStatementModel.create(
-        [
+      await Promise.all([
+        LedgerStatementModel.create(
+          [
+            {
+              type: "dividend",
+              financialAssetId: asset._id,
+              portfolioGroupId: pg_id,
+              userId: u_id,
+              dividendAmount,
+              amount: dividendAmount,
+              date: txDate,
+            },
+          ],
+          { session },
+        ),
+
+        PortfolioGroupModel.updateMany(
+          { _id: { $in: [...path, pg_id] } },
           {
-            type: "dividend",
-            financialAssetId: asset._id,
-            portfolioGroupId: pg_id,
-            userId: u_id,
-            dividendAmount,
-            amount: dividendAmount,
-            date: txDate,
+            $inc: {
+              consolidatedCash: dividendAmount,
+              "groupSnapshot.lifetime.dividend": dividendAmount,
+            },
           },
-        ],
-        { session },
-      );
+          { session },
+        ),
 
-      await PortfolioGroupModel.updateMany(
-        { _id: { $in: [...path, pg_id] } },
-        { $inc: { consolidatedCash: dividendAmount } },
-        { session },
-      );
-
-      await FinantialAssetModel.updateOne(
-        { _id: asset._id },
-        {
-          $inc: {
-            "snapshot.lifetime.dividend": dividendAmount,
+        FinantialAssetModel.updateOne(
+          { _id: asset._id },
+          {
+            $inc: {
+              "snapshot.lifetime.dividend": dividendAmount,
+            },
           },
-        },
-        { session },
-      );
+          { session },
+        ),
+      ]);
     }
 
     await session.commitTransaction();
@@ -371,7 +395,7 @@ module.exports.tradeTransaction = async (req, res) => {
 
     // 🔓 RELEASE LOCK
     await releaseLock(asset._id);
-    return { success: true, message: "Transaction Completed", date };
+    return { success: true, message: "Transaction Completed", txDate };
   } catch (error) {
     await session.abortTransaction();
     session.endSession();

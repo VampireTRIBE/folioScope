@@ -13,6 +13,9 @@ const {
 const {
   Fill_PastNAV_Redesign,
 } = require("../../services/syncPortfolio/fill_nav_GapV2");
+const {
+  syncNavFutureGap,
+} = require("../../services/syncPortfolio/updatePortfolio");
 
 module.exports.groupstatementTransaction = async (req, res) => {
   const session = await mongoose.startSession();
@@ -158,6 +161,7 @@ module.exports.groupstatementTransaction = async (req, res) => {
       );
     });
 
+    const { success } = await syncNavFutureGap(u_id, date);
     return res.status(201).json({
       success: "Transaction completed successfully",
       result,

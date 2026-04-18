@@ -11,48 +11,55 @@ const {
 const { getFinancialAsset } = require("./getAll_financialAssets");
 const { getLatestCloses } = require("./getMarketPrice");
 
-module.exports.updatefinancialSnapshotsBulk = async (
+module.exports.updatefinancialCurrentSnapshots = async (
   userId,
   session = null,
   assetobj = null,
 ) => {
   const start = new Date(getCurrentFinancialDate());
-
-  const assetMap = await getFinancialAsset(userId);
+  const assetMap = await getFinancialAsset(userId, session);
   const assetIds = Object.keys(assetMap);
-
   if (assetIds.length === 0) return;
-
-  const priceMap = assetobj ? assetobj : await getLatestCloses(start);
 
   // =====================================================
   // FY REALIZED + DIVIDEND ONLY
   // =====================================================
-  const ledgerAgg = await LedgerStatementModel.aggregate([
-    {
-      $match: {
-        financialAssetId: {
-          $in: assetIds.map((id) => new mongoose.Types.ObjectId(id)),
-        },
-        date: { $gte: start },
+
+  const [lots, ledgerAgg, priceMap] = await Promise.all([
+    FifoLotModel.find({
+      financialAssetId: {
+        $in: assetIds.map((id) => new mongoose.Types.ObjectId(id)),
       },
-    },
-    {
-      $group: {
-        _id: "$financialAssetId",
-        realizedGain: {
-          $sum: {
-            $cond: [{ $eq: ["$type", "sell"] }, "$profit", 0],
+      remainingQty: { $gt: 0 },
+    }).session(session),
+
+    LedgerStatementModel.aggregate([
+      {
+        $match: {
+          financialAssetId: {
+            $in: assetIds.map((id) => new mongoose.Types.ObjectId(id)),
           },
-        },
-        dividend: {
-          $sum: {
-            $cond: [{ $eq: ["$type", "dividend"] }, "$amount", 0],
-          },
+          date: { $gte: start },
         },
       },
-    },
-  ]).session(session);
+      {
+        $group: {
+          _id: "$financialAssetId",
+          realizedGain: {
+            $sum: {
+              $cond: [{ $eq: ["$type", "sell"] }, "$profit", 0],
+            },
+          },
+          dividend: {
+            $sum: {
+              $cond: [{ $eq: ["$type", "dividend"] }, "$amount", 0],
+            },
+          },
+        },
+      },
+    ]).option({ session }),
+    getLatestCloses(start, session),
+  ]);
 
   const ledgerMap = {};
   for (const l of ledgerAgg) {
@@ -62,12 +69,6 @@ module.exports.updatefinancialSnapshotsBulk = async (
   // =====================================================
   // LOT CALCULATION
   // =====================================================
-  const lots = await FifoLotModel.find({
-    financialAssetId: {
-      $in: assetIds.map((id) => new mongoose.Types.ObjectId(id)),
-    },
-    remainingQty: { $gt: 0 },
-  }).session(session);
 
   const unrealizedMap = {};
   const currentValueMap = {};
@@ -108,8 +109,9 @@ module.exports.updatefinancialSnapshotsBulk = async (
   }
 
   // =====================================================
-  // BULK UPDATE (LIFETIME REMOVED)
+  // BULK UPDATE
   // =====================================================
+  
   const bulkOps = assetIds.map((id) => {
     const idStr = id.toString();
 
@@ -183,5 +185,3 @@ module.exports.updatefinancial_SnapshotsBulk = async (
   }
   return assetsObj;
 };
-
-

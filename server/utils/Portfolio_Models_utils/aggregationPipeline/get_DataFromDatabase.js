@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 module.exports.get_NavMeta = async (
   userId,
   startDate = null,
-  session = null
+  session = null,
 ) => {
   const PortfolioGroup_Model = mongoose.model("portfolioGroup");
 
@@ -111,10 +111,7 @@ module.exports.get_NavMeta = async (
           $push: {
             $cond: [
               {
-                $and: [
-                  { $eq: ["$isLeaf", true] },
-                  { $ne: ["$navData", null] },
-                ],
+                $and: [{ $eq: ["$isLeaf", true] }, { $ne: ["$navData", null] }],
               },
               "$_id",
               "$$REMOVE",
@@ -145,7 +142,6 @@ module.exports.get_NavMeta = async (
 
   return result[0] || {};
 };
-
 
 module.exports.get_GroupAssetQtyMap = async (userId, session = null) => {
   const FinancialAsset = mongoose.model("financialAsset");
@@ -202,6 +198,28 @@ module.exports.get_GroupAssetQtyMap = async (userId, session = null) => {
   return result;
 };
 
+module.exports.get_LastNavDatesByUser = async (session = null) => {
+  const NavPerformanceModel = mongoose.model("navPerformence");
+  const data = await NavPerformanceModel.aggregate([
+    {
+      $sort: { userId: 1, date: -1 },
+    },
+    {
+      $group: {
+        _id: "$userId",
+        lastNavDate: { $first: "$date" },
+      },
+    },
+  ]).session(session);
+  const result = {};
+  for (const item of data) {
+    result[item._id.toString()] = {
+      lastNavDate: item.lastNavDate,
+    };
+  }
+  return result;
+};
+
 module.exports.get_GroupWithCurrentValueMap = async (
   ids = [],
   userId,
@@ -226,11 +244,7 @@ module.exports.get_GroupWithCurrentValueMap = async (
         _id: 0,
         groupId: { $toString: "$_id" },
         value: {
-          $add: [
-            { $ifNull: ["$groupSnapshot.lifetime.realizedGain", 0] },
-            { $ifNull: ["$groupSnapshot.lifetime.dividend", 0] },
-            { $ifNull: ["$consolidatedCash", 0] },
-          ],
+          $add: [{ $ifNull: ["$consolidatedCash", 0] }],
         },
       },
     },

@@ -12,8 +12,7 @@ const {
   get_GroupAssetQtyMap,
   get_GroupWithCurrentValueMap,
 } = require("../../utils/Portfolio_Models_utils/aggregationPipeline/get_DataFromDatabase");
-const {} = require("../../utils/Portfolio_Models_utils/aggregationPipeline/IsLeaf");
-const {} = require("../../utils/Portfolio_Models_utils/aggregationPipeline/getAll_LeafNodes");
+
 const {
   get_AllChildrenMap,
 } = require("../../utils/Portfolio_Models_utils/aggregationPipeline/getAll_NonLeafNodes");
@@ -76,7 +75,6 @@ module.exports.Fill_PastNAV_Redesign = async (
     }
     startDate = normalizeToIST5PM(startDate);
     const lastNAVdateDocMap = await get_NavMeta(userId, startDate, session);
-    startDate.setUTCDate(startDate.getUTCDate() + 1);
 
     endDate = normalizeToISTEndOfDay(endDate);
     const lastDate = normalizeToIST5PM(new Date(endDate));
@@ -221,7 +219,7 @@ module.exports.Fill_PastNAV_Redesign = async (
     }
 
     bulkOps.length > 0 ? await NAV_Model.bulkWrite(bulkOps, { session }) : "";
-
+    console.log(pastCloses);
     return {
       lastNAVdateDocMap,
       pastCloses,

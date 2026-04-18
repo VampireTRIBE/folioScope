@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const {
   normalizeToIST5PM,
+  getCurrentFinancialDate,
 } = require("../../shared_Utils/helpers/getCurrentFinacialyear");
 const {
   upsertNavPerformance,
@@ -21,11 +22,12 @@ module.exports.updatePortfolioGroupTree = async (
   if (!leafIds || leafIds.length === 0) {
     throw new Error("No leaf IDs provided");
   }
+
   const PortfolioGroupModel = mongoose.model("portfolioGroup");
   const FinancialAssetModel = mongoose.model("financialAsset");
 
   // =========================
-  // 1. GET ALL GROUPS FOR USER
+  // 1. GET ALL GROUPS
   // =========================
   const allGroups = await PortfolioGroupModel.find(
     { userId: new mongoose.Types.ObjectId(userId), isDeleted: false },
@@ -36,13 +38,8 @@ module.exports.updatePortfolioGroupTree = async (
 
   if (allGroups.length === 0) return;
 
-  const groupMap = {};
-  for (const g of allGroups) {
-    groupMap[g._id.toString()] = g;
-  }
-
   // =========================
-  // 2. AGGREGATE FINANCIAL ASSETS BY LEAF
+  // 2. AGGREGATE ASSETS (NO LIFETIME)
   // =========================
   const assetAgg = await FinancialAssetModel.aggregate([
     {
@@ -56,46 +53,48 @@ module.exports.updatePortfolioGroupTree = async (
     {
       $group: {
         _id: "$portfolioGroupId",
-        // Position (only active assets)
+
         investmentValue: {
           $sum: { $cond: ["$status", "$snapshot.investmentValue", 0] },
         },
+
         currentValue: {
           $sum: { $cond: ["$status", "$snapshot.currentValue", 0] },
         },
-        // Lifetime (ALL assets, active + inactive)
-        lifetime_realizedGain: { $sum: "$snapshot.lifetime.realizedGain" },
-        lifetime_dividend: { $sum: "$snapshot.lifetime.dividend" },
-        // Financial Year (only active assets)
+
         fy_realizedGain: {
           $sum: {
             $cond: ["$status", "$snapshot.financialYear.realizedGain", 0],
           },
         },
+
         fy_dividend: {
           $sum: { $cond: ["$status", "$snapshot.financialYear.dividend", 0] },
         },
+
         fy_unrealizedGain: {
           $sum: {
             $cond: ["$status", "$snapshot.financialYear.unrealizedGain", 0],
           },
         },
+
         fy_startDate: { $first: "$snapshot.financialYear.startDate" },
       },
     },
   ]).session(session);
 
-  // Map aggregated data
+  // =========================
+  // 3. LEAF SNAPSHOTS
+  // =========================
   const leafSnapshots = {};
+
   for (const agg of assetAgg) {
     const leafId = agg._id.toString();
+
     leafSnapshots[leafId] = {
       investmentValue: agg.investmentValue || 0,
       currentValue: agg.currentValue || 0,
-      lifetime: {
-        realizedGain: agg.lifetime_realizedGain || 0,
-        dividend: agg.lifetime_dividend || 0,
-      },
+
       financialYear: {
         startDate: agg.fy_startDate || null,
         realizedGain: agg.fy_realizedGain || 0,
@@ -106,18 +105,19 @@ module.exports.updatePortfolioGroupTree = async (
           (agg.fy_dividend || 0) +
           (agg.fy_unrealizedGain || 0),
       },
+
       irr: 0,
     };
   }
 
-  // Initialize missing leaves with zero snapshots
+  // fill missing leaves
   for (const leafId of leafIds) {
     const idStr = leafId.toString();
+
     if (!leafSnapshots[idStr]) {
       leafSnapshots[idStr] = {
         investmentValue: 0,
         currentValue: 0,
-        lifetime: { realizedGain: 0, dividend: 0 },
         financialYear: {
           startDate: null,
           realizedGain: 0,
@@ -131,9 +131,10 @@ module.exports.updatePortfolioGroupTree = async (
   }
 
   // =========================
-  // 3. BUILD LEVEL MAP (for bottom-up traversal)
+  // 4. LEVEL MAP
   // =========================
   const levelMap = {};
+
   for (const group of allGroups) {
     const level = group.path.length + 1;
     if (!levelMap[level]) levelMap[level] = [];
@@ -143,7 +144,7 @@ module.exports.updatePortfolioGroupTree = async (
   const maxLevel = Math.max(...Object.keys(levelMap).map(Number));
 
   // =========================
-  // 4. BOTTOM-UP AGGREGATION
+  // 5. BOTTOM-UP BUILD
   // =========================
   const nodeSnapshots = { ...leafSnapshots };
 
@@ -153,20 +154,16 @@ module.exports.updatePortfolioGroupTree = async (
     for (const node of nodesAtLevel) {
       const nodeId = node._id.toString();
 
-      // If this node already has a snapshot (it's a leaf or was computed), skip aggregation
       if (nodeSnapshots[nodeId]) continue;
 
-      // Find all children of this node
       const children = allGroups.filter(
         (g) => g.parentId && g.parentId.toString() === nodeId,
       );
 
       if (children.length === 0) {
-        // No children, initialize with zeros
         nodeSnapshots[nodeId] = {
           investmentValue: 0,
           currentValue: 0,
-          lifetime: { realizedGain: 0, dividend: 0 },
           financialYear: {
             startDate: null,
             realizedGain: 0,
@@ -179,26 +176,21 @@ module.exports.updatePortfolioGroupTree = async (
         continue;
       }
 
-      // Aggregate children
       let investmentValue = 0;
       let currentValue = 0;
-      let lifetime_realizedGain = 0;
-      let lifetime_dividend = 0;
+
       let fy_realizedGain = 0;
       let fy_dividend = 0;
       let fy_unrealizedGain = 0;
       let fy_startDate = null;
 
       for (const child of children) {
-        const childId = child._id.toString();
-        const childSnapshot = nodeSnapshots[childId];
-
+        const childSnapshot = nodeSnapshots[child._id.toString()];
         if (!childSnapshot) continue;
 
         investmentValue += childSnapshot.investmentValue || 0;
         currentValue += childSnapshot.currentValue || 0;
-        lifetime_realizedGain += childSnapshot.lifetime?.realizedGain || 0;
-        lifetime_dividend += childSnapshot.lifetime?.dividend || 0;
+
         fy_realizedGain += childSnapshot.financialYear?.realizedGain || 0;
         fy_dividend += childSnapshot.financialYear?.dividend || 0;
         fy_unrealizedGain += childSnapshot.financialYear?.unrealizedGain || 0;
@@ -211,10 +203,7 @@ module.exports.updatePortfolioGroupTree = async (
       nodeSnapshots[nodeId] = {
         investmentValue,
         currentValue,
-        lifetime: {
-          realizedGain: lifetime_realizedGain,
-          dividend: lifetime_dividend,
-        },
+
         financialYear: {
           startDate: fy_startDate,
           realizedGain: fy_realizedGain,
@@ -228,7 +217,7 @@ module.exports.updatePortfolioGroupTree = async (
   }
 
   // =========================
-  // 5. BULK UPDATE
+  // 6. BULK UPDATE
   // =========================
   const bulkOps = [];
 
@@ -240,13 +229,15 @@ module.exports.updatePortfolioGroupTree = async (
 
     const consolidatedCurrentValue =
       snapshot.currentValue + (group.consolidatedCash || 0);
-
+    snapshot.financialYear.startDate = getCurrentFinancialDate();
     bulkOps.push({
       updateOne: {
         filter: { _id: group._id },
         update: {
           $set: {
-            groupSnapshot: snapshot,
+            "groupSnapshot.investmentValue": snapshot.investmentValue,
+            "groupSnapshot.currentValue": snapshot.currentValue,
+            "groupSnapshot.financialYear": snapshot.financialYear,
             consolidatedCurrentValue,
           },
         },

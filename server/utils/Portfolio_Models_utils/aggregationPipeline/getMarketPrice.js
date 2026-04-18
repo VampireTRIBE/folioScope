@@ -3,7 +3,7 @@ const {
   normalizeToIST330PM,
 } = require("../../shared_Utils/helpers/getCurrentFinacialyear");
 
-module.exports.getLatestCloses = async (targetDate = null) => {
+module.exports.getLatestCloses = async (targetDate = null, session = null) => {
   const date = targetDate ? new Date(targetDate) : null;
 
   const pipeline = [
@@ -20,7 +20,7 @@ module.exports.getLatestCloses = async (targetDate = null) => {
           },
         ],
 
-        // 🔴 Future (>= targetDate)
+        // 🔴 Closest date >= targetDate
         future: date
           ? [
               { $match: { date: { $gte: date } } },
@@ -33,67 +33,40 @@ module.exports.getLatestCloses = async (targetDate = null) => {
               },
             ]
           : [],
-
-        // 🔴 Past (<= targetDate)
-        past: date
-          ? [
-              { $match: { date: { $lte: date } } },
-              { $sort: { assetId: 1, date: -1 } },
-              {
-                $group: {
-                  _id: "$assetId",
-                  datedCmp: { $first: "$close" },
-                },
-              },
-            ]
-          : [],
       },
     },
   ];
 
-  const data = await mongoose.model("AssetPriceHistory").aggregate(pipeline);
-
-  const result = {};
+  const data = await mongoose
+    .model("AssetPriceHistory")
+    .aggregate(pipeline)
+    .session(session);
 
   const latestMap = {};
   const futureMap = {};
-  const pastMap = {};
 
-  const latestData = data[0].latest || [];
-  const futureData = data[0].future || [];
-  const pastData = data[0].past || [];
+  const latestData = data[0]?.latest || [];
+  const futureData = data[0]?.future || [];
 
-  // 🔴 Latest
   for (const item of latestData) {
     latestMap[item._id.toString()] = item.cmp;
   }
 
-  // 🔴 Future
   for (const item of futureData) {
     futureMap[item._id.toString()] = item.datedCmp;
-  }
-
-  // 🔴 Past
-  for (const item of pastData) {
-    pastMap[item._id.toString()] = item.datedCmp;
   }
 
   const allIds = new Set([
     ...Object.keys(latestMap),
     ...Object.keys(futureMap),
-    ...Object.keys(pastMap),
   ]);
+
+  const result = {};
 
   for (const id of allIds) {
     result[id] = {
       cmp: latestMap[id] ?? null,
-      datedCmp: date
-        ? futureMap[id] !== undefined
-          ? futureMap[id]
-          : pastMap[id] !== undefined
-            ? pastMap[id]
-            : null
-        : null,
+      datedCmp: futureMap[id] ?? null,
     };
   }
 

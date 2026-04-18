@@ -18,7 +18,19 @@ const {
 const {
   fetchCurrentPrice,
 } = require("./init_Scripts/init_Appscript/AssetsData_Models_Scripts/init_appscriptFiles/fetch_CurrentPriceScript");
-const { syncPortfolio } = require("./services/syncPortfolio/updatePortfolio");
+const {
+  syncPortfolio,
+  syncNavFutureGap,
+} = require("./services/syncPortfolio/updatePortfolio");
+const {
+  getAllUserIds,
+} = require("./utils/Portfolio_Models_utils/aggregationPipeline/getAll_userIds");
+const {
+  Fill_PastNAV_Redesign,
+} = require("./services/syncPortfolio/fill_nav_GapV2");
+const {
+  get_LastNavDatesByUser,
+} = require("./utils/Portfolio_Models_utils/aggregationPipeline/get_DataFromDatabase");
 
 const app = express();
 let port = 3000;
@@ -34,21 +46,12 @@ const userRoute = require("./routes/userRoutes/userRoute");
 const adminRoute = require("./routes/adminRoutes/adminRoutes");
 const portfolioRoute = require("./routes/portfolioRoutes/portfolioRoutes");
 
-const {
-  updatePastNAV,
-} = require("./services/syncPortfolio/updateDailyPast_NAV");
-const {
-  getAllUserIds,
-} = require("./utils/Portfolio_Models_utils/aggregationPipeline/getAll_userIds");
-const { Fill_PastNAV } = require("./services/syncPortfolio/fill_nav_Gap");
-const {
-  Fill_PastNAV_Redesign,
-} = require("./services/syncPortfolio/fill_nav_GapV2");
-
 // ! for listning all requests
 app.listen(port, async (req, res) => {
   log.running(`SERVER PORT : ${port}`);
 });
+
+// ! System Bootup
 
 (async function () {
   const delay = (ms) => new Promise((res) => setTimeout(res, ms));
@@ -79,86 +82,97 @@ app.listen(port, async (req, res) => {
     await runWithRetry(() => initCacheMaster(), "INIT CACHE");
     log.success("INIT CACHE SUCCESSFUL...");
 
-    // // =========================
-    // // 2. INIT APPSCRIPT
-    // // =========================
+    // =========================
+    // 2. INIT APPSCRIPT
+    // =========================
     // await runWithRetry(() => initAppscriptMaster(), "INIT APPSCRIPT");
     // log.success("INIT APPSCRIPT SUCCESSFUL...");
 
-    // // =========================
-    // // 3. UPDATE NAV
-    // // =========================
-    // const userIds = await getAllUserIds();
-    // if (!userIds.length) {
-    //   log.error("No UserId Found...");
-    //   log.success("BOOTSTRAP COMPLETED SUCCESSFULLY");
-    //   return;
-    // }
-    // const BATCH_SIZE = 10;
-    // const MAX_RETRIES = 3;
-    // const retryUpdate = async (userId, attempt = 1) => {
-    //   try {
-    //     await updatePastNAV(userId);
-    //     return { userId, success: true };
-    //   } catch (error) {
-    //     if (attempt < MAX_RETRIES) {
-    //       await delay(300 * attempt);
-    //       return retryUpdate(userId, attempt + 1);
-    //     }
-    //     return { userId, success: false, error };
-    //   }
-    // };
-    // let success = 0;
-    // let failed = [];
-    // for (let i = 0; i < userIds.length; i += BATCH_SIZE) {
-    //   const batch = userIds.slice(i, i + BATCH_SIZE);
-    //   const results = await Promise.all(
-    //     batch.map((userId) => retryUpdate(userId)),
-    //   );
-    //   results.forEach((r) => {
-    //     if (r.success) success++;
-    //     else failed.push(r);
-    //   });
-    // }
-    // if (failed.length > 0) {
-    //   failed.forEach((f) =>
-    //     log.error(`Failed userId: ${f.userId}, error: ${f.error?.message}`),
-    //   );
-    //   throw new Error(
-    //     `NAV UPDATE FAILED: ${failed.length} users failed, ${success} succeeded`,
-    //   );
-    // }
-    // log.success("Past Nav Update successful for all users");
+    // =========================
+    // 3. UPDATE NAV
+    // =========================
+    const [userIds, userNavMap] = await Promise.all([
+      getAllUserIds(),
+      get_LastNavDatesByUser(),
+    ]);
+    if (!userIds.length) {
+      log.error("No UserId Found...");
+      log.success("BOOTSTRAP COMPLETED SUCCESSFULLY");
+      return;
+    }
+    const BATCH_SIZE = 10;
+    const MAX_RETRIES = 3;
+    const retryUpdate = async (userId, attempt = 1) => {
+      try {
+        await syncNavFutureGap(
+          userId,
+          userNavMap[userId].lastNavDate,
+          new Date(),
+        );
+        return { userId, success: true };
+      } catch (error) {
+        if (attempt < MAX_RETRIES) {
+          await delay(300 * attempt);
+          return retryUpdate(userId, attempt + 1);
+        }
+        return { userId, success: false, error };
+      }
+    };
+    let success = 0;
+    let failed = [];
+    for (let i = 0; i < userIds.length; i += BATCH_SIZE) {
+      const batch = userIds.slice(i, i + BATCH_SIZE);
+      const results = await Promise.all(
+        batch.map((userId) => retryUpdate(userId)),
+      );
+      results.forEach((r) => {
+        if (r.success) success++;
+        else failed.push(r);
+      });
+    }
+    if (failed.length > 0) {
+      failed.forEach((f) =>
+        log.error(`Failed userId: ${f.userId}, error: ${f.error?.message}`),
+      );
+      throw new Error(
+        `NAV UPDATE FAILED: ${failed.length} users failed, ${success} succeeded`,
+      );
+    }
+    log.success("Past Nav Update successful for all users");
 
-    // // =========================
-    // // DONE
-    // // =========================
+    // =========================
+    // DONE
+    // =========================
     log.success("BOOTSTRAP COMPLETED SUCCESSFULLY");
   } catch (err) {
     console.error("FATAL ERROR:", err.message);
-    // process.exit(1);
   }
 })();
 
-// const TIME_INTERVEL = 2*60 * 1000;
+// ! Update Live Price And Sync Portfolio
+
+const TIME_INTERVEL = 3 * 60 * 1000;
 // const init_FetchCurrentPrice = async () => {
 //   await fetchCurrentPrice();
 //   setTimeout(init_FetchCurrentPrice, TIME_INTERVEL);
 // };
 // setTimeout(init_FetchCurrentPrice, TIME_INTERVEL);
 
-// const init_PortfolioSync = async () => {
-//   await syncPortfolio();
-//   setTimeout(init_PortfolioSync, TIME_INTERVEL + 10000);
-// };
-// setTimeout(init_PortfolioSync, TIME_INTERVEL + 10000);
+const init_PortfolioSync = async () => {
+  const [userIds, userNavMap] = await Promise.all([
+    getAllUserIds(),
+    get_LastNavDatesByUser(),
+  ]);
+  for (const userId of userIds) {
+    await syncNavFutureGap(userId, userNavMap[userId].lastNavDate, new Date());
+    await syncPortfolio(userId);
+  }
+  setTimeout(init_PortfolioSync, TIME_INTERVEL + 60000);
+};
+setTimeout(init_PortfolioSync, TIME_INTERVEL + 60000);
 
 app.use("/test", async (req, res) => {
-  const leafGroupIds = await Fill_PastNAV_Redesign(
-    req.user._id,
-    null,
-    new Date(),
-  );
+  const leafGroupIds = await get_LastNavDatesByUser();
   res.status(200).json({
     success: "successful",
     data: leafGroupIds,

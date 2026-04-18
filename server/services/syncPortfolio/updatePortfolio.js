@@ -3,7 +3,7 @@ const {
   getAllUserIds,
 } = require("../../utils/Portfolio_Models_utils/aggregationPipeline/getAll_userIds");
 const {
-  updatefinancialSnapshotsBulk,
+  updatefinancialCurrentSnapshots,
 } = require("../../utils/Portfolio_Models_utils/aggregationPipeline/updateFinancialSnapshots");
 const {
   getLeafNodes,
@@ -11,6 +11,34 @@ const {
 const {
   updatePortfolioGroupTree,
 } = require("../../utils/Portfolio_Models_utils/aggregationPipeline/updatePortfolioGroupSnapshot");
+const { Fill_PastNAV_Redesign } = require("./fill_nav_GapV2");
+
+module.exports.syncNavFutureGap = async (
+  userID = null,
+  startDate = null,
+  endDate = null,
+) => {
+  try {
+    if (!userID || !startDate) {
+      return { success: false };
+    }
+    const session = await mongoose.startSession();
+    try {
+      session.startTransaction();
+      endDate = endDate ? endDate : new Date();
+      await Fill_PastNAV_Redesign(userID, session, startDate, endDate);
+      await session.commitTransaction();
+      session.endSession();
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      return { success: false };
+    }
+    return { success: true };
+  } catch (error) {
+    return { success: false };
+  }
+};
 
 module.exports.syncPortfolio = async (userID = null) => {
   try {
@@ -25,7 +53,7 @@ module.exports.syncPortfolio = async (userID = null) => {
       const session = await mongoose.startSession();
       try {
         session.startTransaction();
-        await updatefinancialSnapshotsBulk(userId, session);
+        await updatefinancialCurrentSnapshots(userId, session);
         const leafNodes = await getLeafNodes(userId, session);
         await updatePortfolioGroupTree(leafNodes, userId, session);
         await session.commitTransaction();
@@ -33,6 +61,7 @@ module.exports.syncPortfolio = async (userID = null) => {
       } catch (error) {
         await session.abortTransaction();
         session.endSession();
+        console.log(error);
         return { success: false };
       }
     }
