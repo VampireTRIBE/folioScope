@@ -158,18 +158,18 @@ const TIME_INTERVEL = 3 * 60 * 1000;
 // };
 // setTimeout(init_FetchCurrentPrice, TIME_INTERVEL);
 
-const init_PortfolioSync = async () => {
-  const [userIds, userNavMap] = await Promise.all([
-    getAllUserIds(),
-    get_LastNavDatesByUser(),
-  ]);
-  for (const userId of userIds) {
-    await syncNavFutureGap(userId, userNavMap[userId].lastNavDate, new Date());
-    await syncPortfolio(userId);
-  }
-  setTimeout(init_PortfolioSync, TIME_INTERVEL + 60000);
-};
-setTimeout(init_PortfolioSync, TIME_INTERVEL + 60000);
+// const init_PortfolioSync = async () => {
+//   const [userIds, userNavMap] = await Promise.all([
+//     getAllUserIds(),
+//     get_LastNavDatesByUser(),
+//   ]);
+//   for (const userId of userIds) {
+//     // await syncNavFutureGap(userId, userNavMap[userId].lastNavDate, new Date());
+//     await syncPortfolio(userId);
+//   }
+//   setTimeout(init_PortfolioSync, TIME_INTERVEL + 60000);
+// };
+// setTimeout(init_PortfolioSync, TIME_INTERVEL + 60000);
 
 app.use("/test", async (req, res) => {
   const leafGroupIds = await get_LastNavDatesByUser();

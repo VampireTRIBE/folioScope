@@ -7,13 +7,6 @@ const {
   upsertNavPerformance,
 } = require("../../../services/syncPortfolio/updateGroup_NAV");
 
-/**
- * Updates the entire portfolio group tree snapshots starting from leaf nodes.
- *
- * @param {string[]} leafIds - Array of leaf portfolio group IDs
- * @param {string} userId - User ID
- * @param {object} session - Mongoose session for transactions
- */
 module.exports.updatePortfolioGroupTree = async (
   leafIds,
   userId,
@@ -27,7 +20,7 @@ module.exports.updatePortfolioGroupTree = async (
   const FinancialAssetModel = mongoose.model("financialAsset");
 
   // =========================
-  // 1. GET ALL GROUPS
+  // ! 1. GET ALL GROUPS
   // =========================
   const allGroups = await PortfolioGroupModel.find(
     { userId: new mongoose.Types.ObjectId(userId), isDeleted: false },
@@ -39,7 +32,7 @@ module.exports.updatePortfolioGroupTree = async (
   if (allGroups.length === 0) return;
 
   // =========================
-  // 2. AGGREGATE ASSETS (NO LIFETIME)
+  // ! 2. AGGREGATE ASSETS
   // =========================
   const assetAgg = await FinancialAssetModel.aggregate([
     {
@@ -84,7 +77,7 @@ module.exports.updatePortfolioGroupTree = async (
   ]).session(session);
 
   // =========================
-  // 3. LEAF SNAPSHOTS
+  // ! 3. LEAF SNAPSHOTS
   // =========================
   const leafSnapshots = {};
 
@@ -110,7 +103,9 @@ module.exports.updatePortfolioGroupTree = async (
     };
   }
 
-  // fill missing leaves
+  // ============================
+  // ! fill missing leaves
+  // ============================
   for (const leafId of leafIds) {
     const idStr = leafId.toString();
 
@@ -131,7 +126,7 @@ module.exports.updatePortfolioGroupTree = async (
   }
 
   // =========================
-  // 4. LEVEL MAP
+  // ! 4. LEVEL MAP
   // =========================
   const levelMap = {};
 
@@ -144,7 +139,7 @@ module.exports.updatePortfolioGroupTree = async (
   const maxLevel = Math.max(...Object.keys(levelMap).map(Number));
 
   // =========================
-  // 5. BOTTOM-UP BUILD
+  // ! 5. BOTTOM-UP BUILD
   // =========================
   const nodeSnapshots = { ...leafSnapshots };
 
@@ -217,7 +212,7 @@ module.exports.updatePortfolioGroupTree = async (
   }
 
   // =========================
-  // 6. BULK UPDATE
+  // ! 6. BULK UPDATE
   // =========================
   const bulkOps = [];
 
@@ -250,59 +245,4 @@ module.exports.updatePortfolioGroupTree = async (
   }
 
   return { success: true, updatedCount: bulkOps.length };
-};
-
-module.exports.rollupNavBottomToTop = async ({
-  userId,
-  date,
-  session,
-  group,
-}) => {
-  const NAV_Model = mongoose.model("navPerformence");
-  date = normalizeToIST5PM(date);
-  for (const [key, value] of Object.entries(group)) {
-    const navdoc = await NAV_Model.find({
-      userId,
-      date,
-      portfolioGroupId: { $in: value.childrens },
-    })
-      .select("value")
-      .session(session)
-      .lean();
-
-    const lastNavDoc = await NAV_Model.findOne({
-      userId,
-      portfolioGroupId: key,
-    })
-      .select("units")
-      .sort({ date: -1 })
-      .session(session)
-      .lean();
-
-    const totalValue = navdoc.reduce((acc, doc) => acc + (doc.value || 0), 0);
-
-    let units = Number(lastNavDoc.units);
-    let nav = Number(totalValue / units);
-
-    await NAV_Model.findOneAndUpdate(
-      {
-        portfolioGroupId: key,
-        userId,
-        date,
-      },
-      {
-        $set: {
-          units,
-          value: totalValue,
-          nav,
-          messege: "market",
-        },
-      },
-      {
-        upsert: true,
-        new: true,
-        session,
-      },
-    );
-  }
 };

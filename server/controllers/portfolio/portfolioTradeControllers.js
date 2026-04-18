@@ -6,9 +6,6 @@ const {
   syncPortfolio,
   syncNavFutureGap,
 } = require("../../services/syncPortfolio/updatePortfolio");
-const {
-  getPortfolioGroupCurrentValues,
-} = require("../../utils/Portfolio_Models_utils/aggregationPipeline/getConsolidatedCurrentValue");
 const { tradeTransaction } = require("./tradeActions/trade");
 
 // =====================================================

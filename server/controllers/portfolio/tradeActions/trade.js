@@ -17,9 +17,6 @@ const {
   getNAMEIDMAP,
 } = require("../../../init_Scripts/init_Cache/AssetsData_Models_Cache/init_cacheFiles/assetClassificationCache");
 const {
-  Fill_PastNAV,
-} = require("../../../services/syncPortfolio/fill_nav_Gap");
-const {
   Fill_PastNAV_Redesign,
 } = require("../../../services/syncPortfolio/fill_nav_GapV2");
 

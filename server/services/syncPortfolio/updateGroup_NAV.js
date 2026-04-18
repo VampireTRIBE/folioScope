@@ -30,7 +30,7 @@ module.exports.upsertNavPerformance = async ({
     .session(session);
 
   // =========================
-  // FIRST ENTRY
+  // ! FIRST ENTRY
   // =========================
   if (!last) {
     if (type !== "deposit" && type !== "market" && !job) {
@@ -66,7 +66,7 @@ module.exports.upsertNavPerformance = async ({
   }
 
   // =========================
-  // LOAD PREVIOUS STATE
+  // ! LOAD PREVIOUS STATE
   // =========================
   let units = Number(last.units || 0);
   let value = Number(last.value || 0);
@@ -77,7 +77,7 @@ module.exports.upsertNavPerformance = async ({
   }
 
   // =========================
-  // APPLY EVENT
+  // ! APPLY EVENT
   // =========================
   if (type === "deposit") {
     const newUnits = amount / nav;
@@ -105,7 +105,7 @@ module.exports.upsertNavPerformance = async ({
   }
 
   // =========================
-  // CLEAN FLOAT NOISE
+  // ! CLEAN FLOAT NOISE
   // =========================
   if (Math.abs(units) < 0.0000001) units = 0;
   if (Math.abs(value) < 0.0000001) value = 0;
@@ -119,7 +119,7 @@ module.exports.upsertNavPerformance = async ({
   }
 
   // =========================
-  // RECALCULATE NAV
+  // ! RECALCULATE NAV
   // =========================
   if (units > 0) {
     nav = value / units;
@@ -130,7 +130,7 @@ module.exports.upsertNavPerformance = async ({
   }
 
   // =========================
-  // UPSERT SAME DAY ROW
+  // ! UPSERT SAME DAY ROW
   // =========================
   const result = await Nav.findOneAndUpdate(
     {
@@ -154,21 +154,4 @@ module.exports.upsertNavPerformance = async ({
   );
 
   return result;
-};
-
-module.exports.getGroupValues = async (userId, session = null) => {
-  const PortfolioGroup = mongoose.model("portfolioGroup");
-
-  const groups = await PortfolioGroup.find(
-    { userId },
-    {
-      _id: 1,
-      userId: 1,
-      consolidatedCurrentValue: 1,
-    },
-  )
-    .session(session)
-    .lean();
-
-  return groups;
 };

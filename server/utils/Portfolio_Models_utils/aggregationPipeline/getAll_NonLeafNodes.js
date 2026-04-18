@@ -26,6 +26,5 @@ module.exports.get_AllChildrenMap = async (userId, session = null) => {
       result[parentId].push(childId);
     }
   }
-
   return result;
 };

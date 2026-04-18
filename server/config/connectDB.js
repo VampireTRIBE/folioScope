@@ -8,7 +8,7 @@ const log = require("../utils/shared_Utils/console_loggers/consoleLoggers");
 async function DB_connect() {
   try {
     mongoose.connect(process.env.DB_URL, { autoIndex: true });
-    log.success("DATABASE CONNECTION SUCCESSFUL");
+    log.success("DATABASE CONNECTION SUCCESSFULL");
   } catch (err) {
     log.error("DATABASE CONNECTION FAILED");
   }

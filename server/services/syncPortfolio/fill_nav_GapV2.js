@@ -219,18 +219,6 @@ module.exports.Fill_PastNAV_Redesign = async (
     }
 
     bulkOps.length > 0 ? await NAV_Model.bulkWrite(bulkOps, { session }) : "";
-    console.log(pastCloses);
-    return {
-      lastNAVdateDocMap,
-      pastCloses,
-      leafGroupQtyMap,
-      leafGroupCurrentValueMap,
-      oldGroupIds,
-      parentChilds,
-      leafToBotton,
-      lastNavData,
-      currentState,
-    };
   } catch (err) {
     throw err;
   }

@@ -31,6 +31,5 @@ module.exports.is_Leaf = async (Model, id, session = null) => {
   if (!result.length) {
     throw new customError("Group not found", 404);
   }
-
   return result[0];
 };

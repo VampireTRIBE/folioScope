@@ -11,6 +11,9 @@ const {
 const { getFinancialAsset } = require("./getAll_financialAssets");
 const { getLatestCloses } = require("./getMarketPrice");
 
+// ======================================
+// ! Update All Financial Assets
+// ======================================
 module.exports.updatefinancialCurrentSnapshots = async (
   userId,
   session = null,
@@ -21,9 +24,9 @@ module.exports.updatefinancialCurrentSnapshots = async (
   const assetIds = Object.keys(assetMap);
   if (assetIds.length === 0) return;
 
-  // =====================================================
-  // FY REALIZED + DIVIDEND ONLY
-  // =====================================================
+  // ==================================
+  // ! FY REALIZED + DIVIDEND ONLY
+  // ==================================
 
   const [lots, ledgerAgg, priceMap] = await Promise.all([
     FifoLotModel.find({
@@ -67,7 +70,7 @@ module.exports.updatefinancialCurrentSnapshots = async (
   }
 
   // =====================================================
-  // LOT CALCULATION
+  // ! LOT CALCULATION
   // =====================================================
 
   const unrealizedMap = {};
@@ -109,9 +112,9 @@ module.exports.updatefinancialCurrentSnapshots = async (
   }
 
   // =====================================================
-  // BULK UPDATE
+  // ! BULK UPDATE
   // =====================================================
-  
+
   const bulkOps = assetIds.map((id) => {
     const idStr = id.toString();
 
@@ -133,12 +136,12 @@ module.exports.updatefinancialCurrentSnapshots = async (
         filter: { _id: new mongoose.Types.ObjectId(id) },
         update: {
           $set: {
-            // POSITION
+            // ! POSITION
             "snapshot.totalQty": totalQty,
             "snapshot.investmentValue": investmentValue,
             "snapshot.currentValue": currentValue,
 
-            // FY ONLY
+            // ! FY SNAPSHOT ONLY
             "snapshot.financialYear.realizedGain": realized,
             "snapshot.financialYear.dividend": dividend,
             "snapshot.financialYear.unrealizedGain": unrealized,
@@ -153,35 +156,4 @@ module.exports.updatefinancialCurrentSnapshots = async (
     await FinantialAssetModel.bulkWrite(bulkOps, { session });
   }
   return { result: true };
-};
-
-module.exports.updatefinancial_SnapshotsBulk = async (
-  userId,
-  session = null,
-  assetobj = null,
-) => {
-  const FinancialAsset_Model = mongoose.model("financialAsset");
-  const assets = await FinancialAsset_Model.find({
-    userId: new mongoose.Types.ObjectId(userId),
-    status: true,
-  })
-    .lean()
-    .session(session);
-
-  let assetsObj = {};
-  for (const asset of assets) {
-    if (!assetsObj?.group?.currentValue) {
-      assetsObj.group = {
-        groupId: asset.portfolioGroupId.toString(),
-        currentValue:
-          asset.snapshot.totalQty *
-          assetobj[asset.assetMetadataId.toString()]?.cmp,
-      };
-    } else {
-      assetsObj.group.currentValue +=
-        asset.snapshot.totalQty *
-        assetobj[asset.assetMetadataId.toString()]?.cmp;
-    }
-  }
-  return assetsObj;
 };
