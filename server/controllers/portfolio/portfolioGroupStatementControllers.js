@@ -17,14 +17,70 @@ const {
   syncNavFutureGap,
 } = require("../../services/syncPortfolio/updatePortfolio");
 
+// =====================================
+// LOCK CONFIG
+// =====================================
+const LOCK_TIMEOUT = 1000 * 60; // 1 minute
+
+// =====================================
+// GROUP LOCK HELPERS
+// =====================================
+const acquireGroupLock = async (groupId, session) => {
+  const now = new Date();
+  const locked = await PortfolioGroupModel.findOneAndUpdate(
+    {
+      _id: groupId,
+      $or: [
+        { "lock.isLocked": false },
+        { "lock.isLocked": { $exists: false } },
+        { "lock.lockedAt": { $lt: new Date(now - LOCK_TIMEOUT) } },
+      ],
+    },
+    {
+      $set: {
+        "lock.isLocked": true,
+        "lock.lockedAt": now,
+      },
+    },
+    { new: true, session },
+  );
+
+  if (!locked) {
+    throw new Error("Another group transaction is in progress");
+  }
+
+  return locked;
+};
+
+const releaseGroupLock = async (groupId) => {
+  await PortfolioGroupModel.updateOne(
+    { _id: groupId },
+    {
+      $set: {
+        "lock.isLocked": false,
+      },
+    },
+  );
+};
+
+// =====================================
+// CONTROLLER
+// =====================================
 module.exports.groupstatementTransaction = async (req, res) => {
   const session = await mongoose.startSession();
+  let lockedGroupId = null;
+
   try {
     const u_id = req.user._id;
     const { pg_id } = req.params;
     let { type, date, amount } = req.body;
     let result = null;
+
     await session.withTransaction(async () => {
+      // ---------------- LOCK FIRST ----------------
+      await acquireGroupLock(pg_id, session);
+      lockedGroupId = pg_id;
+
       // ---------------- VALIDATION ----------------
       const { userId, isLeaf, path, consolidatedCash } = await is_Leaf(
         PortfolioGroupModel,
@@ -47,10 +103,12 @@ module.exports.groupstatementTransaction = async (req, res) => {
       if (type === "withdrawal" && consolidatedCash < amount) {
         throw new Error("Insufficient Funds");
       }
+
       if (type === "tax" && consolidatedCash < amount) {
         throw new Error("Insufficient Funds For Paying Tax");
       }
 
+      // ---------------- LAST TX CHECK ----------------
       const groupLastStatement = await PortfolioGroupStatementModel.findOne({
         userId: u_id,
       })
@@ -77,6 +135,7 @@ module.exports.groupstatementTransaction = async (req, res) => {
         throw new Error("Backdated or same timestamp transaction not allowed");
       }
 
+      // ---------------- FILL NAV GAP ----------------
       let startDate = null;
 
       const groupDate = groupLastStatement
@@ -94,6 +153,7 @@ module.exports.groupstatementTransaction = async (req, res) => {
       } else if (tradeDate) {
         startDate = tradeDate;
       }
+
       if (startDate) {
         result = await Fill_PastNAV_Redesign(
           u_id,
@@ -161,14 +221,26 @@ module.exports.groupstatementTransaction = async (req, res) => {
       );
     });
 
+    if (lockedGroupId) {
+      await releaseGroupLock(lockedGroupId);
+    }
+
     const { success } = await syncNavFutureGap(u_id, date);
+
     return res.status(201).json({
       success: "Transaction completed successfully",
       result,
     });
   } catch (error) {
+    if (lockedGroupId) {
+      await releaseGroupLock(lockedGroupId);
+    }
+
     console.log(error);
-    return res.status(400).json({ error: error.message });
+
+    return res.status(400).json({
+      error: error.message,
+    });
   } finally {
     session.endSession();
   }
