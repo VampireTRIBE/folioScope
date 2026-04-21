@@ -169,7 +169,8 @@ module.exports.Fill_PastNAV_Redesign = async (
           // PARENT NODE
           for (const child of children) {
             if (!currentState[child]) {
-              throw new Error(`Missing NAV for child ${child}`);
+              continue;
+              // throw new Error(`Missing NAV for child ${child}`);
             }
 
             totalValue += currentState[child].nav * currentState[child].units;

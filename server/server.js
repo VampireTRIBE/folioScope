@@ -45,6 +45,22 @@ dataParser.bodyParser(app);
 const userRoute = require("./routes/userRoutes/userRoute");
 const adminRoute = require("./routes/adminRoutes/adminRoutes");
 const portfolioRoute = require("./routes/portfolioRoutes/portfolioRoutes");
+const {
+  fetchAssetPriceHistories,
+  userGroups,
+  groupStatement,
+  financialAsset,
+  ledgerStatement,
+  fifoLot,
+  navPerformence,
+} = require("./test/dbData");
+const {
+  getPastClosePrices,
+  getDailyClosePricesByFinancialAsset,
+} = require("./utils/Portfolio_Models_utils/aggregationPipeline/getMarketPrice");
+const {
+  defaultNavComparison,
+} = require("./services/syncPortfolio/derivedComputation/defaultNavComparision");
 
 // ! for listning all requests
 app.listen(port, async (req, res) => {
@@ -172,10 +188,22 @@ const TIME_INTERVEL = 3 * 60 * 1000;
 // setTimeout(init_PortfolioSync, TIME_INTERVEL + 60000);
 
 app.use("/test", async (req, res) => {
-  const leafGroupIds = await get_LastNavDatesByUser();
+  // const pastcloses = await getPastClosePrices(
+  //   new Date("2026-04-01T06:41:00.000Z"),
+  //   new Date(),
+  // );
+  // const UserGroups = await userGroups("69e68cadb35fcabe7919cffd");
+  // const groupsStatements = await groupStatement("69e68cadb35fcabe7919cffd");
+  // const holdings = await financialAsset("69e68cadb35fcabe7919cffd");
+  // const ledgerStatements = await ledgerStatement("69e68cadb35fcabe7919cffd");
+  // const fifoLots = await fifoLot("69e68cadb35fcabe7919cffd");
+  // const groupsNav = await navPerformence("69e68cadb35fcabe7919cffd");
+
+  const result = await defaultNavComparison();
+
   res.status(200).json({
     success: "successful",
-    data: leafGroupIds,
+    result,
   });
 });
 

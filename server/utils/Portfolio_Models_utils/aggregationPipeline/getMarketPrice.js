@@ -1,8 +1,11 @@
 const mongoose = require("mongoose");
 const {
   normalizeToIST330PM,
+  normalizeToIST5PM,
+  normalizeToISTEndOfDay,
 } = require("../../shared_Utils/helpers/getCurrentFinacialyear");
 const { date } = require("joi");
+const { json } = require("express");
 
 module.exports.getLatestCloses = async (targetDate = null, session = null) => {
   const date = targetDate
@@ -145,6 +148,89 @@ module.exports.getPastClosePrices = async (
 
     current.setDate(current.getDate() + 1);
     current = normalizeToIST330PM(current);
+  }
+  return result;
+};
+
+module.exports.getDailyClosePricesByFinancialAsset = async (
+  financialAsset = null,
+  startDate = null,
+  nav = false,
+  session = null,
+  endDate = null,
+) => {
+  const AssetPriceHistory_Model = mongoose.model("AssetPriceHistory");
+  const NAV_Model = mongoose.model("navPerformence");
+  const reqested_Model = nav ? NAV_Model : AssetPriceHistory_Model;
+
+  // if (!session) {
+  //   throw new Error("Session Requiered");
+  // }
+  if (!startDate) {
+    throw new Error("Start Date Requiered");
+  }
+  if (!financialAsset) {
+    throw new Error("Financial Asset Requiered");
+  }
+  startDate = nav
+    ? normalizeToIST5PM(startDate)
+    : normalizeToIST330PM(startDate);
+
+  endDate = nav
+    ? endDate
+      ? normalizeToIST5PM(endDate)
+      : normalizeToIST5PM(new Date())
+    : endDate
+      ? normalizeToIST330PM(endDate)
+      : normalizeToIST330PM(new Date());
+
+  const assetId = nav ? "portfolioGroupId" : "assetId";
+
+  const [seedData, rangeData] = await Promise.all([
+    reqested_Model
+      .findOne({
+        [assetId]: financialAsset,
+        date: { $lt: startDate },
+      })
+      .sort({ date: -1 })
+      .session(session)
+      .lean(),
+    reqested_Model
+      .find({
+        [assetId]: financialAsset,
+        date: { $gte: startDate, $lte: endDate },
+      })
+      .sort({ date: 1 })
+      .session(session)
+      .lean(),
+  ]);
+  let result = {};
+  
+  if (seedData && seedData.close) {
+    result[startDate.toISOString()] = seedData.close;
+  }
+
+  for (const data of rangeData) {
+    nav
+      ? (result[data.date.toISOString()] = { nav: data.nav, units: data.units })
+      : (result[data.date.toISOString()] = data.close);
+  }
+
+  let current = new Date(startDate);
+
+  while (current <= endDate) {
+    const dateKey = current.toISOString();
+    let previousDayDate = new Date(current);
+    previousDayDate.setDate(previousDayDate.getDate() - 1);
+    if (!result[dateKey]) {
+      nav
+        ? (result[dateKey] = {
+            nav: result[previousDayDate.toISOString()].nav,
+            units: result[previousDayDate.toISOString()].units,
+          })
+        : (result[dateKey] = result[previousDayDate.toISOString()]);
+    }
+    current.setDate(current.getDate() + 1);
   }
   return result;
 };
