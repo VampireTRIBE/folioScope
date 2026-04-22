@@ -163,9 +163,6 @@ module.exports.getDailyClosePricesByFinancialAsset = async (
   const NAV_Model = mongoose.model("navPerformence");
   const reqested_Model = nav ? NAV_Model : AssetPriceHistory_Model;
 
-  // if (!session) {
-  //   throw new Error("Session Requiered");
-  // }
   if (!startDate) {
     throw new Error("Start Date Requiered");
   }
@@ -205,7 +202,7 @@ module.exports.getDailyClosePricesByFinancialAsset = async (
       .lean(),
   ]);
   let result = {};
-  
+
   if (seedData && seedData.close) {
     result[startDate.toISOString()] = seedData.close;
   }

@@ -14,7 +14,7 @@ module.exports.defaultNavComparison = async ({
   startDate = null,
   session = null,
 }) => {
-  if (!indexId || !groupId || !startDate || !session) {
+  if (!indexId || !groupId || !startDate) {
     throw new Error("Missing Request Parameters");
   }
   const [indexPastPrices, navPastPrices] = await Promise.all([
@@ -32,14 +32,14 @@ module.exports.defaultNavComparison = async ({
     ),
   ]);
 
-  let navBasedMetrics = {
+  let navBasedAnalytics = {
     standalone: {},
     comparison: {},
   };
 
   const dateSeries = Object.keys(navPastPrices);
   if (dateSeries.length < 2) {
-    return navBasedMetrics;
+    return navBasedAnalytics;
   }
 
   let normalizeNavsSeries = {};
@@ -70,75 +70,111 @@ module.exports.defaultNavComparison = async ({
   let v5 = dateSeries[1094];
   let lastValue = dateSeries[dateSeries.length - 1];
 
-  const valueCalculation = (x, y, Key1, key2) => {
-    let indexReturn = Number(
-      ((normalizeNavsSeries[x].index - normalizeNavsSeries[y].index) /
-        normalizeNavsSeries[y].index) *
-        100,
-    );
-    let groupReturn = Number(
-      ((normalizeNavsSeries[x].group - normalizeNavsSeries[y].group) /
-        normalizeNavsSeries[y].group) *
-        100,
-    );
+  const valueCalculation = (x, y, Key1) => {
+    const indexBase = normalizeNavsSeries[y]?.index;
+    const groupBase = normalizeNavsSeries[y]?.group;
 
-    navBasedMetrics.standalone[groupId] ??= {};
-    navBasedMetrics.standalone[indexId] ??= {};
+    if (!indexBase || !groupBase) return;
 
-    navBasedMetrics.standalone[groupId][Key1] = groupReturn ? groupReturn : 0;
-    navBasedMetrics.standalone[indexId][Key1] = indexReturn ? indexReturn : 0;
-    navBasedMetrics.comparison[key2] =
-      groupReturn - indexReturn ? groupReturn - indexReturn : 0;
+    let indexReturn =
+      ((normalizeNavsSeries[x].index - indexBase) / indexBase) * 100;
+
+    let groupReturn =
+      ((normalizeNavsSeries[x].group - groupBase) / groupBase) * 100;
+
+    let initDrawdown = {
+      current: null,
+      max: null,
+      peakDate: null,
+      troughDate: null,
+      recoveryDate: null,
+      recoveryDays: null,
+    };
+
+    let drawdown = {
+      index: { ...initDrawdown },
+      group: { ...initDrawdown },
+    };
+
+    let currentDD =
+      ((normalizeNavsSeries[x].index - indexBase) / indexBase) * 100;
+
+    // initialize properly
+    navBasedAnalytics.standalone[groupId] ??= {};
+    navBasedAnalytics.standalone[indexId] ??= {};
+
+    navBasedAnalytics.standalone[groupId][Key1] ??= {};
+    navBasedAnalytics.standalone[indexId][Key1] ??= {};
+
+    navBasedAnalytics.standalone[groupId][Key1].return = Number.isFinite(
+      groupReturn,
+    )
+      ? groupReturn
+      : null;
+
+    navBasedAnalytics.standalone[groupId][Key1].drawdown = {
+      ...drawdown.group,
+    };
+
+    navBasedAnalytics.standalone[indexId][Key1].return = Number.isFinite(
+      indexReturn,
+    )
+      ? indexReturn
+      : null;
+
+    navBasedAnalytics.standalone[indexId][Key1].drawdown = {
+      ...drawdown.index,
+    };
+
+    navBasedAnalytics.comparison[Key1] ??= {};
+    navBasedAnalytics.comparison[Key1].excessReturn = Number.isFinite(
+      groupReturn - indexReturn,
+    )
+      ? groupReturn - indexReturn
+      : null;
+
+    navBasedAnalytics.comparison[Key1].excessDrawdown = { ...drawdown.index };
   };
 
   if (v1 && v2) {
-    valueCalculation(v1, v2, "1Day", "1DayAlpha");
+    valueCalculation(v1, v2, "1Day");
   }
   if (v3) {
-    valueCalculation(v1, v3, "3Months", "3MonthsAlpha");
+    valueCalculation(v1, v3, "3Months");
   }
   if (!v3) {
-    valueCalculation(v1, lastValue, "3MonthsPartial", "3MonthsAlphaPartial");
+    valueCalculation(v1, lastValue, "3MonthsPartial");
     return {
       groupCurveValue,
       normalizeNavsSeries,
-      navBasedMetrics,
-      indexPastPrices,
-      navPastPrices,
+      navBasedAnalytics,
     };
   }
   if (v4) {
-    valueCalculation(v1, v4, "1Year", "1YearAlpha");
+    valueCalculation(v1, v4, "1Year");
   }
   if (!v4) {
-    valueCalculation(v1, lastValue, "1YearPartial", "1YearAlphaPartial");
+    valueCalculation(v1, lastValue, "1YearPartial");
     return {
       groupCurveValue,
       normalizeNavsSeries,
-      navBasedMetrics,
-      indexPastPrices,
-      navPastPrices,
+      navBasedAnalytics,
     };
   }
   if (v5) {
-    valueCalculation(v1, v5, "3Year", "3YearAlpha");
+    valueCalculation(v1, v5, "3Year");
   }
   if (!v5) {
-    valueCalculation(v1, lastValue, "3YearPartial", "3YearAlphaPartial");
+    valueCalculation(v1, lastValue, "3YearPartial");
     return {
       groupCurveValue,
       normalizeNavsSeries,
-      navBasedMetrics,
-      indexPastPrices,
-      navPastPrices,
+      navBasedAnalytics,
     };
   }
   return {
-    dateSeries,
     groupCurveValue,
     normalizeNavsSeries,
-    navBasedMetrics,
-    indexPastPrices,
-    navPastPrices,
+    navBasedAnalytics,
   };
 };

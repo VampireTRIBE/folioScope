@@ -198,13 +198,20 @@ app.use("/test", async (req, res) => {
   // const ledgerStatements = await ledgerStatement("69e68cadb35fcabe7919cffd");
   // const fifoLots = await fifoLot("69e68cadb35fcabe7919cffd");
   // const groupsNav = await navPerformence("69e68cadb35fcabe7919cffd");
-
-  const result = await defaultNavComparison();
-
-  res.status(200).json({
-    success: "successful",
-    result,
-  });
+  try {
+    const result = await defaultNavComparison({
+      indexId: "69dbfdf6a3e43f9891606210",
+      groupId: "69e68cadb35fcabe7919d000",
+      startDate: new Date("2026-03-01T06:37:00.000Z"),
+    });
+    res.status(200).json({
+      success: "successful",
+      result,
+    });
+  } catch (error) {
+    console.log(error);
+    res.send("error");
+  }
 });
 
 // ! Diffrent Routes
