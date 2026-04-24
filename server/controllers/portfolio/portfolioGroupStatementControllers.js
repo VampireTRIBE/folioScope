@@ -196,9 +196,11 @@ module.exports.groupstatementTransaction = async (req, res) => {
               ? {
                   consolidatedCash: signedAmount,
                   consolidatedTax: amount,
+                  consolidatedCurrentValue: signedAmount,
                 }
               : {
                   consolidatedCash: signedAmount,
+                  consolidatedCurrentValue: signedAmount,
                 },
         },
         { session },

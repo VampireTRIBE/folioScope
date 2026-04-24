@@ -7,6 +7,9 @@ const {
   normalizeToIST330PM,
 } = require("../../../utils/shared_Utils/helpers/getCurrentFinacialyear");
 const { session } = require("passport");
+const {
+  drawdownFuntion,
+} = require("../../../utils/shared_Utils/mathematicalCalculations/drawdown");
 
 module.exports.defaultNavComparison = async ({
   indexId = null,
@@ -82,22 +85,7 @@ module.exports.defaultNavComparison = async ({
     let groupReturn =
       ((normalizeNavsSeries[x].group - groupBase) / groupBase) * 100;
 
-    let initDrawdown = {
-      current: null,
-      max: null,
-      peakDate: null,
-      troughDate: null,
-      recoveryDate: null,
-      recoveryDays: null,
-    };
-
-    let drawdown = {
-      index: { ...initDrawdown },
-      group: { ...initDrawdown },
-    };
-
-    let currentDD =
-      ((normalizeNavsSeries[x].index - indexBase) / indexBase) * 100;
+    const drawdown = drawdownFuntion(x, y, normalizeNavsSeries);
 
     // initialize properly
     navBasedAnalytics.standalone[groupId] ??= {};
@@ -133,7 +121,10 @@ module.exports.defaultNavComparison = async ({
       ? groupReturn - indexReturn
       : null;
 
-    navBasedAnalytics.comparison[Key1].excessDrawdown = { ...drawdown.index };
+    navBasedAnalytics.comparison[Key1].excessDrawdown = {
+      current: drawdown.group.current - drawdown.index.current,
+      max: drawdown.group.max - drawdown.index.max,
+    };
   };
 
   if (v1 && v2) {

@@ -61,6 +61,9 @@ const {
 const {
   defaultNavComparison,
 } = require("./services/syncPortfolio/derivedComputation/defaultNavComparision");
+const {
+  defaultXirrComparision,
+} = require("./services/syncPortfolio/derivedComputation/defaultXirrComparision");
 
 // ! for listning all requests
 app.listen(port, async (req, res) => {
@@ -198,15 +201,21 @@ app.use("/test", async (req, res) => {
   // const ledgerStatements = await ledgerStatement("69e68cadb35fcabe7919cffd");
   // const fifoLots = await fifoLot("69e68cadb35fcabe7919cffd");
   // const groupsNav = await navPerformence("69e68cadb35fcabe7919cffd");
+
   try {
-    const result = await defaultNavComparison({
+    const result1 = await defaultNavComparison({
       indexId: "69dbfdf6a3e43f9891606210",
-      groupId: "69e68cadb35fcabe7919d000",
+      groupId: "69eb6f19f9a45a2a35372785",
       startDate: new Date("2026-03-01T06:37:00.000Z"),
     });
+    const result2 = await defaultXirrComparision(
+      "69eb6f19f9a45a2a35372785",
+      "69eb6f19f9a45a2a35372782",
+      "69dbfdf6a3e43f9891606210",
+    );
     res.status(200).json({
       success: "successful",
-      result,
+      result: { result1, result2 },
     });
   } catch (error) {
     console.log(error);
