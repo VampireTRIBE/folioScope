@@ -34,7 +34,10 @@ module.exports.AssetMetadata_Seeder = async () => {
 
     for (let i = 0; i < res.length; i++) {
       const record = res[i];
-      const { result, data } = await validate_AssetMetaData(record, "name");
+      const { result, data, message } = await validate_AssetMetaData(
+        record,
+        "name",
+      );
 
       if (!result) {
         summary.skippedRecords++;

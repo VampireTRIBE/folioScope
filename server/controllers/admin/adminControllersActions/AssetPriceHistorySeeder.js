@@ -16,7 +16,6 @@ module.exports.PriceHistory_Seeder = async (name = null) => {
     log.running("SETTING TICKER TO GOOGLE SHEETS STARTED...");
     const GF_ticker = getSingleAssetMetaDataGFTickerName(name);
     if (!GF_ticker) {
-      console.log("INSIDE IF");
       throw new customError("Invalid Ticker Requet", 404);
     }
     const { success } = await callAppsScript(

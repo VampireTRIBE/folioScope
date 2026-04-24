@@ -15,7 +15,6 @@ const {
   PriceHistory_Seeder,
 } = require("./adminControllersActions/AssetPriceHistorySeeder");
 
-
 const adminControllers = {
   async updateClassification(req, res, next) {
     try {
