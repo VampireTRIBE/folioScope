@@ -6,19 +6,16 @@ const FinantialAssetModel = require("../../../models/Portfolio_Models/PortfolioM
 const LedgerStatementModel = require("../../../models/Portfolio_Models/ledger_Models/ledgerStatement");
 const FifoLotModel = require("../../../models/Portfolio_Models/ledger_Models/fifoLedgerStatement");
 
+const { is_Leaf } = require("../../../utils/mongodb/aggregations/check_Leaf");
 const {
-  is_Leaf,
-} = require("../../../utils/Portfolio_Models_utils/aggregationPipeline/IsLeaf");
-
-const {
-  getSingleAssetMetaDataID,
+  get_SingleAssetMetaDataID,
 } = require("../../../init_Scripts/init_Cache/AssetsData_Models_Cache/init_cacheFiles/assetMetaDataCache");
 const {
-  getNAMEIDMAP,
+  get_NAMEIDMAP,
 } = require("../../../init_Scripts/init_Cache/AssetsData_Models_Cache/init_cacheFiles/assetClassificationCache");
 const {
-  Fill_PastNAV_Redesign,
-} = require("../../../services/syncPortfolio/fill_nav_GapV2");
+  fill_MissingNAVs,
+} = require("../../../sync_Scripts/sync_Portfolio/fill_MissingNavs");
 
 // =====================================================
 // 🔴 CONFIG
@@ -97,15 +94,14 @@ module.exports.tradeTransaction = async (req) => {
     const { userId, isLeaf, path, consolidatedCash } = await is_Leaf(
       PortfolioGroupModel,
       pg_id,
-      session,
     );
 
     if (!isLeaf) throw new Error("Allowed only on leaf nodes");
     if (userId.toString() !== u_id.toString()) throw new Error("Unauthorized");
 
     // ================= ASSET FETCH =================
-    const { name } = getSingleAssetMetaDataID(a_id);
-    const { INDEX } = getNAMEIDMAP();
+    const { name } = get_SingleAssetMetaDataID(a_id);
+    const { INDEX } = get_NAMEIDMAP();
 
     if (INDEX === a_id.toString()) {
       throw new Error("Cannot transact index directly");
@@ -115,7 +111,7 @@ module.exports.tradeTransaction = async (req) => {
       assetMetadataId: a_id,
       portfolioGroupId: pg_id,
       userId: u_id,
-    }).session(session);
+    });
 
     // ================= CREATE + LOCK (FIRST BUY) =================
     if (!asset && type === "buy") {
@@ -144,15 +140,13 @@ module.exports.tradeTransaction = async (req) => {
     }
 
     // ================= BACKDATED CHECK =================
-    const lastTx = await LedgerStatementModel.findOne({ userId: u_id })
-      .sort({ date: -1 })
-      .session(session);
 
-    const groupLastStatement = await PortfolioGroupStatementModel.findOne({
-      userId: u_id,
-    })
-      .sort({ date: -1 })
-      .session(session);
+    const [lastTx, groupLastStatement] = await Promise.all([
+      LedgerStatementModel.findOne({ userId: u_id }).sort({ date: -1 }),
+      PortfolioGroupStatementModel.findOne({
+        userId: u_id,
+      }).sort({ date: -1 }),
+    ]);
 
     if (lastTx && txDate <= new Date(lastTx.date)) {
       throw new Error("Backdated or same timestamp transaction not allowed");
@@ -178,14 +172,9 @@ module.exports.tradeTransaction = async (req) => {
       startDate = tradeDate;
     }
     if (startDate) {
-      await Fill_PastNAV_Redesign(u_id, session, startDate, new Date(date));
+      await fill_MissingNAVs(u_id, session, startDate, new Date(date));
     } else {
-      await Fill_PastNAV_Redesign(
-        u_id,
-        session,
-        new Date(date),
-        new Date(date),
-      );
+      await fill_MissingNAVs(u_id, session, new Date(date), new Date(date));
     }
 
     // =====================================================

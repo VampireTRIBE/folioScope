@@ -3,19 +3,16 @@ const PortfolioGroupModel = require("../../models/Portfolio_Models/PortfolioGrou
 const PortfolioGroupStatementModel = require("../../models/Portfolio_Models/ledger_Models/groupStatement");
 const LedgerStatementModel = require("../../models/Portfolio_Models/ledger_Models/ledgerStatement");
 
+const { is_Leaf } = require("../../utils/mongodb/aggregations/check_Leaf");
 const {
-  is_Leaf,
-} = require("../../utils/Portfolio_Models_utils/aggregationPipeline/IsLeaf");
-
+  update_GroupNAV,
+} = require("../../sync_Scripts/sync_Portfolio/update_GroupNAV");
 const {
-  upsertNavPerformance,
-} = require("../../services/syncPortfolio/updateGroup_NAV");
+  fill_MissingNAVs,
+} = require("../../sync_Scripts/sync_Portfolio/fill_MissingNavs");
 const {
-  Fill_PastNAV_Redesign,
-} = require("../../services/syncPortfolio/fill_nav_GapV2");
-const {
-  syncNavFutureGap,
-} = require("../../services/syncPortfolio/updatePortfolio");
+  sync_FillFutureNAVs,
+} = require("../../sync_Scripts/sync_Portfolio/sync_Portfolio");
 
 // =====================================
 // LOCK CONFIG
@@ -82,11 +79,18 @@ module.exports.groupstatementTransaction = async (req, res) => {
       lockedGroupId = pg_id;
 
       // ---------------- VALIDATION ----------------
-      const { userId, isLeaf, path, consolidatedCash } = await is_Leaf(
-        PortfolioGroupModel,
-        pg_id,
-        session,
-      );
+      const [cheak_Leaf, groupLastStatement, tradeLastStatement] =
+        await Promise.all([
+          is_Leaf(PortfolioGroupModel, pg_id),
+          PortfolioGroupStatementModel.findOne({
+            userId: u_id,
+          }).sort({ date: -1 }),
+          LedgerStatementModel.findOne({
+            userId: u_id,
+          }).sort({ date: -1 }),
+        ]);
+
+      const { userId, isLeaf, path, consolidatedCash } = cheak_Leaf;
 
       if (!isLeaf) {
         throw new Error("Allowed only on leaf nodes");
@@ -109,17 +113,6 @@ module.exports.groupstatementTransaction = async (req, res) => {
       }
 
       // ---------------- LAST TX CHECK ----------------
-      const groupLastStatement = await PortfolioGroupStatementModel.findOne({
-        userId: u_id,
-      })
-        .sort({ date: -1 })
-        .session(session);
-
-      const tradeLastStatement = await LedgerStatementModel.findOne({
-        userId: u_id,
-      })
-        .sort({ date: -1 })
-        .session(session);
 
       if (
         groupLastStatement &&
@@ -155,14 +148,14 @@ module.exports.groupstatementTransaction = async (req, res) => {
       }
 
       if (startDate) {
-        result = await Fill_PastNAV_Redesign(
+        result = await fill_MissingNAVs(
           u_id,
           session,
           startDate,
           new Date(date),
         );
       } else {
-        result = await Fill_PastNAV_Redesign(
+        result = await fill_MissingNAVs(
           u_id,
           session,
           new Date(date),
@@ -211,7 +204,7 @@ module.exports.groupstatementTransaction = async (req, res) => {
 
       await Promise.all(
         groupAffectedIds.map((id) =>
-          upsertNavPerformance({
+          update_GroupNAV({
             session,
             portfolioGroupId: id,
             userId: u_id,
@@ -227,7 +220,7 @@ module.exports.groupstatementTransaction = async (req, res) => {
       await releaseGroupLock(lockedGroupId);
     }
 
-    const { success } = await syncNavFutureGap(u_id, date);
+    const { success } = await sync_FillFutureNAVs(u_id, date);
 
     return res.status(201).json({
       success: "Transaction completed successfully",
@@ -237,8 +230,6 @@ module.exports.groupstatementTransaction = async (req, res) => {
     if (lockedGroupId) {
       await releaseGroupLock(lockedGroupId);
     }
-
-    console.log(error);
 
     return res.status(400).json({
       error: error.message,

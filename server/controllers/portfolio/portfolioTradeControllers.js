@@ -1,12 +1,9 @@
 const mongoose = require("mongoose");
-const {
-  upsertNavPerformance,
-} = require("../../services/syncPortfolio/updateGroup_NAV");
-const {
-  syncPortfolio,
-  syncNavFutureGap,
-} = require("../../services/syncPortfolio/updatePortfolio");
 const { tradeTransaction } = require("./tradeActions/trade");
+const {
+  sync_FillFutureNAVs,
+  sync_Portfolio,
+} = require("../../sync_Scripts/sync_Portfolio/sync_Portfolio");
 
 // =====================================================
 // 🔴 CONTROLLER
@@ -26,7 +23,7 @@ module.exports.trade = async (req, res) => {
 
     // 🔴 1. Future Nav Fill upto current Date
     const { date } = req.body;
-    const { success } = await syncNavFutureGap(req.user.id, date);
+    const { success } = await sync_FillFutureNAVs(req.user.id, date);
     if (!success) {
       return res.status(400).json({
         error: true,
@@ -36,7 +33,7 @@ module.exports.trade = async (req, res) => {
     }
 
     // 🔴 1. group syncPortfolio only currnet Snapshot
-    const syncPortfolioResult = await syncPortfolio(req.user.id);
+    const syncPortfolioResult = await sync_Portfolio(req.user.id);
 
     if (!syncPortfolioResult.success) {
       return res.status(400).json({

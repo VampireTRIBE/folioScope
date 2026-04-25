@@ -24,7 +24,7 @@ const navPerformenceSchema = new Schema(
     units: { type: Number, required: true, default: 0 },
     nav: { type: Number, required: true, default: 100 },
     value: { type: Number, required: true, default: 0 },
-    messege: { type: String },
+    message: { type: String },
     date: { type: Date, required: true },
   },
   { timestamps: true },

@@ -2,11 +2,13 @@ const AssetMetaDataModel = require("../../../models/AssetsData_Models/Central_Mo
 const {
   callAppsScript,
 } = require("../../../services/appsScript/appsScriptService");
+
+const customError = require("../../../utils/shared/error/customError");
+const log = require("../../../utils/shared/console_Loggers/consoleLoggers");
+
 const {
-  validate_AssetMetaData,
-} = require("../../../utils/AssetData_Models_utils/validations/validateData/assetMetaData_Validate");
-const log = require("../../../utils/shared_Utils/console_loggers/consoleLoggers");
-const customError = require("../../../utils/shared_Utils/error_Class/customError");
+  validate_AssetMetadata,
+} = require("../../../utils/validations/contentValidater/validate_AssetMetadata");
 
 module.exports.AssetMetadata_Seeder = async () => {
   try {
@@ -34,7 +36,7 @@ module.exports.AssetMetadata_Seeder = async () => {
 
     for (let i = 0; i < res.length; i++) {
       const record = res[i];
-      const { result, data, message } = await validate_AssetMetaData(
+      const { result, data, message } = await validate_AssetMetadata(
         record,
         "name",
       );
