@@ -1,7 +1,8 @@
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
-const { validate_ISIN } = require("../../../utils/AssetData_Models_utils/helpers/others/ISIN_Validation");
-const { validate_AssetMetaData } = require("../../../utils/AssetData_Models_utils/validations/validateData/assetMetaData_Validate");
+const {
+  validate_ISIN,
+} = require("../../../utils/validations/contentValidater/ISIN_Validater");
 
 const AssetMetaDataSchema = new Schema(
   {
@@ -126,14 +127,5 @@ AssetMetaDataSchema.index({ assetIndexName: 1 });
 AssetMetaDataSchema.index({ assetSector: 1 });
 AssetMetaDataSchema.index({ assetIndustry: 1 });
 AssetMetaDataSchema.index({ assetAMC: 1 });
-
-AssetMetaDataSchema.pre("validate", async function (next) {
-  try {
-    await validate_AssetMetaData(this, "id", true);
-    next();
-  } catch (err) {
-    next(err);
-  }
-});
 
 module.exports = mongoose.model("AssetMetaData", AssetMetaDataSchema);

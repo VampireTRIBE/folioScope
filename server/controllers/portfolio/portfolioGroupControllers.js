@@ -1,4 +1,5 @@
 const PortfolioGroupModel = require("../../models/Portfolio_Models/PortfolioGroup_Models/portfolioGroup");
+const financialAssetModel = require("../../models/Portfolio_Models/PortfolioMetrix_Models/finantialAsset");
 
 module.exports.addGroup = async (req, res) => {
   try {
@@ -14,9 +15,19 @@ module.exports.addGroup = async (req, res) => {
       return res.status(400).json({ error: "Name is required" });
     }
 
-    const parent = await PortfolioGroupModel.findById(pg_id)
-      .select("level path userId")
-      .lean();
+    const [parent, financialAsset] = await Promise.all([
+      PortfolioGroupModel.findById(pg_id).select("level path userId").lean(),
+      financialAssetModel
+        .findOne({ portfolioGroupId: pg_id, userId: u_id })
+        .lean(),
+    ]);
+
+    if (financialAsset) {
+      return res
+        .status(400)
+        .json({ error: "Group with asset cannot become parent" });
+    }
+
     if (!parent) {
       return res.status(404).json({ error: "Invalid Group ID" });
     }

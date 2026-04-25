@@ -8,7 +8,7 @@ let assetClassificationCache = {
   assetAMCID: null,
 };
 
-module.exports.setAssetClassificationCache = (
+module.exports.set_AssetClassificationCache = (
   nameMap,
   assetClassID,
   assetClassName,
@@ -26,32 +26,32 @@ module.exports.setAssetClassificationCache = (
   assetClassificationCache.assetAMCName = assetAMCName;
 };
 
-module.exports.getNAMEIDMAP = () => {
+module.exports.get_NAMEIDMAP = () => {
   return Object.freeze(assetClassificationCache.NAMEIDMAP);
 };
 
-module.exports.getAssetClassificationStructureID = () => {
+module.exports.get_AssetClassificationStructureID = () => {
   return Object.freeze(assetClassificationCache.assetClassificationStructureID);
 };
 
-module.exports.getAssetClassificationStructureName = () => {
+module.exports.get_AssetClassificationStructureName = () => {
   return Object.freeze(
     assetClassificationCache.assetClassificationStructureName,
   );
 };
 
-module.exports.getSectorClasificationStructureID = () => {
+module.exports.get_SectorClasificationStructureID = () => {
   return Object.freeze(assetClassificationCache.assetSectorID);
 };
 
-module.exports.getSectorClassificationStructureName = () => {
+module.exports.get_SectorClassificationStructureName = () => {
   return Object.freeze(assetClassificationCache.assetSectorName);
 };
 
-module.exports.getAMCClasificationStructureID = () => {
+module.exports.get_AMCClasificationStructureID = () => {
   return Object.freeze(assetClassificationCache.assetAMCID);
 };
 
-module.exports.getAMCClassificationStructureName = () => {
+module.exports.get_AMCClassificationStructureName = () => {
   return Object.freeze(assetClassificationCache.assetAMCName);
 };

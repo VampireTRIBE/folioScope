@@ -5,7 +5,10 @@ let assetMetaDataCache = {
   AssetMetaDataGFTickerID: {},
 };
 
-module.exports.setAssetMetaDataCache = (assetmetadataID, assetmetadataName) => {
+module.exports.set_AssetMetaDataCache = (
+  assetmetadataID,
+  assetmetadataName,
+) => {
   assetMetaDataCache.assetMetaDataID = assetmetadataID;
   assetMetaDataCache.assetMetaDataName = assetmetadataName;
 
@@ -20,33 +23,33 @@ module.exports.setAssetMetaDataCache = (assetmetadataID, assetmetadataName) => {
   }
 };
 
-module.exports.getAssetMetaDataID = () => {
+module.exports.get_AssetMetaDataID = () => {
   return assetMetaDataCache.assetMetaDataID;
 };
 
-module.exports.getAssetMetaDataName = () => {
+module.exports.get_AssetMetaDataName = () => {
   return assetMetaDataCache.assetMetaDataName;
 };
 
-module.exports.getSingleAssetMetaDataID = (id) => {
+module.exports.get_SingleAssetMetaDataID = (id) => {
   return assetMetaDataCache.assetMetaDataID?.[id];
 };
 
-module.exports.getSingleAssetMetaDataName = (name) => {
+module.exports.get_SingleAssetMetaDataName = (name) => {
   return assetMetaDataCache.assetMetaDataName?.[name];
 };
 
-module.exports.getAssetMetaDataGFTickerName = () => {
+module.exports.get_AssetMetaDataGFTickerName = () => {
   return assetMetaDataCache.AssetMetaDataGFTickerName;
 };
-module.exports.getAssetMetaDataGFTickerID = () => {
+module.exports.get_AssetMetaDataGFTickerID = () => {
   return assetMetaDataCache.AssetMetaDataGFTickerID;
 };
 
-module.exports.getSingleAssetMetaDataGFTickerName = (name) => {
+module.exports.get_SingleAssetMetaDataGFTickerName = (name) => {
   return assetMetaDataCache.AssetMetaDataGFTickerName?.[name];
 };
 
-module.exports.getSingleAssetMetaDataGFTickerID = (id) => {
+module.exports.get_SingleAssetMetaDataGFTickerID = (id) => {
   return assetMetaDataCache.AssetMetaDataGFTickerName?.[id];
 };

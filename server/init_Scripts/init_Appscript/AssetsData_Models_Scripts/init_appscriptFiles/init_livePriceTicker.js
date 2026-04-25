@@ -2,18 +2,18 @@ const AssetPriceHistoryModel = require("../../../../models/AssetsData_Models/Met
 const {
   callAppsScript,
 } = require("../../../../services/appsScript/appsScriptService");
+const customError = require("../../../../utils/shared/error/customError");
+const log = require("../../../../utils/shared/console_loggers/consoleLoggers");
 const {
   validate_AssetPriceHistory,
-} = require("../../../../utils/AssetData_Models_utils/validations/validateData/assetPriceHistory_Validate");
-const log = require("../../../../utils/shared_Utils/console_loggers/consoleLoggers");
-const customError = require("../../../../utils/shared_Utils/error_Class/customError");
+} = require("../../../../utils/validations/contentValidater/validate_AssetPriceHistory");
 const {
-  getAssetMetaDataGFTickerName,
+  get_AssetMetaDataGFTickerName,
 } = require("../../../init_Cache/AssetsData_Models_Cache/init_cacheFiles/assetMetaDataCache");
 
-module.exports.initLivePriceTicker = async () => {
+module.exports.init_LivePriceTicker = async () => {
   try {
-    const GF_ticker = getAssetMetaDataGFTickerName();
+    const GF_ticker = get_AssetMetaDataGFTickerName();
     log.running("INSERTING LIVE TICKER TO GOOGLE SHEETS STARTED...");
     const res = await callAppsScript(
       process.env.APPSCRIPT_SEEDER_URL,
@@ -28,7 +28,7 @@ module.exports.initLivePriceTicker = async () => {
   }
 };
 
-module.exports.initPastPrice = async () => {
+module.exports.init_PastPrices = async () => {
   try {
     log.running("FETCHING PAST PRICE STARTED...");
     const res = await callAppsScript(

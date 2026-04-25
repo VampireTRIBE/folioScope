@@ -2,19 +2,20 @@ const AssetPriceHistoryModel = require("../../../models/AssetsData_Models/Metrix
 const {
   callAppsScript,
 } = require("../../../services/appsScript/appsScriptService");
+const customError = require("../../../utils/shared/error/customError");
+const log = require("../../../utils/shared/console_Loggers/consoleLoggers");
+
+const {
+  get_SingleAssetMetaDataGFTickerName,
+} = require("../../../init_Scripts/init_Cache/AssetsData_Models_Cache/init_cacheFiles/assetMetaDataCache");
 const {
   validate_AssetPriceHistory,
-} = require("../../../utils/AssetData_Models_utils/validations/validateData/assetPriceHistory_Validate");
-const {
-  getSingleAssetMetaDataGFTickerName,
-} = require("../../../init_Scripts/init_Cache/AssetsData_Models_Cache/init_cacheFiles/assetMetaDataCache");
-const log = require("../../../utils/shared_Utils/console_loggers/consoleLoggers");
-const customError = require("../../../utils/shared_Utils/error_Class/customError");
+} = require("../../../utils/validations/contentValidater/validate_AssetPriceHistory");
 
 module.exports.PriceHistory_Seeder = async (name = null) => {
   try {
     log.running("SETTING TICKER TO GOOGLE SHEETS STARTED...");
-    const GF_ticker = getSingleAssetMetaDataGFTickerName(name);
+    const GF_ticker = get_SingleAssetMetaDataGFTickerName(name);
     if (!GF_ticker) {
       throw new customError("Invalid Ticker Requet", 404);
     }

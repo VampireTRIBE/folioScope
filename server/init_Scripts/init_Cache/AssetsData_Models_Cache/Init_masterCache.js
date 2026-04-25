@@ -1,9 +1,9 @@
 const {
-  buildAssetClass_TreeStructure,
-  buildAssetSector_TreeStructure,
-  buildAssetAMC_TreeStructure,
-  buildAssetMetaData,
-} = require("../../../utils/AssetData_Models_utils/aggregations/DB_Queries");
+  build_AssetClass_TreeStructure,
+  build_AssetSector_TreeStructure,
+  build_AssetAMC_TreeStructure,
+  build_AssetMetaData,
+} = require("../../../utils/mongodb/aggregations/build_classificationStructure");
 const {
   assetClassClassification_StructureID,
   assetSectorClassification_StructureID,
@@ -13,20 +13,20 @@ const {
   assetAMCClassification_StructureName,
   assetMetaDataID,
   assetMetaDataName,
-} = require("../../../utils/AssetData_Models_utils/helpers/transformStructure/transformAggrigation");
+} = require("../../../utils/transformData/build_AggregationStructure");
 const {
-  setAssetClassificationCache,
+  set_AssetClassificationCache,
 } = require("./init_cacheFiles/assetClassificationCache");
 const {
-  setAssetMetaDataCache,
+  set_AssetMetaDataCache,
 } = require("./init_cacheFiles/assetMetaDataCache");
 
-module.exports.initCacheAssetDataStructure = async () => {
+module.exports.init_CacheAssetDataStructure = async () => {
   const [assetClassResult, assetSectorResult, assetAMCResult] =
     await Promise.all([
-      buildAssetClass_TreeStructure(),
-      buildAssetSector_TreeStructure(),
-      buildAssetAMC_TreeStructure(),
+      build_AssetClass_TreeStructure(),
+      build_AssetSector_TreeStructure(),
+      build_AssetAMC_TreeStructure(),
     ]);
 
   const [
@@ -48,7 +48,7 @@ module.exports.initCacheAssetDataStructure = async () => {
   for (const key of Object.keys(assetClassIDStructure)) {
     nameMap[assetClassIDStructure[key].name] = key;
   }
-  setAssetClassificationCache(
+  set_AssetClassificationCache(
     nameMap,
     assetClassIDStructure,
     assetClassNameStructure,
@@ -59,19 +59,19 @@ module.exports.initCacheAssetDataStructure = async () => {
   );
 };
 
-module.exports.initCacheAssetMetaData = async () => {
-  const assetMetaDataResult = await buildAssetMetaData();
+module.exports.init_CacheAssetMetaData = async () => {
+  const assetMetaDataResult = await build_AssetMetaData();
   const [assetmetadataID, assetmetadataName] = await Promise.all([
     assetMetaDataID(assetMetaDataResult),
     assetMetaDataName(assetMetaDataResult),
   ]);
-  setAssetMetaDataCache(assetmetadataID, assetmetadataName);
+  set_AssetMetaDataCache(assetmetadataID, assetmetadataName);
 };
 
-module.exports.initCacheMaster = async () => {
+module.exports.init_CacheMaster = async () => {
   try {
-    await this.initCacheAssetDataStructure();
-    await this.initCacheAssetMetaData();
+    await this.init_CacheAssetDataStructure();
+    await this.init_CacheAssetMetaData();
     return { result: true };
   } catch (error) {
     return { result: false };

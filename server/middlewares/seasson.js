@@ -1,6 +1,6 @@
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
-const log = require("../utils/shared_Utils/console_loggers/consoleLoggers");
+const log = require("../utils/shared/console_Loggers/consoleLoggers");
 
 function sessionConfig(app) {
   store = MongoStore.create({

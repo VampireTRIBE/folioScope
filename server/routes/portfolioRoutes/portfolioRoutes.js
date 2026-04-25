@@ -1,28 +1,30 @@
 const express = require("express");
 const router = express.Router({ mergeParams: true });
+
+// ! Controllers
 const {
   addGroup,
   deleteGroup,
   updateGroup,
 } = require("../../controllers/portfolio/portfolioGroupControllers");
 const {
-  isLogedIn,
-} = require("../../utils/shared_Utils/helpers/authenticationUtils");
-const {
-  validateID,
-} = require("../../utils/shared_Utils/helpers/mongoDBValitation");
-const {
   groupstatementTransaction,
 } = require("../../controllers/portfolio/portfolioGroupStatementControllers");
-const {
-  validate_GroupStatementData,
-  validate_tradeData,
-} = require("../../utils/Portfolio_Models_utils/PortfolioGroup_Models_utils/validations/middleware_level_validations/joi_validation/validate_joi_schema");
 const {
   trade,
 } = require("../../controllers/portfolio/portfolioTradeControllers");
 
-// routes
+// ! Validate Request Data
+const {
+  validateID,
+} = require("../../utils/validations/contentValidater/validateID");
+const {
+  validate_GroupStatementData,
+  validate_tradeData,
+} = require("../../utils/validations/middlewares/joi_validation/validate_Data/portfolioData");
+const { isLogedIn } = require("../../utils/authentication/isLogedIn");
+
+// ! routes
 
 // ! Portfolio Group Routes
 router

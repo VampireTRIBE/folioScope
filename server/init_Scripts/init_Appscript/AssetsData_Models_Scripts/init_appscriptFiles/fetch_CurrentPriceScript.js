@@ -2,13 +2,16 @@ const AssetPriceHistoryModel = require("../../../../models/AssetsData_Models/Met
 const {
   callAppsScript,
 } = require("../../../../services/appsScript/appsScriptService");
+const customError = require("../../../../utils/shared/error/customError");
+const log = require("../../../../utils/shared/console_loggers/consoleLoggers");
 const {
   validate_AssetPriceHistory,
-} = require("../../../../utils/AssetData_Models_utils/validations/validateData/assetPriceHistory_Validate");
-const log = require("../../../../utils/shared_Utils/console_loggers/consoleLoggers");
-const customError = require("../../../../utils/shared_Utils/error_Class/customError");
+} = require("../../../../utils/validations/contentValidater/validate_AssetPriceHistory");
+const {
+  get_AssetMetaDataGFTickerName,
+} = require("../../../init_Cache/AssetsData_Models_Cache/init_cacheFiles/assetMetaDataCache");
 
-module.exports.fetchCurrentPrice = async () => {
+module.exports.fetch_CurrentPrice = async () => {
   try {
     log.running("FETCHING CURRENT PRICE STARTED...");
     const res = await callAppsScript(

@@ -6,11 +6,13 @@ const AssetIndexNameModel = require("../../../models/AssetsData_Models/Classific
 const AssetSectorModel = require("../../../models/AssetsData_Models/Classification_Models/AssetSector");
 const AssetIndustryModel = require("../../../models/AssetsData_Models/Classification_Models/AssetIndustry");
 const AssetAMCModel = require("../../../models/AssetsData_Models/Classification_Models/AssetAMC");
+
 const {
   callAppsScript,
 } = require("../../../services/appsScript/appsScriptService");
-const log = require("../../../utils/shared_Utils/console_loggers/consoleLoggers");
-const customError = require("../../../utils/shared_Utils/error_Class/customError");
+
+const customError = require("../../../utils/shared/error/customError");
+const log = require("../../../utils/shared/console_Loggers/consoleLoggers");
 
 module.exports.AssetClassification_Seeder = async () => {
   const session = await mongoose.startSession();
