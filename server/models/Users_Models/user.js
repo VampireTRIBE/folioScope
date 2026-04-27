@@ -31,5 +31,6 @@ const userSchema = new Schema(
 );
 
 userSchema.plugin(passportLocalMongoose);
+userSchema.index({ role: 1 });
 
 module.exports = mongoose.model("users", userSchema);

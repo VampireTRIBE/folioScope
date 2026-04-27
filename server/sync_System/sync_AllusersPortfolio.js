@@ -1,5 +1,6 @@
 const {
   sync_FillFutureNAVs,
+  sync_Portfolio,
 } = require("../sync_Scripts/sync_Portfolio/sync_Portfolio");
 const {
   get_AllUserIDs,
@@ -20,7 +21,7 @@ module.exports.sync_AllUsersPortfolio = async () => {
       userNavMap[userId].lastNavDate,
       new Date(),
     );
-    await this.sync_AllUsersPortfolio(userId);
+    await sync_Portfolio(userId);
   }
   setTimeout(syncAllUsersPortfolio, TIME_INTERVEL);
 };
