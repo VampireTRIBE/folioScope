@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const customError = require("../../utils/shared/error/customError");
 const log = require("../../utils/shared/console_Loggers/consoleLoggers");
 
-
 module.exports.clearDatabase = async (req, res, next) => {
   const session = await mongoose.startSession();
   try {
@@ -34,4 +33,12 @@ module.exports.clearDatabase = async (req, res, next) => {
   } finally {
     session.endSession();
   }
+};
+
+module.exports.getGroup = async (req, res, next) => {
+  const groupModel = mongoose.model("portfolioGroup");
+  const u_id = req.user.id;
+  const { g_id } = req.params;
+  const groupDoc = await groupModel.findById(g_id);
+  res.status(200).json({ success: true, groupDoc });
 };

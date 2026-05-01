@@ -1,0 +1,17 @@
+.searchInput {
+  flex: 1;
+  height: 100%;
+  padding: var(--space-1);
+  justify-content: flex-start;
+  background-color: var(--color-primary-light);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--text-inverse);
+  gap: var(--space-1);
+  transition: var(--transition-fast);
+}
+
+.searchInput:focus-within {
+  border-color: var(--border-accent);
+  box-shadow: 0 0 0 3px var(--color-primary-light-alpha);
+}

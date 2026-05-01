@@ -2,7 +2,7 @@ const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const log = require("../utils/shared/console_Loggers/consoleLoggers");
 
-function sessionConfig(app) {
+module.exports.sessionConfig = (app) => {
   store = MongoStore.create({
     mongoUrl: process.env.DB_URL,
     crypto: {
@@ -13,6 +13,7 @@ function sessionConfig(app) {
 
   store.on("error", () => {
     log.error("MONGO SESSON STORE", err);
+    process.exit(1);
   });
 
   const sessionOptions = {
@@ -28,6 +29,4 @@ function sessionConfig(app) {
   };
   app.use(session(sessionOptions));
   log.success("SESSION CONNECTED WITH MONGODB");
-}
-
-module.exports = sessionConfig;
+};
