@@ -1,0 +1,41 @@
+.imgButton {
+  height: 100%;
+  width: fit-content;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  gap: var(--space-1);
+}
+
+.imgButtonInharit {
+  composes: imgButton;
+  background-color: inherit;
+  color: inherit;
+}
+
+.icon {
+  height: 100%;
+  min-height: 100%;
+  aspect-ratio: 1/1;
+}
+.iconInharit {
+  composes: icon;
+  background-color: inherit;
+}
+
+.sideBarbtn {
+  width: 100%;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  font-weight: var(--fw-medium);
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.sideBarbtn:hover {
+  border-color: var(--border-accent);
+  box-shadow: 0 0 0 3px var(--color-primary-light-alpha);
+}

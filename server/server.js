@@ -1,25 +1,24 @@
-if (process.env.NODE_ENV != "production") {
-  require("dotenv").config();
-}
+const dotenv = require("dotenv");
+dotenv.config({ quiet: true });
 
 // ! IMPORTANT IMPORTS
 
 const express = require("express");
-const corAuth = require("./middlewares/cors");
-const DB_connect = require("./config/connectDB");
-const passportAuth = require("./middlewares/authentication");
-const sessionConfig = require("./middlewares/seasson");
-const dataParser = require("./middlewares/dataParser");
+const { corAuth } = require("./middlewares/cors");
+const { DB_connect } = require("./config/connectDB");
+const { passportAuthentication } = require("./middlewares/authentication");
+const { sessionConfig } = require("./middlewares/seasson");
+const { bodyParser } = require("./middlewares/dataParser");
 const log = require("./utils/shared/console_Loggers/consoleLoggers");
 const { systemBootup } = require("./sync_System/SystemBootup");
 
 const app = express();
 
-corAuth.corAuth(app);
+corAuth(app);
 DB_connect();
 sessionConfig(app);
-passportAuth(app);
-dataParser.bodyParser(app);
+passportAuthentication(app);
+bodyParser(app);
 
 // !import routes
 const userRoute = require("./routes/userRoutes/userRoute");
