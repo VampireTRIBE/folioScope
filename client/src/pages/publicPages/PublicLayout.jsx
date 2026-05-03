@@ -1,10 +1,10 @@
 import { Outlet } from "react-router-dom";
-import Header from "../../components/public/header/header";
+import FinalHeader from "../../features/public/header/components/FinalHeader";
 
 const PublicLayout = () => {
   return (
     <>
-      <Header/>
+      <FinalHeader/>
       <Outlet />
       <h1 className="footer">Footer</h1>
     </>

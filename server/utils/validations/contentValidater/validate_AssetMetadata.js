@@ -72,7 +72,7 @@ module.exports.validate_AssetMetadata = async (data = null, dataType = "id", val
   // -------------------- REQUIRED FIELDS --------------------
 
   for (const field of requiredFields) {
-    if (!(field in data) || data[field] == null) {
+    if (!(field in data)) {
       return {
         result: false,
         message: `Missing ${field} Field for ${data.assetClass}`,

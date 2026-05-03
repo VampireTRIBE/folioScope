@@ -21,6 +21,7 @@ passportAuthentication(app);
 bodyParser(app);
 
 // !import routes
+const publicRoute = require("./routes/publicRoutes/publicRoutes");
 const userRoute = require("./routes/userRoutes/userRoute");
 const adminRoute = require("./routes/adminRoutes/adminRoutes");
 const portfolioRoute = require("./routes/portfolioRoutes/portfolioRoutes");
@@ -46,6 +47,9 @@ app.use("/test", testRoutes);
 
 // ! login/signup Routes
 app.use("/", userRoute);
+
+// ! Public Data View
+app.use("/", publicRoute);
 
 // ! Admin Routes
 app.use("/admin/dataseeders", adminRoute);
