@@ -233,3 +233,23 @@ module.exports.get_DailyClosePricesByAsset = async (
   }
   return result;
 };
+
+module.exports.get_RawPastPricesbyAssetID = async (assetId, count = 90) => {
+  const AssetPriceHistory_Model = mongoose.model("AssetPriceHistory");
+  const prices = await AssetPriceHistory_Model.find({
+    assetId,
+  })
+    .sort({ date: -1 })
+    .limit(count)
+    .select("close -_id")
+    .lean();
+
+  let resultObj = {
+    [assetId]: [],
+  };
+  for (let index = prices.length - 1; index >= 0; index--) {
+    resultObj[assetId].push(prices[index].close);
+  }
+
+  return resultObj;
+};

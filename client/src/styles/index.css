@@ -689,15 +689,15 @@
     - Dashboard sidebar
   */
   --sidebar-width: 12rem;
-
-  /*
+  --row-height: 2rem;
+    /*
     Max application width
 
     Use:
     - Centered layouts
     - Large screen constraint
   */
-  --max-width: 1440px;
+    --max-width: 1440px;
 
   /* ===== Z INDEX ===== */
 
