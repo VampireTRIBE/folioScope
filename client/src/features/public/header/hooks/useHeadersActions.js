@@ -44,6 +44,13 @@ export const useHeaderActions = () => {
     navigate(ROUTES.SIGNUP);
   }, [navigate]);
 
+  const goToSecurityDashbord = useCallback(
+    (security) => {
+      navigate(ROUTES.SECURITYDASHBORD(security));
+    },
+    [navigate],
+  );
+
   // =========================
   // SHARED AUTH OPTIONS
   // =========================
@@ -147,6 +154,7 @@ export const useHeaderActions = () => {
   return {
     toggle,
     goToHome,
+    goToSecurityDashbord,
     profileBtn,
     profileSidebarItems,
   };

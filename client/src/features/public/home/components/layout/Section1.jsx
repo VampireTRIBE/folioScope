@@ -8,9 +8,11 @@ import {
   START_SECTION_1_AUTO_REFRESH,
   STOP_SECTION_1_AUTO_REFRESH,
 } from "../../cor jobs/section1Data.js";
+import { useSection1Actions } from "../../hooks/useSection1Actions.js";
 
 const Section1 = () => {
   const { data1, data2, data3 } = useSelector(get_Section1_Data());
+  const { goToSecurityDashbord } = useSection1Actions();
 
   useEffect(() => {
     START_SECTION_1_AUTO_REFRESH();
@@ -24,9 +26,9 @@ const Section1 = () => {
     <section className={`${section1Style.section1}`}>
       <h3 className={`${section1Style.sectionTitle}`}>Market Glance</h3>
       <div className={`${section1Style.content}`}>
-        <CardWrapperType1 cardData={data1} />
-        <CardWrapperType1 cardData={data2} />
-        <CardWrapperType1 cardData={data3} />
+        <CardWrapperType1 cardData={data1} onClick={goToSecurityDashbord} />
+        <CardWrapperType1 cardData={data2} onClick={goToSecurityDashbord} />
+        <CardWrapperType1 cardData={data3} onClick={goToSecurityDashbord} />
       </div>
     </section>
   );

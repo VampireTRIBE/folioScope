@@ -91,6 +91,7 @@ module.exports.fetch_CurrentPrice = async () => {
 
     return { success: true };
   } catch (error) {
+    return { success: false };
     throw new customError(error.message || "Internal Server Error", 500);
   }
 };

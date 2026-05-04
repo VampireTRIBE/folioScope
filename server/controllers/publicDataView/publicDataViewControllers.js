@@ -18,3 +18,16 @@ module.exports.getDefaultMetadata = async (req, res, next) => {
     next(error);
   }
 };
+
+module.exports.getAllSecuritiesList = async (req, res, next) => {
+  try {
+    const allsecuritieslist = get_AssetMetaDataName();
+    const data = Object.keys(allsecuritieslist);
+    res.status(200).json({
+      success: true,
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

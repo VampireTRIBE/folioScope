@@ -9,7 +9,7 @@ const FinalHeader = () => {
   const menuToggle = useSelector(selectToggleByKey("menuToggle"));
   const { profileBtn, profileSidebarItems, profileNavbarOptions } =
     useHeaderActions();
-
+  
   return (
     <Header
       profile={{ profileBtn, profileSidebarItems, profileNavbarOptions }}

@@ -2,10 +2,15 @@ import React from "react";
 
 import cardContentType1Style from "./cardContentType1.module.css";
 
-const CardContentType1 = ({ name = null, path = [], price = {} }) => {
+const CardContentType1 = ({
+  name = null,
+  path = [],
+  price = {},
+  onClick = null,
+}) => {
   const width = 100;
   const height = 40;
- 
+
   const max = Math.max(...path);
   const min = Math.min(...path);
 
@@ -26,18 +31,15 @@ const CardContentType1 = ({ name = null, path = [], price = {} }) => {
 
   return (
     <div className={`${cardContentType1Style.card}`}>
-      <h4 className={`${cardContentType1Style.cardName}`}>
+      <h4
+        onClick={() => onClick?.(name)}
+        className={`${cardContentType1Style.cardName}`}>
         {name}
       </h4>
 
-      <div
-        className={`${cardContentType1Style.cardData} ${graphTrendClass}`}
-      >
+      <div className={`${cardContentType1Style.cardData} ${graphTrendClass}`}>
         <div className={cardContentType1Style.cardGraph}>
-          <svg
-            viewBox={`0 0 ${width} ${height}`}
-            preserveAspectRatio="none"
-          >
+          <svg viewBox={`0 0 ${width} ${height}`} preserveAspectRatio="none">
             <polyline
               points={points}
               fill="none"
@@ -56,8 +58,7 @@ const CardContentType1 = ({ name = null, path = [], price = {} }) => {
               price.today[0] === "-"
                 ? cardContentType1Style.down
                 : cardContentType1Style.up
-            }
-          >
+            }>
             {price.today}
           </div>
         </div>
