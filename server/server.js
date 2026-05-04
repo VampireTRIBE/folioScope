@@ -11,6 +11,10 @@ const { sessionConfig } = require("./middlewares/seasson");
 const { bodyParser } = require("./middlewares/dataParser");
 const log = require("./utils/shared/console_Loggers/consoleLoggers");
 const { systemBootup } = require("./sync_System/SystemBootup");
+const { sync_CurrentPrices } = require("./sync_System/sync_CurrentPrices");
+const {
+  sync_AllUsersPortfolio,
+} = require("./sync_System/sync_AllusersPortfolio");
 
 const app = express();
 
@@ -38,7 +42,16 @@ app.listen(process.env.PORT, async (req, res) => {
   await systemBootup();
 })();
 
-// ! Update Live Price And Sync Portfolio
+// ! Update Live Price
+
+(async function () {
+  await sync_CurrentPrices();
+})();
+
+// ! Update for all users
+(async function () {
+  await sync_AllUsersPortfolio();
+})();
 
 // ! Only for Testing purpouse In Devlopment
 app.use("/test", testRoutes);

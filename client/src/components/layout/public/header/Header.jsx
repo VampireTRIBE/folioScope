@@ -6,7 +6,7 @@ import containerStyle from "../../../../styles/containerStyles/container.module.
 import ImgButton from "../../../UI/buttons/ImgButton";
 import TextButton from "../../../UI/buttons/TextButton";
 import ProfileSideBar from "../sideBar/ProfileSideBar";
-import MobileViewBar from "../mobileViewBar/MobileViewBar";
+import MobileViewBar from "../../../../features/public/header/components/mobileViewBar/MobileViewBar";
 
 const Header = ({
   profile: {
@@ -32,7 +32,6 @@ const Header = ({
       {toggle?.profileToggle && (
         <ProfileSideBar profileSidebarItems={profileSidebarItems} />
       )}
-      
 
       {view && <MobileViewBar />}
     </header>

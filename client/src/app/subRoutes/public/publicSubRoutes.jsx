@@ -17,18 +17,6 @@ export const publicSubRoutes = [
         <h1>hello</h1>
         <h1>hello</h1>
         <h1>hello</h1>
-        <h1>hello</h1>
-        <h1>hello</h1>
-        <h1>hello</h1>
-        <h1>hello</h1>
-        <h1>hello</h1>
-        <h1>hello</h1>
-        <h1>hello</h1>
-        <h1>hello</h1>
-        <h1>hello</h1>
-        <h1>hello</h1>
-        <h1>hello</h1>
-        <h1>hello</h1>
       </>
     ),
   },
@@ -39,5 +27,21 @@ export const publicSubRoutes = [
   {
     path: "signup",
     element: <h1>SIGNUP</h1>,
+  },
+  {
+    path: "/security/:name",
+    element: (
+      <>
+        <h1>securityDataPage</h1>
+        <h1>securityDataPage</h1>
+        <h1>securityDataPage</h1>
+        <h1>securityDataPage</h1>
+        <h1>securityDataPage</h1>
+        <h1>securityDataPage</h1>
+        <h1>securityDataPage</h1>
+        <h1>securityDataPage</h1>
+        <h1>securityDataPage</h1>
+      </>
+    ),
   },
 ];

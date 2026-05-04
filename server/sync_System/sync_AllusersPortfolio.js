@@ -10,7 +10,7 @@ const {
 } = require("../utils/mongodb/aggregations/get_LastNavDatesByUser");
 
 const TIME_INTERVEL = 4 * 60 * 1000;
-module.exports.sync_AllUsersPortfolio = async () => {
+const sync_AllUsersPortfolio = async () => {
   const [userIds, userNavMap] = await Promise.all([
     get_AllUserIDs(),
     get_LastNavDatesByUser(),
@@ -23,5 +23,7 @@ module.exports.sync_AllUsersPortfolio = async () => {
     );
     await sync_Portfolio(userId);
   }
-  setTimeout(syncAllUsersPortfolio, TIME_INTERVEL);
+  setTimeout(sync_AllUsersPortfolio, TIME_INTERVEL);
 };
+
+module.exports = { sync_AllUsersPortfolio };
