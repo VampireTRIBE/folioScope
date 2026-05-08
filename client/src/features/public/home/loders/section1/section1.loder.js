@@ -19,25 +19,3 @@ export const LOADER_SECTION_1 = async () => {
     console.log(err);
   }
 };
-
-export const START_SECTION_1_AUTO_REFRESH = () => {
-  // Prevent duplicate intervals
-  if (intervalId) return;
-
-  // Run immediately
-  LOADER_SECTION_1();
-
-  intervalId = setInterval(
-    () => {
-      if (window.location.href === "http://localhost:5173/") {
-        LOADER_SECTION_1();
-      }
-    },
-    2 * 60 * 1000,
-  );
-};
-
-export const STOP_SECTION_1_AUTO_REFRESH = () => {
-  clearInterval(intervalId);
-  intervalId = null;
-};

@@ -1,6 +1,7 @@
 import React from "react";
 
 import cardContentType1Style from "./cardContentType1.module.css";
+import PriceBadge from "../priceBadge/PriceBadge";
 
 const CardContentType1 = ({
   name = null,
@@ -51,16 +52,7 @@ const CardContentType1 = ({
         </div>
 
         <div className={`${cardContentType1Style.cardPrice}`}>
-          <div className={`${cardContentType1Style.price}`}>{price.price}</div>
-
-          <div
-            className={
-              price.today[0] === "-"
-                ? cardContentType1Style.down
-                : cardContentType1Style.up
-            }>
-            {price.today}
-          </div>
+          <PriceBadge price={price} />
         </div>
       </div>
     </div>
