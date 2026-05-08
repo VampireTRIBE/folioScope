@@ -1,14 +1,14 @@
 import React, { useEffect } from "react";
-import CardWrapperType1 from "../../../../../components/layout/public/cardWrapper/CardWrapperType1.jsx";
+import CardWrapperType1 from "../../../../../../components/layout/public/cardWrapper/CardWrapperType1.jsx";
 
 import section1Style from "./section1.module.css";
 import { useSelector } from "react-redux";
-import { get_Section1_Data } from "../../homeSelectors.js";
+import { get_Section1_Data } from "../../../homeSelectors.js";
 import {
   START_SECTION_1_AUTO_REFRESH,
   STOP_SECTION_1_AUTO_REFRESH,
-} from "../../cor jobs/section1Data.js";
-import { useSection1Actions } from "../../hooks/useSection1Actions.js";
+} from "../../../autoRefreshData/section1Data.js";
+import { useSection1Actions } from "../../../hooks/useSection1Actions.js";
 
 const Section1 = () => {
   const { data1, data2, data3 } = useSelector(get_Section1_Data());

@@ -47,9 +47,6 @@
   background-color: inherit;
   color: var(--chart-5);
 }
-.price {
-  background-color: inherit;
-}
 
 .cardGraph svg {
   padding: var(--space-1);
