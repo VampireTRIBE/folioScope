@@ -8,7 +8,12 @@ const CardContentType1 = ({
   path = [],
   price = {},
   onClick = null,
+  shimmer = false,
 }) => {
+  if (shimmer) {
+    return <div className={`${cardContentType1Style.shimmer}`}></div>;
+  }
+
   const width = 100;
   const height = 40;
 

@@ -1,4 +1,5 @@
 const customError = require("../../../shared/error/customError");
+
 const {
   get_AssetMetaDataName,
 } = require("../../../../init_Scripts/init_Cache/AssetsData_Models_Cache/init_cacheFiles/assetMetaDataCache");
@@ -25,7 +26,9 @@ const getTopAssets = ({ assets, filterFn, sortFn, limit = 5 }) =>
 module.exports.readTodaysTopSecurites = async () => {
   try {
     const assetMetaDataName = get_AssetMetaDataName();
+
     const assetClassificationID = get_AssetClassificationStructureID();
+
     const AssetClassification = get_AssetClassificationStructureName();
 
     const {
@@ -78,49 +81,68 @@ module.exports.readTodaysTopSecurites = async () => {
       },
     };
 
-    const intermediateResult = {
+    const finalResult = {
       Stocks: {
-        LargeCap: {},
-        MidCap: {},
-        SmallCap: {},
+        LargeCap: {
+          assets: {},
+        },
+
+        MidCap: {
+          assets: {},
+        },
+
+        SmallCap: {
+          assets: {},
+        },
       },
 
       Etfs: {
-        Equity: {},
-        Sectoral: {},
-        International: {},
+        Equity: {
+          assets: {},
+        },
+
+        Sectoral: {
+          assets: {},
+        },
+
+        International: {
+          assets: {},
+        },
       },
 
       "Mutual Funds": {
-        Equity: {},
-        Debt: {},
-        Others: {},
+        Equity: {
+          assets: {},
+        },
+
+        Debt: {
+          assets: {},
+        },
+
+        Others: {
+          assets: {},
+        },
       },
     };
 
     const assetIds = [];
 
     for (const value of Object.values(assetMetaDataName)) {
-      if (!structureIds?.[value?.assetClass]?.[value?.assetCategory]) {
-        continue;
-      }
+      if (!structureIds?.[value?.assetClass]?.[value?.assetCategory]) continue;
 
       const assetClass = structureIds[value.assetClass][value.assetClass];
-
       const assetCategory = structureIds[value.assetClass][value.assetCategory];
-
-      if (!intermediateResult[assetClass]?.[assetCategory]) {
-        continue;
-      }
+      if (!finalResult[assetClass]?.[assetCategory]) continue;
 
       const assetClassID = value.assetClass.toString();
       const assetCategoryID = value.assetCategory.toString();
       const assetSubCategoryID = value.assetSubCategory.toString();
+
       const assetSubCategory =
         assetClassificationID?.[assetClassID]?.category?.[assetCategoryID]
           ?.subcategory?.[assetSubCategoryID]?.name;
 
-      intermediateResult[assetClass][assetCategory][value._id] = {
+      finalResult[assetClass][assetCategory].assets[value._id] = {
         id: value._id,
         name: value.name,
         category: assetSubCategory ?? "Others",
@@ -128,7 +150,6 @@ module.exports.readTodaysTopSecurites = async () => {
           ...DEFAULT_PRICE,
         },
       };
-
       assetIds.push(value._id);
     }
 
@@ -138,6 +159,7 @@ module.exports.readTodaysTopSecurites = async () => {
 
     for (const assetId of assetIds) {
       bulkOps.push(get_52WStatsByAssetId(assetId, 252));
+
       if (bulkOps.length === BATCH_SIZE) {
         const result = await Promise.all(bulkOps);
         results.push(...result);
@@ -152,9 +174,9 @@ module.exports.readTodaysTopSecurites = async () => {
 
     const assetPrices = Object.assign({}, ...results);
 
-    for (const [assetClass, categories] of Object.entries(intermediateResult)) {
-      for (const [category, assets] of Object.entries(categories)) {
-        for (const [assetId, assetValue] of Object.entries(assets)) {
+    for (const [assetClass, categories] of Object.entries(finalResult)) {
+      for (const [category, output] of Object.entries(categories)) {
+        for (const [assetId, assetValue] of Object.entries(output.assets)) {
           assetValue.price = assetPrices[assetId] ?? {
             ...DEFAULT_PRICE,
           };
@@ -162,29 +184,9 @@ module.exports.readTodaysTopSecurites = async () => {
       }
     }
 
-    const finalResult = {
-      Stocks: {
-        LargeCap: {},
-        MidCap: {},
-        SmallCap: {},
-      },
-
-      Etfs: {
-        Equity: {},
-        Sectoral: {},
-        International: {},
-      },
-
-      "Mutual Funds": {
-        Equity: {},
-        Debt: {},
-        Others: {},
-      },
-    };
-
     for (const [assetClass, categories] of Object.entries(finalResult)) {
       for (const [category, output] of Object.entries(categories)) {
-        const assets = Object.values(intermediateResult[assetClass][category]);
+        const assets = Object.values(output.assets);
 
         output.gainers = getTopAssets({
           assets,
@@ -199,7 +201,7 @@ module.exports.readTodaysTopSecurites = async () => {
           filterFn: ({ price: { todayChangePercent } }) =>
             todayChangePercent !== null && todayChangePercent < 0,
           sortFn: (a, b) =>
-            b.price.todayChangePercent - a.price.todayChangePercent,
+            a.price.todayChangePercent - b.price.todayChangePercent,
         });
 
         output.near52WHigh = getTopAssets({
@@ -207,7 +209,7 @@ module.exports.readTodaysTopSecurites = async () => {
           filterFn: ({ price: { distanceFrom52WHighPercent } }) =>
             distanceFrom52WHighPercent !== null &&
             distanceFrom52WHighPercent < 5,
-          sortFn: (a, b) => (a, b) =>
+          sortFn: (a, b) =>
             a.price.distanceFrom52WHighPercent -
             b.price.distanceFrom52WHighPercent,
         });
@@ -216,17 +218,21 @@ module.exports.readTodaysTopSecurites = async () => {
           assets,
           filterFn: ({ price: { distanceFrom52WLowPercent } }) =>
             distanceFrom52WLowPercent !== null && distanceFrom52WLowPercent < 5,
-          sortFn: (a, b) => (a, b) =>
+          sortFn: (a, b) =>
             a.price.distanceFrom52WLowPercent -
             b.price.distanceFrom52WLowPercent,
         });
       }
     }
 
+    for (const categories of Object.values(finalResult)) {
+      for (const output of Object.values(categories)) {
+        delete output.assets;
+      }
+    }
+    
     return finalResult;
   } catch (error) {
-    console.log(error);
-
     throw new customError(error.message || "Database Error", 503);
   }
 };

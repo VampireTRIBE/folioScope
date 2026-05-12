@@ -1,14 +1,14 @@
 import React from "react";
 
 import homeStyle from "./home.module.css";
-import Section1 from "../components/layout/section1/Section1";
-import Section2 from "../components/layout/section2/Section2";
+import MarketGlance from "../components/layout/MarketGlance/MarketGlance";
+import TodaysMarkets from "../components/layout/TodaysMarket/TodaysMarkets";
 
 const Home = () => {
   return (
     <main className={homeStyle.home}>
-      <Section1 />
-      <Section2 />
+      <MarketGlance />
+      <TodaysMarkets />
     </main>
   );
 };

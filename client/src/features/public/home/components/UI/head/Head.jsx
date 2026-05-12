@@ -3,11 +3,15 @@ import headStyle from "./head.module.css";
 import TextButton from "../../../../../../components/UI/buttons/TextButton";
 import ImgButton from "../../../../../../components/UI/buttons/ImgButton";
 import TextImgButton from "../../../../../../components/UI/buttons/TextImgButton";
+import { selectActiveFilterByKey } from "../../../redux/todaysMarketSelectors";
+import { useTodaysMarketActions } from "../../../hooks/useTodaysMarketActions";
 
-const Head = () => {
+const Head = ({ activeCategory = null }) => {
+  const { toggleFilter } = useTodaysMarketActions();
+
   const filterButton = {
     varient: "filterButton",
-    name: "Filter",
+    name: activeCategory.active ?? "Filter",
     imgAttibutes: {
       variantButton: "icon",
       variantImg: "icon",
@@ -62,8 +66,12 @@ const Head = () => {
   return (
     <div className={headStyle.head}>
       <div className={headStyle.headMetadata}>
-        <h3 className={headStyle.title}>Name</h3>
-        <div className={headStyle.filterButton}>
+        <h3 className={headStyle.title}>
+          Today's {activeCategory.category ?? Name}
+        </h3>
+        <div
+          onClick={() => toggleFilter(activeCategory.category)}
+          className={headStyle.filterButton}>
           <TextImgButton {...filterButton} />
         </div>
       </div>
