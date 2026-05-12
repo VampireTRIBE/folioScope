@@ -234,7 +234,7 @@ module.exports.get_DailyClosePricesByAsset = async (
   return result;
 };
 
-module.exports.get_RawPastPricesbyAssetID = async (assetId, count = 90) => {
+module.exports.get_RawPastPricesbyAssetID = async (assetId, count = 252) => {
   const AssetPriceHistory_Model = mongoose.model("AssetPriceHistory");
   const prices = await AssetPriceHistory_Model.find({
     assetId,
@@ -250,6 +250,88 @@ module.exports.get_RawPastPricesbyAssetID = async (assetId, count = 90) => {
   for (let index = prices.length - 1; index >= 0; index--) {
     resultObj[assetId].push(prices[index].close);
   }
-
   return resultObj;
+};
+
+module.exports.get_52WStatsByAssetId = async (
+  assetId,
+  count = 252,
+) => {
+  const AssetPriceHistory_Model =
+    mongoose.model("AssetPriceHistory");
+
+  const prices = await AssetPriceHistory_Model.find({
+    assetId,
+  })
+    .sort({ date: -1 })
+    .limit(count)
+    .select("close -_id")
+    .lean();
+
+  if (!prices.length) {
+    return {
+      [assetId]: {
+        distanceFrom52WHighPercent: null,
+        distanceFrom52WLowPercent: null,
+        currentPrice: null,
+        todayChangePercent: null,
+        high52W: null,
+        low52W: null,
+      },
+    };
+  }
+
+  // reverse because DB data is newest -> oldest
+  const closePrices = prices
+    .reverse()
+    .map((item) => item.close);
+
+  const currentPrice =
+    closePrices[closePrices.length - 1];
+
+  const previousPrice =
+    closePrices.length > 1
+      ? closePrices[closePrices.length - 2]
+      : currentPrice;
+
+  const todayChangePercent = Number(
+    (
+      ((currentPrice - previousPrice) /
+        previousPrice) *
+      100
+    ).toFixed(2),
+  );
+
+  const high52W = Math.max(...closePrices);
+
+  const low52W = Math.min(...closePrices);
+
+  const distanceFrom52WHighPercent =
+    Number(
+      (
+        ((high52W - currentPrice) /
+          high52W) *
+        100
+      ).toFixed(2),
+    );
+
+  const distanceFrom52WLowPercent =
+    Number(
+      (
+        ((currentPrice - low52W) /
+          low52W) *
+        100
+      ).toFixed(2),
+    );
+
+  return {
+    [assetId]: {
+      high52W,
+      low52W,
+      currentPrice,
+      todayChangePercent,
+      distanceFrom52WHighPercent,
+      distanceFrom52WLowPercent,
+    },
+  };
 };

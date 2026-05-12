@@ -1,17 +1,31 @@
-const mongoose = require("mongoose");
 const customError = require("../../../shared/error/customError");
 const {
   get_AssetMetaDataName,
 } = require("../../../../init_Scripts/init_Cache/AssetsData_Models_Cache/init_cacheFiles/assetMetaDataCache");
-const { get_RawPastPricesbyAssetID } = require("../get_AssetsPrice");
+
+const { get_52WStatsByAssetId } = require("../get_AssetsPrice");
+
 const {
-  get_AssetClassificationStructureID,
   get_AssetClassificationStructureName,
+  get_AssetClassificationStructureID,
 } = require("../../../../init_Scripts/init_Cache/AssetsData_Models_Cache/init_cacheFiles/assetClassificationCache");
+
+const DEFAULT_PRICE = {
+  high52W: null,
+  low52W: null,
+  currentPrice: null,
+  todayChangePercent: null,
+  distanceFrom52WHighPercent: null,
+  distanceFrom52WLowPercent: null,
+};
+
+const getTopAssets = ({ assets, filterFn, sortFn, limit = 5 }) =>
+  [...assets].filter(filterFn).sort(sortFn).slice(0, limit);
 
 module.exports.readTodaysTopSecurites = async () => {
   try {
     const assetMetaDataName = get_AssetMetaDataName();
+    const assetClassificationID = get_AssetClassificationStructureID();
     const AssetClassification = get_AssetClassificationStructureName();
 
     const {
@@ -37,78 +51,182 @@ module.exports.readTodaysTopSecurites = async () => {
       category: {
         ["Equity"]: { _id: equityMFId },
         ["Debt"]: { _id: debtMFId },
-        ["Other"]: { _id: otherMDId },
+        ["Other"]: { _id: otherMFId },
       },
     } = AssetClassification["MUTUAL FUND"];
 
-    const StructrueIds = {
+    const structureIds = {
       [stockId]: {
         [stockId]: "Stocks",
         [largeCapId]: "LargeCap",
-        [midCapId]: "midCapId",
-        [smallCapId]: "smallCapId",
+        [midCapId]: "MidCap",
+        [smallCapId]: "SmallCap",
       },
+
       [etfId]: {
         [etfId]: "Etfs",
-        [equityEtfId]: "Equaty",
+        [equityEtfId]: "Equity",
         [sectoralEtfId]: "Sectoral",
         [internationalEtfId]: "International",
       },
+
       [mutualFundId]: {
         [mutualFundId]: "Mutual Funds",
-        [equityMFId]: "Equaty",
+        [equityMFId]: "Equity",
         [debtMFId]: "Debt",
-        [otherMDId]: "Others",
+        [otherMFId]: "Others",
       },
     };
 
     const intermediateResult = {
-      Stocks: [{ LargeCap: [] }, { MidCap: [] }, { SmallCap: [] }],
-      Etfs: [{ Equaty: [] }, { Sectoral: [] }, { International: [] }],
-      "Mutual Funds": [{ Equaty: [] }, { Debt: [] }, { Others: [] }],
+      Stocks: {
+        LargeCap: {},
+        MidCap: {},
+        SmallCap: {},
+      },
+
+      Etfs: {
+        Equity: {},
+        Sectoral: {},
+        International: {},
+      },
+
+      "Mutual Funds": {
+        Equity: {},
+        Debt: {},
+        Others: {},
+      },
     };
 
     const assetIds = [];
 
-    for (const [key, value] of Object.entries(assetMetaDataName)) {
-      if (StructrueIds?.[value?.assetClass]?.[value?.assetCategory]) {
-        const assetClass = StructrueIds[value.assetClass][value.assetClass];
-        const assetCategory =
-          StructrueIds[value.assetClass][value.assetCategory];
+    for (const value of Object.values(assetMetaDataName)) {
+      if (!structureIds?.[value?.assetClass]?.[value?.assetCategory]) {
+        continue;
+      }
 
-        for (const el of intermediateResult[assetClass]) {
-          if (el?.[assetCategory]) {
-            el[assetCategory].push({
-              id: value._id,
-              name: value.name,
-              category: value.assetSubCategory,
-              image: null,
-              price: {
-                price: null,
-                today: null,
-              },
-            });
-          }
-        }
-        assetIds.push(value._id);
+      const assetClass = structureIds[value.assetClass][value.assetClass];
+
+      const assetCategory = structureIds[value.assetClass][value.assetCategory];
+
+      if (!intermediateResult[assetClass]?.[assetCategory]) {
+        continue;
+      }
+
+      const assetClassID = value.assetClass.toString();
+      const assetCategoryID = value.assetCategory.toString();
+      const assetSubCategoryID = value.assetSubCategory.toString();
+      const assetSubCategory =
+        assetClassificationID?.[assetClassID]?.category?.[assetCategoryID]
+          ?.subcategory?.[assetSubCategoryID]?.name;
+
+      intermediateResult[assetClass][assetCategory][value._id] = {
+        id: value._id,
+        name: value.name,
+        category: assetSubCategory ?? "Others",
+        price: {
+          ...DEFAULT_PRICE,
+        },
+      };
+
+      assetIds.push(value._id);
+    }
+
+    let bulkOps = [];
+    const results = [];
+    const BATCH_SIZE = 500;
+
+    for (const assetId of assetIds) {
+      bulkOps.push(get_52WStatsByAssetId(assetId, 252));
+      if (bulkOps.length === BATCH_SIZE) {
+        const result = await Promise.all(bulkOps);
+        results.push(...result);
+        bulkOps = [];
       }
     }
 
-    let bulkops = assetIds.map((el) => get_RawPastPricesbyAssetID(el, 2));
-    const results = await Promise.all(bulkops);
+    if (bulkOps.length > 0) {
+      const result = await Promise.all(bulkOps);
+      results.push(...result);
+    }
+
     const assetPrices = Object.assign({}, ...results);
 
-    // ! todo inserting price then sort
+    for (const [assetClass, categories] of Object.entries(intermediateResult)) {
+      for (const [category, assets] of Object.entries(categories)) {
+        for (const [assetId, assetValue] of Object.entries(assets)) {
+          assetValue.price = assetPrices[assetId] ?? {
+            ...DEFAULT_PRICE,
+          };
+        }
+      }
+    }
 
-    return {
-      assetMetaDataName,
-      StructrueIds,
-      assetIds,
-      intermediateResult,
-      assetPrices,
+    const finalResult = {
+      Stocks: {
+        LargeCap: {},
+        MidCap: {},
+        SmallCap: {},
+      },
+
+      Etfs: {
+        Equity: {},
+        Sectoral: {},
+        International: {},
+      },
+
+      "Mutual Funds": {
+        Equity: {},
+        Debt: {},
+        Others: {},
+      },
     };
+
+    for (const [assetClass, categories] of Object.entries(finalResult)) {
+      for (const [category, output] of Object.entries(categories)) {
+        const assets = Object.values(intermediateResult[assetClass][category]);
+
+        output.gainers = getTopAssets({
+          assets,
+          filterFn: ({ price: { todayChangePercent } }) =>
+            todayChangePercent !== null && todayChangePercent > 0,
+          sortFn: (a, b) =>
+            b.price.todayChangePercent - a.price.todayChangePercent,
+        });
+
+        output.losers = getTopAssets({
+          assets,
+          filterFn: ({ price: { todayChangePercent } }) =>
+            todayChangePercent !== null && todayChangePercent < 0,
+          sortFn: (a, b) =>
+            b.price.todayChangePercent - a.price.todayChangePercent,
+        });
+
+        output.near52WHigh = getTopAssets({
+          assets,
+          filterFn: ({ price: { distanceFrom52WHighPercent } }) =>
+            distanceFrom52WHighPercent !== null &&
+            distanceFrom52WHighPercent < 5,
+          sortFn: (a, b) => (a, b) =>
+            a.price.distanceFrom52WHighPercent -
+            b.price.distanceFrom52WHighPercent,
+        });
+
+        output.near52WLow = getTopAssets({
+          assets,
+          filterFn: ({ price: { distanceFrom52WLowPercent } }) =>
+            distanceFrom52WLowPercent !== null && distanceFrom52WLowPercent < 5,
+          sortFn: (a, b) => (a, b) =>
+            a.price.distanceFrom52WLowPercent -
+            b.price.distanceFrom52WLowPercent,
+        });
+      }
+    }
+
+    return finalResult;
   } catch (error) {
     console.log(error);
+
     throw new customError(error.message || "Database Error", 503);
   }
 };
