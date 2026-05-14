@@ -1,3 +1,5 @@
 /server/node_modules
 /test
 /server/.env
+/chatgpt.md
+*react_feature_based_architecture_guide.md
