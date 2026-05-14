@@ -21,9 +21,6 @@ const Header = ({
     <header className={`${containerStyle.header} flex`}>
       <BrandComponet />
       <nav className={`${containerStyle.nav} flex`}>
-        {/* {profileNavbarOptions.map((el, index) => (
-          <TextButton key={el.id || index} {...el} />
-        ))} */}
         {profileBtn.map((el, index) => (
           <ImgButton key={el.id || index} {...el} />
         ))}

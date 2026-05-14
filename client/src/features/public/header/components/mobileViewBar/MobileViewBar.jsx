@@ -1,41 +1,36 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { FETCH_SECURITIESLIST } from "../../api/fetchApis";
+
+import Input from "../../../../../components/UI/inputs/Input";
+
 import containerStyle from "../../../../../styles/containerStyles/container.module.css";
 import componentStyle from "../../../../../styles/componetsStyles/component.module.css";
 import buttonStyle from "../../../../../styles/singleStyles/button.module.css";
-import Input from "../../../../../components/UI/inputs/Input";
-import { FETCH_SECURITIESLIST } from "../../api/fetchApis";
 
 const MobileViewBar = () => {
   const navigate = useNavigate();
   const inputRef = useRef(null);
+
   const [query, setQuery] = useState("");
   const [showPreview, setShowPreview] = useState(false);
-  const [securitieslist, setSecuritieslist] = useState([]);
-  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const fetchSecurities = async () => {
-      try {
-        setLoading(true);
-        const data = await FETCH_SECURITIESLIST();
-        setSecuritieslist(data || []);
-      } catch (error) {
-        console.error("FETCH_SECURITIESLIST ERROR:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchSecurities();
-  }, []);
+  const { data, isPending, isError, error } = useQuery({
+    queryKey: ["securitieslist"],
+    queryFn: FETCH_SECURITIESLIST,
+    staleTime: 600000,
+  });
+
+  const safeData = Array.isArray(data) ? data : [];
 
   const filteredList = useMemo(() => {
     if (!query.trim()) return [];
-    return securitieslist.filter((item) => {
-      const value = typeof item === "string" ? item : item.name;
-      return value.toLowerCase().includes(query.toLowerCase());
+    return safeData.filter((item) => {
+      const value = typeof item === "string" ? item : item?.name;
+      return (value || "").toLowerCase().includes(query.toLowerCase());
     });
-  }, [query, securitieslist]);
+  }, [query, safeData]);
 
   const resetSearch = () => {
     setQuery("");
@@ -48,29 +43,27 @@ const MobileViewBar = () => {
     resetSearch();
   };
 
-  const handleSelect = (value) => {
-    navigateToSecurity(value);
-  };
-
   const handleEnter = (e) => {
     if (e.key === "Enter") {
       navigateToSecurity(query);
     }
   };
 
+  if (isError) {
+    return <div>Error: {error.message}</div>;
+  }
+
   return (
     <div className={`flex ${containerStyle.mobileViewNavOption}`}>
       <div
         className={`flex ${componentStyle.searchInput}`}
-        style={{
-          position: "relative",
-        }}>
+        style={{ position: "relative" }}>
         <Input
           ref={inputRef}
-          varient={"searchBar"}
-          id={"inputSearch"}
-          name={"inputSearch"}
-          placeholder={loading ? "Loading..." : "Search for Insturments"}
+          varient="searchBar"
+          id="inputSearch"
+          name="inputSearch"
+          placeholder={isPending ? "Loading..." : "Search for Instruments"}
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
@@ -78,14 +71,10 @@ const MobileViewBar = () => {
           }}
           onKeyDown={handleEnter}
           onBlur={() => {
-            setTimeout(() => {
-              setShowPreview(false);
-            }, 200);
+            setTimeout(() => setShowPreview(false), 200);
           }}
           onFocus={() => {
-            if (query.trim()) {
-              setShowPreview(true);
-            }
+            if (query.trim()) setShowPreview(true);
           }}
           autoComplete="off"
         />
@@ -93,12 +82,12 @@ const MobileViewBar = () => {
         {showPreview && filteredList.length > 0 && (
           <div className={componentStyle.suggestionPreview}>
             {filteredList.map((item, index) => {
-              const value = typeof item === "string" ? item : item.name;
+              const value = typeof item === "string" ? item : item?.name;
 
               return (
                 <div
                   key={index}
-                  onMouseDown={() => handleSelect(value)}
+                  onMouseDown={() => navigateToSecurity(value)}
                   style={{
                     padding: "var(--space-3)",
                     cursor: "pointer",
@@ -120,7 +109,6 @@ const MobileViewBar = () => {
             className={`${buttonStyle.iconInharit}`}
             src="/assets/icons/search.png"
             alt="search icon"
-            title="search icon"
           />
         </label>
       </div>

@@ -1,27 +1,30 @@
 import { createSlice } from "@reduxjs/toolkit";
 
+const initialState = {
+  profileToggle: false,
+  menuToggle: false,
+};
+
 const headerToggle = createSlice({
   name: "headerToggle",
-  initialState: { profileToggle: false, menuToggle: false },
-  reducers: {
-    TOGGLE: (state, action = null) => {
-      console.log(action)
-      if (!action || !action.payload) return;
-      const { payload } = action;
-      if (!payload.key || !(payload.key in state)) return;
-      state[payload.key] = !state[payload.key];
-    },
+  initialState,
 
-    TOGGLE_FALSE: (state, action = null) => {
-      if (!action || !action.payload) return;
-      const { payload } = action;
-      if (!payload.key || !state[payload.key]) return;
-      state[payload.key] = false;
+  reducers: {
+    TOGGLE: (state, action) => {
+      const key = action.payload?.key;
+      if (!(key in state)) return;
+      state[key] = !state[key];
+      Object.keys(state).forEach((k) => {
+        if (k !== key && state[key] !== false) {
+          state[k] = state[key] ? false : true;
+        }
+      });
     },
 
     TOGGLE_RESET: (state) => {
-      state.profileToggle = false;
-      state.menuToggle = false;
+      Object.keys(state).forEach((k) => {
+        state[k] = false;
+      });
     },
   },
 });

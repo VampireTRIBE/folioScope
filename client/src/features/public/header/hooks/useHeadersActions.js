@@ -1,16 +1,11 @@
 import { useCallback, useMemo } from "react";
-
 import { useDispatch } from "react-redux";
-
 import { useNavigate } from "react-router-dom";
-
 import { headerToggleActions } from "../redux/headerToggleState";
-
 import { ROUTES } from "../../../../constants/routes";
 
 export const useHeaderActions = () => {
   const dispatch = useDispatch();
-
   const navigate = useNavigate();
 
   // =========================
@@ -146,10 +141,6 @@ export const useHeaderActions = () => {
     ],
     [authOptions, toggle],
   );
-
-  // =========================
-  // PROFILE NAVBAR ITEMS
-  // =========================
 
   return {
     toggle,
