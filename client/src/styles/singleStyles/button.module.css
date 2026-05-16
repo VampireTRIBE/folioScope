@@ -78,9 +78,55 @@
   color: var(--text-inverse);
 }
 
-.text{
+.text {
   background-color: inherit;
   color: inherit;
   font-size: inherit;
   font-weight: inherit;
+}
+
+.navlinkButton {
+  background-color: inherit;
+  color: inherit;
+  padding: var(--space-1) var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: var(--fw-medium);
+  outline: none;
+  border: none;
+  border-bottom: var(--border-width-md) solid var(--border-dark);
+  cursor: pointer;
+  transition:
+    color var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.navlinkButton:hover {
+  color: var(--color-info);
+  border-color: var(--color-info);
+}
+
+.chartFilter {
+  padding: var(--space-2);
+  flex: 1;
+  background-color: inherit;
+  color: inherit;
+  font-size: var(--text-base);
+  font-weight: var(--fw-bold);
+  outline: none;
+  border: none;
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.chartFilterActive {
+  composes: chartFilter;
+  background-color: var(--color-primary);
+  color: var(--text-inverse);
+}
+
+.chartFilter:hover {
+  background-color: var(--text-muted);
+  color: var(--color-primary);
 }

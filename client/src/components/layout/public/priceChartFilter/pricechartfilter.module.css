@@ -1,0 +1,8 @@
+.container {
+  margin: var(--space-1) 0;
+  border: var(--border-width-sm) solid var(--border-dark);
+  border-right: none;
+  border-left: none;
+  display: flex;
+  justify-content: space-between;
+}

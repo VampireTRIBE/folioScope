@@ -1,0 +1,33 @@
+.container {
+  background-color: inherit;
+  color: inherit;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3) var(--space-1);
+}
+
+.conternerDiv {
+  width: fit-content;
+  background-color: inherit;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: start;
+  gap: var(--space-1);
+}
+
+.label {
+  background-color: inherit;
+  color: var(--text-muted);
+  font-weight: var(--fw-semibold);
+}
+
+.value {
+  background-color: inherit;
+  color: inherit;
+  font-size: var(--text-xl);
+  font-weight: var(--fw-medium);
+}

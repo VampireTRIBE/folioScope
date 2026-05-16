@@ -1,0 +1,5 @@
+.container {
+  padding: var(--space-2) var(--space-1);
+  background-color: inherit;
+  color: inherit;
+}

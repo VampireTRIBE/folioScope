@@ -1,0 +1,11 @@
+.securitydetailContainer {
+  background-color: inherit;
+  color: inherit;
+  position: relative;
+
+}
+
+.div{
+   min-height: 30rem;
+   background-color: red;
+}
