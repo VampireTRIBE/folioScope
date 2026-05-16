@@ -253,12 +253,8 @@ module.exports.get_RawPastPricesbyAssetID = async (assetId, count = 252) => {
   return resultObj;
 };
 
-module.exports.get_52WStatsByAssetId = async (
-  assetId,
-  count = 252,
-) => {
-  const AssetPriceHistory_Model =
-    mongoose.model("AssetPriceHistory");
+module.exports.get_52WStatsByAssetId = async (assetId, count = 252) => {
+  const AssetPriceHistory_Model = mongoose.model("AssetPriceHistory");
 
   const prices = await AssetPriceHistory_Model.find({
     assetId,
@@ -282,56 +278,33 @@ module.exports.get_52WStatsByAssetId = async (
   }
 
   // reverse because DB data is newest -> oldest
-  const closePrices = prices
-    .reverse()
-    .map((item) => item.close);
-
-  const currentPrice =
-    closePrices[closePrices.length - 1];
-
-  const previousPrice =
-    closePrices.length > 1
-      ? closePrices[closePrices.length - 2]
-      : currentPrice;
-
-  const todayChangePercent = Number(
-    (
-      ((currentPrice - previousPrice) /
-        previousPrice) *
-      100
-    ).toFixed(2),
-  );
+  const closePrices = prices.reverse().map((item) => item.close);
 
   const high52W = Math.max(...closePrices);
-
   const low52W = Math.min(...closePrices);
+  const currentPrice = closePrices[closePrices.length - 1];
 
-  const distanceFrom52WHighPercent =
-    Number(
-      (
-        ((high52W - currentPrice) /
-          high52W) *
-        100
-      ).toFixed(2),
-    );
+  const previousPrice =
+    closePrices.length > 1 ? closePrices[closePrices.length - 2] : currentPrice;
 
-  const distanceFrom52WLowPercent =
-    Number(
-      (
-        ((currentPrice - low52W) /
-          low52W) *
-        100
-      ).toFixed(2),
-    );
+  const todayChangePercent = Number(
+    ((currentPrice - previousPrice) / previousPrice) * 100,
+  );
+  const distanceFrom52WHighPercent = Number(
+    ((high52W - currentPrice) / high52W) * 100,
+  );
+  const distanceFrom52WLowPercent = Number(
+    ((currentPrice - low52W) / low52W) * 100,
+  );
 
   return {
     [assetId]: {
-      high52W,
-      low52W,
-      currentPrice,
-      todayChangePercent,
-      distanceFrom52WHighPercent,
-      distanceFrom52WLowPercent,
+      high52W: high52W.toFixed(2),
+      low52W: low52W.toFixed(2),
+      currentPrice: currentPrice.toFixed(2),
+      todayChangePercent: todayChangePercent.toFixed(2),
+      distanceFrom52WHighPercent: distanceFrom52WHighPercent.toFixed(2),
+      distanceFrom52WLowPercent: distanceFrom52WLowPercent.toFixed(2),
     },
   };
 };

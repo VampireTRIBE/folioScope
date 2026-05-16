@@ -12,6 +12,19 @@ export const useTodaysMarketActions = () => {
   // TOGGLE ACTION
   // =========================
 
+  const toggleSubFilter = useCallback(
+    (category, subCategory, target) => {
+      dispatch(
+        todaysMarketToggleActions.SUB_FILTER_TOGGLE({
+          category,
+          subCategory,
+          target,
+        }),
+      );
+    },
+    [dispatch],
+  );
+
   const toggleFilter = useCallback(
     (key) => {
       dispatch(
@@ -36,5 +49,6 @@ export const useTodaysMarketActions = () => {
   return {
     goToSecurityDashbord,
     toggleFilter,
+    toggleSubFilter,
   };
 };

@@ -70,6 +70,7 @@ const todaysMarketToggle = createSlice({
       const key = action.payload?.key;
       const group = state.filterToggle?.[key];
       if (!group) return;
+
       const keys = Object.keys(group);
       const currentIndex = keys.findIndex((k) => group[k] === true);
       if (currentIndex === -1) {
@@ -82,13 +83,17 @@ const todaysMarketToggle = createSlice({
     },
 
     SUB_FILTER_TOGGLE: (state, action) => {
-      const { key1, key2, subKey } = action.payload;
-      const group = state.subFilterToggle?.[key1]?.[key2];
-      if (!group || !(subKey in group)) return;
+      const { category, subCategory, target } = action.payload;
+      if (!target) return;
+      const group = state.subFilterToggle?.[category]?.[subCategory];
+      if (!group) return;
+      if (!(target in group)) return;
+      group[target] = true;
       Object.keys(group).forEach((k) => {
-        group[k] = false;
+        if (k !== target) {
+          group[k] = false;
+        }
       });
-      group[subKey] = true;
     },
   },
 });

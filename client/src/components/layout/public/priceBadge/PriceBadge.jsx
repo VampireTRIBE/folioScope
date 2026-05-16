@@ -4,11 +4,13 @@ import ImgButton from "../../../UI/buttons/ImgButton";
 import pricebadgeStyle from "./pricebadge.module.css";
 import cardContentType1Style from "../cardContent/cardcontentType1.module.css";
 
-const PriceBadge = ({ price }) => {
-  const today = price?.today ?? "";
-
+const PriceBadge = ({ price, currency = false }) => {
+  const today = price?.today.toString() ?? "";
   const isNegative = today.startsWith("-");
-  const displayValue = isNegative ? today.slice(1) : today;
+  let displayValue = isNegative ? today.slice(1) : today;
+  if (displayValue[displayValue.length - 1] !== "%") {
+    displayValue += "%";
+  }
 
   const imgAtributes = {
     variantButton: "imgBadge",
@@ -19,14 +21,13 @@ const PriceBadge = ({ price }) => {
 
   return (
     <>
-      <div className={`${pricebadgeStyle.price}`}>{price?.price}</div>
+      <div className={`${pricebadgeStyle.price}`}>
+        {currency ? `₹${price?.price}` : price?.price}
+      </div>
       <div className={pricebadgeStyle.today}>
         <ImgButton {...imgAtributes} />
 
-        <div
-          className={
-            isNegative ? pricebadgeStyle.down : pricebadgeStyle.up
-          }>
+        <div className={isNegative ? pricebadgeStyle.down : pricebadgeStyle.up}>
           {displayValue}
         </div>
       </div>

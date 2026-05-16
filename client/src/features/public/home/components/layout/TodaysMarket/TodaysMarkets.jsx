@@ -3,28 +3,34 @@ import Head from "../../UI/head/Head";
 import TodaysMarketStyle from "./TodaysMarkets.module.css";
 import PriceBadge from "../../../../../../components/layout/public/priceBadge/PriceBadge";
 import Content from "../../UI/content/Content";
-import { selectActiveFilterByKey } from "../../../redux/todaysMarketSelectors";
+import {
+  selectActiveFilterByGroup,
+  selectActiveSubFilterByGroup,
+} from "../../../redux/todaysMarketSelectors";
 import { useSelector } from "react-redux";
+import { todaysMarketToggleActions } from "../../../redux/todaysMarketsState";
 
 const TodaysMarkets = () => {
-  const activeStockCategory = useSelector(selectActiveFilterByKey("Stocks"));
-  const activeEtfCategory = useSelector(selectActiveFilterByKey("Etfs"));
-  const activeMfCategory = useSelector(selectActiveFilterByKey("Mutual Funds"));
+  const activeStockCategory = useSelector(selectActiveFilterByGroup("Stocks"));
+  const activeEtfCategory = useSelector(selectActiveFilterByGroup("Etfs"));
+  const activeMfCategory = useSelector(
+    selectActiveFilterByGroup("Mutual Funds"),
+  );
 
   return (
     <section className={TodaysMarketStyle.section2}>
       <div className={TodaysMarketStyle.containerMarketData}>
-        <div>
+        <div className={TodaysMarketStyle.cardcontainer}>
           <Head activeCategory={activeStockCategory} />
-          <Content />
+          <Content activeCategory={activeStockCategory} />
         </div>
-        <div>
+        <div className={TodaysMarketStyle.cardcontainer}>
           <Head activeCategory={activeEtfCategory} />
-          <Content />
+          <Content activeCategory={activeEtfCategory} />
         </div>
-        <div>
+        <div className={TodaysMarketStyle.cardcontainer}>
           <Head activeCategory={activeMfCategory} />
-          <Content />
+          <Content activeCategory={activeMfCategory} />
         </div>
       </div>
       <aside className="container-adds"></aside>

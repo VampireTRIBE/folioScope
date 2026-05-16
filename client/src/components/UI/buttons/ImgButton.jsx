@@ -16,6 +16,7 @@ const ImgButton = ({
         src={src}
         alt={alt}
         title={title}
+        loading="lazy"
         {...rest}></img>
     </figure>
   );

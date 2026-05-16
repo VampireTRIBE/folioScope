@@ -19,3 +19,8 @@
   flex-flow: column wrap;
   gap: var(--space-4);
 }
+
+.cardcontainer{
+  background-color: inherit;
+  color: inherit;
+}

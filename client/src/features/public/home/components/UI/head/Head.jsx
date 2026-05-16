@@ -1,17 +1,23 @@
 import React from "react";
 import headStyle from "./head.module.css";
-import TextButton from "../../../../../../components/UI/buttons/TextButton";
-import ImgButton from "../../../../../../components/UI/buttons/ImgButton";
 import TextImgButton from "../../../../../../components/UI/buttons/TextImgButton";
-import { selectActiveFilterByKey } from "../../../redux/todaysMarketSelectors";
 import { useTodaysMarketActions } from "../../../hooks/useTodaysMarketActions";
+import { useSelector } from "react-redux";
+import { selectActiveSubFilterByGroup } from "../../../redux/todaysMarketSelectors";
 
 const Head = ({ activeCategory = null }) => {
-  const { toggleFilter } = useTodaysMarketActions();
+  const { activeFilter } = useSelector(
+    selectActiveSubFilterByGroup(
+      activeCategory?.category,
+      activeCategory?.subCategory,
+    ),
+  );
+
+  const { toggleFilter, toggleSubFilter } = useTodaysMarketActions();
 
   const filterButton = {
     varient: "filterButton",
-    name: activeCategory.active ?? "Filter",
+    name: activeCategory?.subCategory ?? "Sub Category",
     imgAttibutes: {
       variantButton: "icon",
       variantImg: "icon",
@@ -22,7 +28,8 @@ const Head = ({ activeCategory = null }) => {
 
   const headButtonsArray = [
     {
-      varient: "headButtonActive",
+      id: "gainers",
+      varient: activeFilter === "gainers" ? "headButtonActive" : "headButton",
       name: "Gainers",
       imgAttibutes: {
         variantButton: "iconInharit",
@@ -32,33 +39,38 @@ const Head = ({ activeCategory = null }) => {
       },
     },
     {
-      varient: "headButton",
-      name: "Lossers",
+      id: "losers",
+      varient: activeFilter === "losers" ? "headButtonActive" : "headButton",
+      name: "Losers",
       imgAttibutes: {
         variantButton: "iconInharit",
         variantImg: "iconInharit",
         src: "assets/icons/losser.png",
-        alt: "lossers Icon",
+        alt: "losers Icon",
       },
     },
     {
-      varient: "headButton",
+      id: "near52WHigh",
+      varient:
+        activeFilter === "near52WHigh" ? "headButtonActive" : "headButton",
       name: "52W High",
       imgAttibutes: {
         variantButton: "iconInharit",
         variantImg: "iconInharit",
         src: "assets/icons/52Whigh.png",
-        alt: "lossers Icon",
+        alt: "52WHigh Icon",
       },
     },
     {
-      varient: "headButtonActive",
+      id: "near52WLow",
+      varient:
+        activeFilter === "near52WLow" ? "headButtonActive" : "headButton",
       name: "52W Low",
       imgAttibutes: {
         variantButton: "iconInharit",
         variantImg: "iconInharit",
         src: "assets/icons/52Wlow.png",
-        alt: "lossers Icon",
+        alt: "52WLow Icon",
       },
     },
   ];
@@ -67,17 +79,27 @@ const Head = ({ activeCategory = null }) => {
     <div className={headStyle.head}>
       <div className={headStyle.headMetadata}>
         <h3 className={headStyle.title}>
-          Today's {activeCategory.category ?? Name}
+          Today's {activeCategory?.category ?? "Category"}
         </h3>
         <div
-          onClick={() => toggleFilter(activeCategory.category)}
+          onClick={() => toggleFilter(activeCategory?.category)}
           className={headStyle.filterButton}>
           <TextImgButton {...filterButton} />
         </div>
       </div>
       <div className={headStyle.headbuttons}>
         {headButtonsArray.map((button) => (
-          <TextImgButton key={button.name} {...button} />
+          <TextImgButton
+            onClick={() =>
+              toggleSubFilter(
+                activeCategory?.category,
+                activeCategory?.subCategory,
+                button.id,
+              )
+            }
+            key={button.id}
+            {...button}
+          />
         ))}
       </div>
     </div>

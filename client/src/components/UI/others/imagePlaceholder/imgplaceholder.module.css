@@ -1,0 +1,19 @@
+.container {
+  aspect-ratio: 1 / 1;
+  min-width: 2rem;
+  width: var(--space-5);
+  max-width: 3rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--border-dark);
+  border-radius: var(--radius-sm);
+}
+
+.letter {
+  background-color: inherit;
+  color: inherit;
+  font-size: var(--text-xl);
+  font-weight: var(--fw-bold);
+  -webkit-text-stroke: 1px;
+}

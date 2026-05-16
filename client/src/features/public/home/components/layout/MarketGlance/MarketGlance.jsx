@@ -19,7 +19,6 @@ const MarketGlance = () => {
     return (
       <section className={marketGlanceStyle.section1}>
         <h3 className={marketGlanceStyle.sectionTitle}>Market Glance</h3>
-
         <div className={marketGlanceStyle.content}>
           <CardWrapperType1 shimmer={true} />
           <CardWrapperType1 shimmer={true} />
