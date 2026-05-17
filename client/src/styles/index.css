@@ -1,6 +1,8 @@
 *,
 *::after,
 *::before {
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
 }
 
@@ -690,14 +692,14 @@
   */
   --sidebar-width: 12rem;
   --row-height: 2rem;
-    /*
+  /*
     Max application width
 
     Use:
     - Centered layouts
     - Large screen constraint
   */
-    --max-width: 1440px;
+  --max-width: 1440px;
 
   /* ===== Z INDEX ===== */
 
@@ -727,15 +729,14 @@
   padding: 0;
   box-sizing: border-box;
   text-decoration: none;
-  transition: all 0.3s ease-in-out;
-  background-color: var(--bg-main);
-  color: var(--text-primary);
 }
 
 body {
   width: 100%;
   min-height: 100vh;
   height: fit-content;
+  background-color: var(--bg-main);
+  color: var(--text-primary);
 }
 
 ul,
@@ -745,4 +746,12 @@ ol {
 
 a {
   text-decoration: none;
+  color: inherit;
+}
+
+a,
+button,
+input,
+textarea {
+  transition: all 0.3s ease-in-out;
 }

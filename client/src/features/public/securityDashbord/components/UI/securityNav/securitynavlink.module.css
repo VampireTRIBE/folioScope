@@ -10,4 +10,5 @@
   gap: var(--space-3);
   box-shadow: var(--shadow-md);
   border-bottom: var(--border-width-sm) solid var(--border-dark);
+  z-index: 900;
 }

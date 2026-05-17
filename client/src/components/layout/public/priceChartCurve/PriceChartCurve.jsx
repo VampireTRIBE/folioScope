@@ -1,35 +1,78 @@
+import { useEffect, useRef } from "react";
+import { AreaSeries, createChart } from "lightweight-charts"; // Removed LineSeries since you aren't using it
+
 import priceChartCurveStyle from "./pricechartcurve.module.css";
 
-import { createChart, AreaSeries } from "lightweight-charts";
-
-import { useEffect, useRef } from "react";
-
 const PriceChartCurve = () => {
-  //   const chartContainerRef = useRef(null);
+  const chartContainerRef = useRef(null);
 
-  //   useEffect(() => {
-  //     const chart = createChart(chartContainerRef.current, {
-  //       width: chartContainerRef.current.clientWidth,
-  //       height: 400,
-  //     });
+  const data = [
+    { value: 60, time: 1642425322 },
+    { value: 8, time: 1642511722 },
+    { value: 10, time: 1642598122 },
+    { value: 20, time: 1642684522 },
+    { value: 3, time: 1642770922 },
+    { value: 43, time: 1642857322 },
+    { value: 41, time: 1642943722 },
+    { value: 43, time: 1643030122 },
+    { value: 56, time: 1643116522 },
+    { value: 46, time: 1643202922 },
+  ];
 
-  //     const areaSeries = chart.addSeries(AreaSeries);
+  const isNegative = data[0].value > data[data.length - 1].value;
 
-  //     areaSeries.setData([
-  //       { time: "2026-05-10", value: 100 },
-  //       { time: "2026-05-11", value: 105 },
-  //       { time: "2026-05-12", value: 102 },
-  //       { time: "2026-05-13", value: 110 },
-  //     ]);
+  useEffect(() => {
+    if (!chartContainerRef.current) return;
 
-  //     return () => {
-  //       chart.remove();
-  //     };
-  //   }, []);
+    const styles = getComputedStyle(chartContainerRef.current);
+    const textColor =
+      styles.getPropertyValue("--text-primary").trim() || "black";
+    const backgroundColor =
+      styles.getPropertyValue("--bg-card").trim() || "white";
+    const chartLineColor = isNegative
+      ? styles.getPropertyValue("--chart-5").trim()
+      : styles.getPropertyValue("--chart-1").trim();
+
+    const chart = createChart(chartContainerRef.current, {
+      layout: {
+        textColor: textColor,
+        background: { type: "solid", color: backgroundColor },
+      },
+      autoSize: true,
+      rightPriceScale: {
+        scaleMargins: {
+          top: 0.2,
+          bottom: 0,
+        },
+      },
+    });
+
+    const areaSeries = chart.addSeries(AreaSeries, {
+      lineColor: chartLineColor,
+      topColor: chartLineColor + "50",
+      bottomColor: chartLineColor + "00",
+      lineWidth: 2,
+
+      autoscaleInfoProvider: (original) => {
+        const res = original();
+        if (res !== null) {
+          res.priceRange.minValue = 0;
+        }
+        return res;
+      },
+    });
+
+    areaSeries.setData(data);
+    chart.timeScale().fitContent();
+
+    return () => {
+      chart.remove();
+    };
+  }, []);
 
   return (
     <div
-      // ref={chartContainerRef}
+      ref={chartContainerRef}
       className={priceChartCurveStyle.chartContainer}
     />
   );

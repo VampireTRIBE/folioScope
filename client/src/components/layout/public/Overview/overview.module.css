@@ -1,0 +1,25 @@
+.container {
+  background-color: inherit;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+.title {
+  margin-bottom: var(--space-1);
+  padding-bottom: var(--space-1);
+  font-size: var(--text-xl);
+  font-weight: var(--fw-bold);
+  letter-spacing: 1px;
+  border-bottom: var(--border-width-sm) dotted var(--border-dark);
+}
+
+.overview {
+  color: var(--text-secondary);
+  margin-bottom: var(--space-1);
+  padding-bottom: var(--space-1);
+  font-size: var(--text-lg);
+  font-weight: var(--fw-medium);
+  text-align: justify;
+  letter-spacing: 0.6px;
+}
