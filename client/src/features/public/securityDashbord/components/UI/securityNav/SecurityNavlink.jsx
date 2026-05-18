@@ -1,30 +1,79 @@
+import { useEffect, useState } from "react";
+
 import Button from "../../../../../../components/UI/buttons/Button";
+
 import securityNavlinkStyle from "./securitynavlink.module.css";
 
 const SecurityNavlink = () => {
-  const buttonArray = [
+  const [activeSection, setActiveSection] = useState("overview");
+
+  const sections = [
     {
       id: "overview",
       text: "Overview",
-      varient: "navlinkButton",
     },
     {
-      id: "Analysis",
+      id: "analysis",
       text: "Analysis",
-      varient: "navlinkButton",
     },
     {
-      id: "Comparision",
-      text: "Comparision",
-      varient: "navlinkButton",
+      id: "comparison",
+      text: "Comparison",
     },
   ];
+
+  const handleScrollToSection = (id) => {
+    const section = document.getElementById(id);
+    if (!section) return;
+    section.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setActiveSection(entry.target.id);
+          }
+        });
+      },
+      {
+        rootMargin: "-100px 0px -90% 0px",
+        threshold: 0,
+      },
+    );
+
+    sections.forEach((sectionData) => {
+      const section = document.getElementById(sectionData.id);
+
+      if (section) {
+        observer.observe(section);
+      }
+    });
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
+
   return (
-    <div className={securityNavlinkStyle.navlinkContainer}>
-      {buttonArray.map((button, indx) => (
-        <Button key={button?.id ?? indx} {...button} />
+    <nav className={securityNavlinkStyle.navlinkContainer}>
+      {sections.map((section, indx) => (
+        <Button
+          key={section?.id ?? indx}
+          text={section.text}
+          varient={
+            activeSection === section.id
+              ? "navlinkButtonActive"
+              : "navlinkButton"
+          }
+          onClick={() => handleScrollToSection(section.id)}
+        />
       ))}
-    </div>
+    </nav>
   );
 };
 

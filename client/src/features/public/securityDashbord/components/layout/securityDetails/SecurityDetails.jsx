@@ -6,6 +6,7 @@ import SecurityContent from "../securityContent/SecurityContent";
 import PriceChartShimmer from "../priceChart/PriceChartShimmer";
 
 const PriceChart = lazy(() => import("../priceChart/PriceChart"));
+
 const SecurityDetails = () => {
   return (
     <section className={securityDetailsStyle.securitydetailContainer}>

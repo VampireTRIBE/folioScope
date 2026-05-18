@@ -3,6 +3,7 @@
   padding: var(--space-2);
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-md);
+  scroll-margin-top: calc(var(--header-height) + 2.5rem);
 }
 
 .title {

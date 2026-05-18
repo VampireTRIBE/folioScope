@@ -1,12 +1,12 @@
 import overviewStyle from "./overview.module.css";
 
-const OverView = () => {
+const OverView = ({ title, overview }) => {
   return (
-    <div className={overviewStyle.container}>
-      <h3 className={overviewStyle.title}>Name</h3>
+    <div id="overview" className={overviewStyle.container}>
+      <h3 className={overviewStyle.title}>{title ?? "Title"}</h3>
       <div className={overviewStyle.overview}>
-        dsfjdslkfjadskfjldskajfklds fdskjfldskjfldsf jdsfadsjflkdsj fkldsldskfj
-        oesfoewif iofjoiejf oindslf djfldsjflkdsjf
+        {overview ??
+          "................................... ........................ ...................................... ................................... ................................... ........................ ..................................................."}
       </div>
     </div>
   );

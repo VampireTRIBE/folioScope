@@ -6,6 +6,7 @@
   cursor: pointer;
   white-space: nowrap;
   gap: var(--space-1);
+  background-color: var(--text-inverse);
 }
 
 .imgBadge {
@@ -101,6 +102,12 @@
 }
 
 .navlinkButton:hover {
+  color: var(--color-info);
+  border-color: var(--color-info);
+}
+
+.navlinkButtonActive {
+  composes: navlinkButton;
   color: var(--color-info);
   border-color: var(--color-info);
 }

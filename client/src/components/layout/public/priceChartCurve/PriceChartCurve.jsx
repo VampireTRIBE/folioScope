@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { AreaSeries, createChart } from "lightweight-charts"; // Removed LineSeries since you aren't using it
+import { AreaSeries, createChart } from "lightweight-charts"; 
 
 import priceChartCurveStyle from "./pricechartcurve.module.css";
 
