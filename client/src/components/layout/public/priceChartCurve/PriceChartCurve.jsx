@@ -1,44 +1,37 @@
 import { useEffect, useRef } from "react";
-import { AreaSeries, createChart } from "lightweight-charts"; 
+
+import { AreaSeries, createChart } from "lightweight-charts";
 
 import priceChartCurveStyle from "./pricechartcurve.module.css";
 
-const PriceChartCurve = () => {
+const PriceChartCurve = ({ data = [] }) => {
   const chartContainerRef = useRef(null);
-
-  const data = [
-    { value: 60, time: 1642425322 },
-    { value: 8, time: 1642511722 },
-    { value: 10, time: 1642598122 },
-    { value: 20, time: 1642684522 },
-    { value: 3, time: 1642770922 },
-    { value: 43, time: 1642857322 },
-    { value: 41, time: 1642943722 },
-    { value: 43, time: 1643030122 },
-    { value: 56, time: 1643116522 },
-    { value: 46, time: 1643202922 },
-  ];
-
-  const isNegative = data[0].value > data[data.length - 1].value;
+  const chartRef = useRef(null);
+  const seriesRef = useRef(null);
 
   useEffect(() => {
     if (!chartContainerRef.current) return;
 
     const styles = getComputedStyle(chartContainerRef.current);
+
     const textColor =
       styles.getPropertyValue("--text-primary").trim() || "black";
+
     const backgroundColor =
       styles.getPropertyValue("--bg-card").trim() || "white";
-    const chartLineColor = isNegative
-      ? styles.getPropertyValue("--chart-5").trim()
-      : styles.getPropertyValue("--chart-1").trim();
 
-    const chart = createChart(chartContainerRef.current, {
+    chartRef.current = createChart(chartContainerRef.current, {
       layout: {
-        textColor: textColor,
-        background: { type: "solid", color: backgroundColor },
+        textColor,
+
+        background: {
+          type: "solid",
+          color: backgroundColor,
+        },
       },
+
       autoSize: true,
+
       rightPriceScale: {
         scaleMargins: {
           top: 0.2,
@@ -47,28 +40,35 @@ const PriceChartCurve = () => {
       },
     });
 
-    const areaSeries = chart.addSeries(AreaSeries, {
+    seriesRef.current = chartRef.current.addSeries(AreaSeries, {
+      lineWidth: 2,
+    });
+
+    return () => {
+      chartRef.current?.remove();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!seriesRef.current) return;
+    if (!data.length) return seriesRef.current.setData(data);
+    const styles = getComputedStyle(chartContainerRef.current);
+
+    const isNegative = data[0]?.value > data[data.length - 1]?.value;
+
+    const chartLineColor = isNegative
+      ? styles.getPropertyValue("--chart-5").trim()
+      : styles.getPropertyValue("--chart-1").trim();
+
+    seriesRef.current.applyOptions({
       lineColor: chartLineColor,
       topColor: chartLineColor + "50",
       bottomColor: chartLineColor + "00",
-      lineWidth: 2,
-
-      autoscaleInfoProvider: (original) => {
-        const res = original();
-        if (res !== null) {
-          res.priceRange.minValue = 0;
-        }
-        return res;
-      },
     });
 
-    areaSeries.setData(data);
-    chart.timeScale().fitContent();
-
-    return () => {
-      chart.remove();
-    };
-  }, []);
+    seriesRef.current.setData(data);
+    chartRef.current?.timeScale().fitContent();
+  }, [data]);
 
   return (
     <div

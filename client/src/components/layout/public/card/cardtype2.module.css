@@ -1,17 +1,14 @@
 .card {
   padding: var(--space-1);
-  background-color: inherit;
-  color: inherit;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-flow: wrap;
   gap: var(--space-2);
   border-bottom: var(--border-width-sm) solid var(--border-dark);
 }
 
 .cardInfo {
-  background-color: inherit;
-  color: inherit;
   display: flex;
   align-items: center;
   gap: var(--space-2);
@@ -28,18 +25,14 @@
   color: inherit;
   font-size: var(--text-sm);
   font-weight: var(--fw-semibold);
-  white-space: nowrap;
 }
 
 .subCategory {
-  background-color: inherit;
   color: var(--text-muted);
-  font-size: var(--text-xm);
-  white-space: nowrap;
+  font-size: var(--text-xs);
 }
 
 .priceContainer{
-   background-color: inherit;
    display: flex;
    flex-direction: column;
    justify-content: space-between;

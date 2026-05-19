@@ -9,7 +9,6 @@ const ImgButton = ({
   title,
   ...rest
 }) => {
-  console.log(src);
   return (
     <figure onClick={onClick} className={buttonStyle[variantButton]}>
       <img

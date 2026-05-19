@@ -1,7 +1,7 @@
 import PriceBadge from "../priceBadge/PriceBadge";
 import pricechartheadStyle from "./pricecharthead.module.css";
 
-const PriceChartHead = ({ high, low, today }) => {
+const PriceChartHead = ({ high, low, price }) => {
   return (
     <div className={pricechartheadStyle.container}>
       <div className={pricechartheadStyle.conternerDiv}>
@@ -14,7 +14,7 @@ const PriceChartHead = ({ high, low, today }) => {
       </div>
       <div className={pricechartheadStyle.conternerDiv}>
         <div className={pricechartheadStyle.label}>Return</div>
-        <PriceBadge />
+        <PriceBadge price={price} />
       </div>
     </div>
   );

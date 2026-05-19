@@ -21,6 +21,5 @@
   padding-bottom: var(--space-1);
   font-size: var(--text-lg);
   font-weight: var(--fw-medium);
-  text-align: justify;
   letter-spacing: 0.6px;
 }

@@ -15,7 +15,7 @@ const CardType2 = ({ content, onClick }) => {
           className={cardType2Style.infoDetails}>
           <div className={cardType2Style.title}>{content?.name ?? "Name"}</div>
           <div className={cardType2Style.subCategory}>
-            {content?.category ?? "Sub Category"}
+            {content?.category ?? "Category"}
           </div>
         </div>
       </div>

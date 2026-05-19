@@ -1,11 +1,14 @@
+import { useParams } from "react-router-dom";
+import { FETCH_SECURITYOVERVIEW } from "../api/fetchApis";
 import SecurityDetails from "../components/layout/securityDetails/SecurityDetails";
 import SecurityMetadata from "../components/layout/securityMetadata/SecurityMetadata";
 import securityDashbordStyle from "./securitydashbord.module.css";
+import { useQuery } from "@tanstack/react-query";
 
 const SecurityDashbord = () => {
   return (
     <main className={securityDashbordStyle.main}>
-      <SecurityMetadata />
+      <SecurityMetadata/>
       <SecurityDetails />
     </main>
   );

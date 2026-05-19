@@ -15,7 +15,7 @@ export const publicSubRoutes = [
     element: <h1>SIGNUP</h1>,
   },
   {
-    path: "security/:name",
+    path: "security/:securityID",
     element: <SecurityDashbord />,
   },
 ];
