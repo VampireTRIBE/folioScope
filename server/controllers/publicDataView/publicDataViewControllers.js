@@ -6,7 +6,13 @@ const {
   get_AssetMetaDataID,
   get_AssetMetaDataName,
 } = require("../../init_Scripts/init_Cache/AssetsData_Models_Cache/init_cacheFiles/assetMetaDataCache");
-const { readTodaysTopSecurites } = require("../../utils/mongodb/aggregations/readModels/readTodaysTopSecurites");
+const {
+  readTodaysTopSecurites,
+} = require("../../utils/mongodb/aggregations/readModels/readTodaysTopSecurites");
+const {
+  readSecurityOverview,
+} = require("../../utils/mongodb/aggregations/readModels/readSecurityDetails");
+const customError = require("../../utils/shared/error/customError");
 
 module.exports.getDefaultMetadata = async (req, res, next) => {
   try {
@@ -36,6 +42,20 @@ module.exports.getAllSecuritiesList = async (req, res, next) => {
 module.exports.getTodaysSecurities = async (req, res, next) => {
   try {
     const data = await readTodaysTopSecurites();
+    res.status(200).json({
+      success: true,
+      data,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports.getSecurityOverview = async (req, res, next) => {
+  try {
+    const { securityId } = req.params;
+    if (!securityId) throw new customError("Security Id Required", 400);
+    const data = await readSecurityOverview(securityId);
     res.status(200).json({
       success: true,
       data,

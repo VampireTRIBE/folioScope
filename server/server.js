@@ -26,6 +26,8 @@ bodyParser(app);
 
 // !import routes
 const publicRoute = require("./routes/publicRoutes/publicRoutes");
+const analyticsRoute = require("./routes/analyticsRoutes/priceAnalyticRoutes");
+const priceRangeRoute = require("./routes/priceRoutes/priceRoutes");
 const userRoute = require("./routes/userRoutes/userRoute");
 const adminRoute = require("./routes/adminRoutes/adminRoutes");
 const portfolioRoute = require("./routes/portfolioRoutes/portfolioRoutes");
@@ -64,6 +66,12 @@ app.use("/", userRoute);
 // ! Public Data View
 app.use("/", publicRoute);
 
+// ! Price Range Data View
+app.use("/price", priceRangeRoute);
+
+// ! Analytic Routes
+app.use("/analytic", analyticsRoute);
+
 // ! Admin Routes
 app.use("/admin/dataseeders", adminRoute);
 
@@ -74,5 +82,5 @@ app.use("/portfolio", portfolioRoute);
 app.use((err, req, res, next) => {
   const { statusCode = 500, message = "Some Error" } = err;
   console.log(`Status Code : ${statusCode}\nMessage : ${message}`);
-  res.status(statusCode).json({ statusCode, error: message });
+  res.status(statusCode).json({ success: false, statusCode, message: message });
 });

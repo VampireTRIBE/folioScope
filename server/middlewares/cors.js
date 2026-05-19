@@ -5,7 +5,8 @@ let corsOptions = {
     if (
       !origin ||
       origin.startsWith("http://192.168.") ||
-      origin.startsWith("http://localhost:5173")
+      origin.startsWith("http://localhost:5173") ||
+      origin.startsWith("http://localhost:4173")
     ) {
       callback(null, true);
     } else {

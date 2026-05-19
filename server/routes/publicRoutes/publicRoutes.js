@@ -6,6 +6,7 @@ const {
   getDefaultMetadata,
   getAllSecuritiesList,
   getTodaysSecurities,
+  getSecurityOverview,
 } = require("../../controllers/publicDataView/publicDataViewControllers");
 
 // ! Validate Request Data
@@ -16,5 +17,6 @@ const {
 router.route("/allsecuritieslist").get(getAllSecuritiesList);
 router.route("/defaultmetadata").get(getDefaultMetadata);
 router.route("/top/securities").get(getTodaysSecurities);
+router.route("/security/:securityId").get(getSecurityOverview);
 
 module.exports = router;
