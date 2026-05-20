@@ -9,6 +9,13 @@ const Home = () => {
     <main className={homeStyle.home}>
       <MarketGlance />
       <TodaysMarkets />
+
+      <section className={homeStyle.aboutUs}>
+        <h3>About US</h3>
+      </section>
+      <section className={homeStyle.ourServies}>
+        <h3>Our Servies</h3>
+      </section>
     </main>
   );
 };

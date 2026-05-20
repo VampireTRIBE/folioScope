@@ -1,0 +1,68 @@
+import { useEffect, useState } from "react";
+import { useNavigationActions } from "../../../../hooks/customHooks/useNavigationActions";
+
+import Button from "../../../UI/buttons/Button";
+import portfolioAddStyle from "./portfoiloadd.module.css";
+
+const PortfolioAdd = () => {
+  const { goToLogin } = useNavigationActions();
+  const [activeRadio, setActiveRadio] = useState(0);
+
+  const buttonATTR = {
+    text: "Track Your Investments",
+    varient: "buttonBlackSquare",
+    onClick: goToLogin,
+  };
+  const textArray = [
+    "NAV Analysis",
+    "Compare with index",
+    "Compare XIRR",
+    "Analyze Rolling Returns",
+    "Analyze Drawdown",
+  ];
+
+  const imgSrc = ["IMAGE 1", "IMAGE 2", "IMAGE 3", "IMAGE 4", "IMAGE 5"];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveRadio((prev) => (prev + 1) % textArray.length);
+    }, 15000);
+
+    return () => clearInterval(interval);
+  }, [textArray.length]);
+
+  return (
+    <aside className={portfolioAddStyle.addContainer}>
+      <div className={portfolioAddStyle.leftContainer}>
+        <div className={portfolioAddStyle.head}>
+          <div className={portfolioAddStyle.text}>Connect Portfolio To</div>
+
+          <div className={portfolioAddStyle.punchline}>
+            {textArray[activeRadio]}
+          </div>
+
+          <div className={portfolioAddStyle.inputContainer}>
+            {[0, 1, 2, 3, 4].map((item) => (
+              <input
+                className={portfolioAddStyle.radio}
+                key={item}
+                type="radio"
+                name="portfolio-slider"
+                checked={activeRadio === item}
+                onChange={() => setActiveRadio(item)}
+              />
+            ))}
+          </div>
+        </div>
+
+        <Button {...buttonATTR} />
+      </div>
+
+      <div className={portfolioAddStyle.rightContainer}>
+        {imgSrc[activeRadio]}
+      </div>
+    </aside>
+  );
+};
+
+export default PortfolioAdd;

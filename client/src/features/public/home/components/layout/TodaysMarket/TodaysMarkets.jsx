@@ -9,6 +9,10 @@ import {
 } from "../../../redux/todaysMarketSelectors";
 import { useSelector } from "react-redux";
 import { todaysMarketToggleActions } from "../../../redux/todaysMarketsState";
+import PortfolioAdd from "../../../../../../components/layout/public/adds/PortfolioAdd";
+import LoginAds from "../../../../../../components/layout/public/adds/LoginAds";
+import SignupAds from "../../../../../../components/layout/public/adds/SignUpAds";
+import ImgSliderAds from "../../../../../../components/layout/public/adds/ImgSliderAds";
 
 const TodaysMarkets = () => {
   const activeStockCategory = useSelector(selectActiveFilterByGroup("Stocks"));
@@ -20,6 +24,7 @@ const TodaysMarkets = () => {
   return (
     <section className={TodaysMarketStyle.section2}>
       <div className={TodaysMarketStyle.containerMarketData}>
+        <PortfolioAdd />
         <div className={TodaysMarketStyle.cardcontainer}>
           <Head activeCategory={activeStockCategory} />
           <Content activeCategory={activeStockCategory} />
@@ -33,7 +38,12 @@ const TodaysMarkets = () => {
           <Content activeCategory={activeMfCategory} />
         </div>
       </div>
-      <aside className="container-adds"></aside>
+      <aside className={TodaysMarketStyle.adsContainer}>
+        <h3>Connect with us</h3>
+        <LoginAds />
+        <ImgSliderAds />
+        <SignupAds />
+      </aside>
     </section>
   );
 };
