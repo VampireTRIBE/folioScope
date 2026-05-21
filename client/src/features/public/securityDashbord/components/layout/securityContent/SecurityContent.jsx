@@ -1,9 +1,10 @@
 import { useParams } from "react-router-dom";
-import Analysis from "../../../../../../components/layout/public/analysis/Analysis";
 import CardType3 from "../../../../../../components/layout/public/card/CardType3";
 import OverView from "../../../../../../components/layout/public/Overview/OverView";
 import securityContentStyles from "./securitycontent.module.css";
 import { useSecurityOverview } from "../../../hooks/RTK Query/useSecurityQuery";
+import DrawdownAnalysis from "../priceAnalysis/DrawdownAnalysis";
+import ComparisionAnalysis from "../priceAnalysis/ComparisionAnalysis";
 
 const dummyOverview = [
   {
@@ -58,7 +59,8 @@ const SecurityContent = () => {
 
       <OverView {...overview} />
 
-      <Analysis />
+      <DrawdownAnalysis />
+      <ComparisionAnalysis />
     </div>
   );
 };

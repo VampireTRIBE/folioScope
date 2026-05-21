@@ -1,22 +1,32 @@
 const {
+  get_SingleAssetMetaDataName,
+} = require("../../../init_Scripts/init_Cache/AssetsData_Models_Cache/init_cacheFiles/assetMetaDataCache");
+const {
   get_DailyClosePricesByAsset,
 } = require("../../mongodb/aggregations/get_AssetsPrice");
+const customError = require("../../shared/error/customError");
 const {
   singleDrawdownFuntion,
 } = require("../../shared/tools/computationFormula/drawdown");
 const { normalizeToIST330PM } = require("../../transformData/normalizeDates");
 
 module.exports.priceDrawdownAnalysis = async ({
-  assetId = "69f655b476de7bba98957403",
+  assetId = null,
   startDate = null,
   nav = false,
   session = null,
 }) => {
   if (!assetId || !startDate) {
-    throw new Error("Missing Request Parameters");
+    throw new customError("Missing Request Parameters", 400);
   }
+  const securityDetail = get_SingleAssetMetaDataName(assetId);
+  if (!securityDetail) {
+    throw new customError("Data Not Available", 404);
+  }
+
+  const { _id } = securityDetail;
   const pastPrices = await get_DailyClosePricesByAsset(
-    assetId,
+    _id,
     new Date(startDate),
     nav,
     session,
@@ -57,28 +67,25 @@ module.exports.priceDrawdownAnalysis = async ({
     };
   };
 
-  if (v1 && v2) {
-    valueCalculation(v1, v2, "1Day");
-  }
   if (v3) {
-    valueCalculation(v1, v3, "3Months");
+    valueCalculation(v1, v3, "3 Months");
   }
   if (!v3) {
-    valueCalculation(v1, lastValue, "3MonthsPartial");
+    valueCalculation(v1, lastValue, "3 MonthsPartial");
     return priceDrawdownAnalysis;
   }
   if (v4) {
-    valueCalculation(v1, v4, "1Year");
+    valueCalculation(v1, v4, "1 Year");
   }
   if (!v4) {
-    valueCalculation(v1, lastValue, "1YearPartial");
+    valueCalculation(v1, lastValue, "1 YearPartial");
     return priceDrawdownAnalysis;
   }
   if (v5) {
-    valueCalculation(v1, v5, "3Year");
+    valueCalculation(v1, v5, "3 Year");
   }
   if (!v5) {
-    valueCalculation(v1, lastValue, "3YearPartial");
+    valueCalculation(v1, lastValue, "3 YearPartial");
     return priceDrawdownAnalysis;
   }
   return priceDrawdownAnalysis;

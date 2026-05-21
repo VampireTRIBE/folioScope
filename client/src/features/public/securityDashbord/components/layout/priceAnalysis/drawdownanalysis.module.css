@@ -8,8 +8,8 @@
   min-height: 15rem;
 }
 
-.title{
-   margin-bottom: var(--space-1);
+.title {
+  margin-bottom: var(--space-1);
   padding-bottom: var(--space-1);
   font-size: var(--text-xl);
   font-weight: var(--fw-bold);

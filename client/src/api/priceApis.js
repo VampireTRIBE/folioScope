@@ -8,3 +8,5 @@ export const FETCH_RANGEPRICE = async (securityID, range = null) => {
   const response = await baseURL.get(`/price/${securityID}?range=${range}`);
   return response.data.data;
 };
+
+

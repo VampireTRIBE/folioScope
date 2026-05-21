@@ -11,6 +11,6 @@ const {
 // ! routes
 
 // ! Public Data Fetch Routes
-router.route("/drawdown/:assetId").get(priceDrawdownAnalytic);
+router.route("/drawdown/:securityId").get(priceDrawdownAnalytic);
 
 module.exports = router;
