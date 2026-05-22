@@ -755,3 +755,16 @@ input,
 textarea {
   transition: all 0.3s ease-in-out;
 }
+
+
+/*
+======================
+  Media Query
+======================
+*/
+
+@media screen and (min-width: 500px) {
+  :root{
+    --container-padding:10%
+  }
+}

@@ -45,9 +45,9 @@ module.exports.systemBootup = async () => {
     await runWithRetry(() => init_CacheMaster(), "INIT CACHE");
     log.success("INIT CACHE SUCCESSFULL");
 
-    // =========================
-    // 2. INIT APPSCRIPT
-    // =========================
+    // // =========================
+    // // 2. INIT APPSCRIPT
+    // // =========================
     // await runWithRetry(() => init_AppscriptMaster(), "INIT APPSCRIPT");
     // log.success("INIT APPSCRIPT SUCCESSFULL");
 
