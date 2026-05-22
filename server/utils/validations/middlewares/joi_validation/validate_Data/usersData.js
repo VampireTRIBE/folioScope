@@ -1,5 +1,6 @@
 const {
   newUserRegisteration_joi_Schema,
+  authValidationSchema,
 } = require("../joi_Schema/usersSchema");
 
 module.exports.validate_RegisterData = (req, res, next) => {
@@ -11,7 +12,8 @@ module.exports.validate_RegisterData = (req, res, next) => {
   const { error } = newUserRegisteration_joi_Schema.validate(req.body);
   if (error) {
     return res.status(400).json({
-      error: error.details[0].message,
+      success: false,
+      message: error.details[0].message,
     });
   }
   next();
@@ -23,10 +25,11 @@ module.exports.validate_loginDATA = (req, res, next) => {
       error: "Invalid PayLoad",
     });
   }
-  const { username, password } = req.body;
-  if (!username || !password || password.length < 6) {
-    return res.status(401).json({
-      error: "Username Or Password Not Valid",
+  const { error } = authValidationSchema.validate(req.body);
+  if (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.details[0].message,
     });
   }
   next();

@@ -1,6 +1,5 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
-const passportLocalMongoose = require("passport-local-mongoose");
 
 const userSchema = new Schema(
   {
@@ -16,6 +15,12 @@ const userSchema = new Schema(
       match: [/^\S+@\S+\.\S+$/, "Invalid email"],
     },
 
+    password: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
     role: {
       type: String,
       default: "client",
@@ -26,11 +31,20 @@ const userSchema = new Schema(
       type: Boolean,
       default: true,
     },
+
+    isVerified: {
+      type: Boolean,
+      default: false,
+    },
+    isAdminVerified: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true },
 );
 
-userSchema.plugin(passportLocalMongoose);
 userSchema.index({ role: 1 });
+userSchema.index({ isVerified: 1 });
 
 module.exports = mongoose.model("users", userSchema);

@@ -1,11 +1,17 @@
-const passport = require("passport");
-const userModel = require("../models/users_Models/user");
-const localStrategy = require("passport-local");
+const crypto = require("node:crypto");
 
-module.exports.passportAuthentication = (app) => {
-  app.use(passport.initialize());
-  app.use(passport.session());
-  passport.use(new localStrategy(userModel.authenticate()));
-  passport.serializeUser(userModel.serializeUser());
-  passport.deserializeUser(userModel.deserializeUser());
+module.exports.accessTokenCheck = (req, res, next) => {
+  const authHeader = req?.headers?.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(400).json({
+      success: false,
+      message: "Access Token is missing or invalid",
+    });
+  }
+  req.accessToken = authHeader.split(" ")[1];
+  next();
+};
+
+module.exports.hashRefreshToken = (token) => {
+  return crypto.createHash("sha256").update(token).digest("hex");
 };

@@ -6,8 +6,7 @@ dotenv.config({ quiet: true });
 const express = require("express");
 const { corAuth } = require("./middlewares/cors");
 const { DB_connect } = require("./config/connectDB");
-const { passportAuthentication } = require("./middlewares/authentication");
-const { sessionConfig } = require("./middlewares/seasson");
+const { cookieParser } = require("./middlewares/cookieParser");
 const { bodyParser } = require("./middlewares/dataParser");
 const log = require("./utils/shared/console_Loggers/consoleLoggers");
 const { systemBootup } = require("./sync_System/SystemBootup");
@@ -20,8 +19,7 @@ const app = express();
 
 corAuth(app);
 DB_connect();
-sessionConfig(app);
-passportAuthentication(app);
+cookieParser(app);
 bodyParser(app);
 
 // !import routes
@@ -34,8 +32,11 @@ const portfolioRoute = require("./routes/portfolioRoutes/portfolioRoutes");
 const testRoutes = require("./routes/testRoutes/testRoutes");
 
 // ! for listning all requests
-app.listen(process.env.PORT, async (req, res) => {
-  log.running(`SERVER PORT : ${process.env.PORT}`);
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, (err) => {
+  err
+    ? log.error("ERROR : ", err)
+    : log.running(`Server running at http://localhost:${PORT}`);
 });
 
 // ! System Bootup
