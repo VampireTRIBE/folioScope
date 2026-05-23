@@ -16,6 +16,7 @@ const sessionSchema = new Schema(
     sessionId: {
       type: String,
       required: [true, "sessionId Required"],
+      unique: true,
     },
 
     ip: {
@@ -35,13 +36,25 @@ const sessionSchema = new Schema(
       type: Boolean,
       default: false,
     },
-    expires: { type: String, default: "7d" },
+    lastUsedAt: {
+      type: Date,
+      default: Date.now,
+    },
+
+    expiresAt: {
+      type: Date,
+      required: true,
+    },
   },
   { timestamps: true },
 );
 
-sessionSchema.index({ userId: 1, revoke: 1, sessionId: 1 });
-sessionSchema.index({ userId: 1, sessionId: 1 });
-sessionSchema.index({ refreshToken: 1 });
+sessionSchema.index({
+  userId: 1,
+  sessionId: 1,
+  revoke: 1,
+});
+sessionSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 
-module.exports = mongoose.model("Session", sessionSchema);
+module.exports =
+  mongoose.models.Session || mongoose.model("Session", sessionSchema);

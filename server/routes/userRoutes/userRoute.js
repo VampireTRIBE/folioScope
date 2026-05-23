@@ -1,31 +1,44 @@
 const express = require("express");
 const router = express.Router();
 
-const {
-  login_User,
-  register_NewUser,
-  logout_User,
-  isLogedIn,
-  emailVerify,
-  refreshToken,
-} = require("../../controllers/users/userControllers");
+// ! middlewares
 const {
   validate_RegisterData,
   validate_loginDATA,
 } = require("../../utils/validations/middlewares/joi_validation/validate_Data/usersData");
-const { accessTokenCheck } = require("../../middlewares/authentication");
+const {
+  verifyAccessToken,
+  verifyEmailTokenCheck,
+  verifyRefreshToken,
+} = require("../../middlewares/authentication");
 
-// ! middlewares
+// ! Controllers
+const {
+  login_User,
+  register_NewUser,
+  logout_User,
+  emailVerify,
+  refreshToken,
+  logout_AllUser,
+  sendVerificationEmail,
+} = require("../../controllers/users/userControllers");
 
 // routes
 
 router.route("/signup").post(validate_RegisterData, register_NewUser);
-router.post("/verify", accessTokenCheck, emailVerify);
+
+router.post("/verifyemail", verifyEmailTokenCheck, emailVerify);
+router.post("/sendverificationemail", sendVerificationEmail);
+
 router.route("/login").post(validate_loginDATA, login_User);
-router.get("/refreshtoken", refreshToken);
+router.post("/refreshtoken", verifyRefreshToken, refreshToken);
 
-// router.route("/logout").get(logout_User);
-
-// router.route("/islogedin").get(isLogedIn);
+router.route("/logoutuser").post(verifyAccessToken, logout_User);
+router.route("/logoutalluser").post(verifyAccessToken, logout_AllUser);
 
 module.exports = router;
+
+// ! to do
+// router.post("/forgot-password", userControllers.forgotPassword);
+// router.post("/verify-otp/:email", userControllers.verifyOtp);
+// router.post("/confirm-password/:email", userControllers.confirmPassword);

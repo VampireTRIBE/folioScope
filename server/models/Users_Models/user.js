@@ -40,6 +40,13 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    verificationLastSentAt: {
+      type: Date,
+    },
+    verificationRetry: {
+      type: Number,
+      default: 1,
+    },
   },
   { timestamps: true },
 );
