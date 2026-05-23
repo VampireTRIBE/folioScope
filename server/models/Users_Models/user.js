@@ -36,14 +36,29 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
+
     isAdminVerified: {
       type: Boolean,
       default: false,
     },
+
     verificationLastSentAt: {
       type: Date,
     },
+
     verificationRetry: {
+      type: Number,
+      default: 1,
+    },
+
+    otp: { type: String, default: null },
+    otpExpiry: { type: Date, default: null },
+
+    otpLastSentAt: {
+      type: Date,
+    },
+
+    otpRetry: {
       type: Number,
       default: 1,
     },

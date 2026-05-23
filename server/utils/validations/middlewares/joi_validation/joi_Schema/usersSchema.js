@@ -44,3 +44,38 @@ module.exports.authValidationSchema = Joi.object({
     "string.max": "Password cannot exceed 128 characters",
   }),
 });
+
+module.exports.changePasswordSchema = Joi.object({
+  newPassword: Joi.string().min(6).max(128).required().messages({
+    "string.empty": "New password is required",
+    "string.min": "New password must be at least 6 characters",
+    "string.max": "New password cannot exceed 128 characters",
+    "any.required": "New password is required",
+  }),
+
+  confirmPassword: Joi.string()
+    .valid(Joi.ref("newPassword"))
+    .required()
+    .messages({
+      "string.empty": "Confirm password is required",
+      "any.only": "Passwords do not match",
+      "any.required": "Confirm password is required",
+    }),
+});
+
+module.exports.emailSchema = Joi.object({
+  email: Joi.string().trim().lowercase().email().required().messages({
+    "string.base": "Email must be a string",
+    "string.empty": "Email is required",
+    "string.email": "Email must be a valid email address",
+  }),
+});
+
+module.exports.otpSchema = Joi.object({
+  otp: Joi.string().max(6).min(6).required().messages({
+    "string.base": "otp must be a string",
+    "string.empty": "otp is required",
+    "string.max": "otp must be 6 digit",
+    "string.min": "otp must be 6 digit",
+  }),
+});

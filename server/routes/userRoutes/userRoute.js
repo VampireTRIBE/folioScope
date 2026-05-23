@@ -5,6 +5,9 @@ const router = express.Router();
 const {
   validate_RegisterData,
   validate_loginDATA,
+  validate_email,
+  validate_otp,
+  validate_ChangePasswordDATA,
 } = require("../../utils/validations/middlewares/joi_validation/validate_Data/usersData");
 const {
   verifyAccessToken,
@@ -18,27 +21,43 @@ const {
   register_NewUser,
   logout_User,
   emailVerify,
-  refreshToken,
   logout_AllUser,
   sendVerificationEmail,
+  forgotPassword,
+  confirmPassword,
+  verifyOtp,
+  accessTokenRotation,
 } = require("../../controllers/users/userControllers");
+const {
+  validateParamsEmail,
+} = require("../../utils/validations/contentValidater/validateEmail");
 
 // routes
 
 router.route("/signup").post(validate_RegisterData, register_NewUser);
 
 router.post("/verifyemail", verifyEmailTokenCheck, emailVerify);
-router.post("/sendverificationemail", sendVerificationEmail);
+router.post("/sendverificationemail", validate_email, sendVerificationEmail);
 
 router.route("/login").post(validate_loginDATA, login_User);
-router.post("/refreshtoken", verifyRefreshToken, refreshToken);
+router.post("/refreshtoken", verifyRefreshToken, accessTokenRotation);
+
+router.post("/forgotpassword", validate_email, forgotPassword);
+router.post(
+  "/verifyotp/:email",
+  validate_otp,
+  validateParamsEmail("email"),
+  verifyOtp,
+);
+
+router.post(
+  "/confirmpassword/:email",
+  validate_ChangePasswordDATA,
+  validateParamsEmail("email"),
+  confirmPassword,
+);
 
 router.route("/logoutuser").post(verifyAccessToken, logout_User);
 router.route("/logoutalluser").post(verifyAccessToken, logout_AllUser);
 
 module.exports = router;
-
-// ! to do
-// router.post("/forgot-password", userControllers.forgotPassword);
-// router.post("/verify-otp/:email", userControllers.verifyOtp);
-// router.post("/confirm-password/:email", userControllers.confirmPassword);

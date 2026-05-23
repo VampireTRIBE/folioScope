@@ -3,11 +3,11 @@ const fs = require("node:fs");
 const handleBars = require("handlebars");
 const nodeMailer = require("nodemailer");
 
-module.exports.verifyMail = async (token, email) => {
+module.exports.sendVerificationMail = async (token, email) => {
   try {
     const filepath = path.join(__dirname, "template.hbs");
     const emailTemplateSource = fs.readFileSync(filepath, "utf-8");
-    
+
     const template = handleBars.compile(emailTemplateSource);
     const htmlToSend = template({
       token: encodeURIComponent(token),
