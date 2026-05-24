@@ -1,18 +1,25 @@
-import React from "react";
+import { useSelector } from "react-redux";
+
+// ! components
 import Head from "../../UI/head/Head";
-import TodaysMarketStyle from "./TodaysMarkets.module.css";
 import PriceBadge from "../../../../../../components/layout/public/priceBadge/PriceBadge";
 import Content from "../../UI/content/Content";
-import {
-  selectActiveFilterByGroup,
-  selectActiveSubFilterByGroup,
-} from "../../../redux/todaysMarketSelectors";
-import { useSelector } from "react-redux";
-import { todaysMarketToggleActions } from "../../../redux/todaysMarketsState";
+
+// ! ads components
 import PortfolioAdd from "../../../../../../components/layout/public/adds/PortfolioAdd";
 import LoginAds from "../../../../../../components/layout/public/adds/LoginAds";
 import SignupAds from "../../../../../../components/layout/public/adds/SignUpAds";
 import ImgSliderAds from "../../../../../../components/layout/public/adds/ImgSliderAds";
+
+// ! Styles
+import TodaysMarketStyle from "./TodaysMarkets.module.css";
+
+// ! Selectors
+import {
+  selectActiveFilterByGroup,
+  selectActiveSubFilterByGroup,
+} from "../../../redux/todaysMarketSelectors";
+import { todaysMarketToggleActions } from "../../../redux/todaysMarketsState";
 
 const TodaysMarkets = () => {
   const activeStockCategory = useSelector(selectActiveFilterByGroup("Stocks"));

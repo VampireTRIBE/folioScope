@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const LedgerStatementModel = require("../../../models/Portfolio_Models/ledger_Models/ledgerStatement");
 const FifoLotModel = require("../../../models/Portfolio_Models/ledger_Models/fifoLedgerStatement");
-const FinantialAssetModel = require("../../../models/Portfolio_Models/PortfolioMetrix_Models/finantialAsset");
+const FinantialAssetModel = require("../../../models/Portfolio_Models/PortfolioMetrix_Models/financialAsset");
 
 const {
   normalizeToCurrentFinacialYear,

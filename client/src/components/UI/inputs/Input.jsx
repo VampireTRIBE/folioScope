@@ -1,6 +1,5 @@
 import React from "react";
-
-import inputStyle from "../../../styles/singleStyles/input.module.css";
+import inputStyle from "./input.module.css";
 
 const Input = ({ type = "text", varient, id, name, placeholder, ...rest }) => {
   return (

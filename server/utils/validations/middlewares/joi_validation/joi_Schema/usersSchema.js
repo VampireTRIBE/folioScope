@@ -25,8 +25,8 @@ module.exports.newUserRegisteration_joi_Schema = Joi.object({
     "string.max": "Password cannot exceed 128 characters",
   }),
 
-  role: Joi.string().valid("client").default("client").messages({
-    "any.only": "Role must be client",
+  role: Joi.string().valid("client", "admin").default("client").messages({
+    "any.only": "Role must be client or admin",
   }),
   isActive: Joi.boolean().default(true),
 }).required();

@@ -1,6 +1,4 @@
-import React from "react";
-
-import buttonStyle from "../../../styles/singleStyles/button.module.css";
+import buttonStyle from "./button.module.css";
 
 const TextButton = ({ onClick, variant, children, ...rest }) => {
   return (

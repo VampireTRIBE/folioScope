@@ -19,7 +19,6 @@ module.exports.priceDrawdownAnalytic = async (req, res, next) => {
       data: priceDrawdown?.[key] ?? null,
     });
   } catch (error) {
-    console.log(error)
     next(error);
   }
 };

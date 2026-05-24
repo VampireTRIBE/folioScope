@@ -1,8 +1,14 @@
 import { useParams } from "react-router-dom";
+
+// ! components
 import CardType2 from "../../../../../../components/layout/public/card/CardType2";
+
+// ! styles
 import securityMetadataStyle from "./securityMetadata.module.css";
+
+// ! tanStack Query Hooks
 import { useSecurityOverview } from "../../../hooks/RTK Query/useSecurityQuery";
-import { use1DPriceRange } from "../../../../../../hooks/usePricesQuery";
+import { use1DPriceRange } from "../../../../../hooks/RKT Query/usePricesQuery";
 
 const SecurityMetadata = () => {
   const { securityID } = useParams();

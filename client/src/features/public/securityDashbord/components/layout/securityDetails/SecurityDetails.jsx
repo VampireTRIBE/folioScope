@@ -1,10 +1,12 @@
 import { lazy, Suspense } from "react";
 
+// ! styles
 import securityDetailsStyle from "./securitydetails.module.css";
+
+// ! componets
 import SecurityNavlink from "../../UI/securityNav/SecurityNavlink";
 import SecurityContent from "../securityContent/SecurityContent";
 import PriceChartShimmer from "../priceChart/PriceChartShimmer";
-
 const PriceChart = lazy(() => import("../priceChart/PriceChart"));
 
 const SecurityDetails = () => {

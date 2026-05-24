@@ -1,5 +1,5 @@
 const PortfolioGroupModel = require("../../models/Portfolio_Models/PortfolioGroup_Models/portfolioGroup");
-const financialAssetModel = require("../../models/Portfolio_Models/PortfolioMetrix_Models/finantialAsset");
+const financialAssetModel = require("../../models/Portfolio_Models/PortfolioMetrix_Models/financialAsset");
 
 module.exports.addGroup = async (req, res) => {
   try {

@@ -1,6 +1,12 @@
-import Button from "../../../../../../components/UI/buttons/Button";
-import { useNavigationActions } from "../../../../../../hooks/customHooks/useNavigationActions";
+// ! styles
 import comparisionAnalysisStyle from "./comparisionAnalysis.module.css";
+
+// ! componets
+import Button from "../../../../../../components/UI/buttons/Button";
+import { useNavigationActions } from "../../../../../hooks/customHooks/useNavigationActions";
+
+// ! custom Hooks
+
 
 const ComparisionAnalysis = () => {
   const { goToLogin } = useNavigationActions();

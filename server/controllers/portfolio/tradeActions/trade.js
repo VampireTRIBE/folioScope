@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const PortfolioGroupModel = require("../../../models/Portfolio_Models/PortfolioGroup_Models/portfolioGroup");
 const PortfolioGroupStatementModel = require("../../../models/Portfolio_Models/ledger_Models/groupStatement");
-const FinantialAssetModel = require("../../../models/Portfolio_Models/PortfolioMetrix_Models/finantialAsset");
+const FinantialAssetModel = require("../../../models/Portfolio_Models/PortfolioMetrix_Models/financialAsset");
 const LedgerStatementModel = require("../../../models/Portfolio_Models/ledger_Models/ledgerStatement");
 const FifoLotModel = require("../../../models/Portfolio_Models/ledger_Models/fifoLedgerStatement");
 

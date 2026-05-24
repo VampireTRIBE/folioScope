@@ -14,6 +14,7 @@ const { sync_CurrentPrices } = require("./sync_System/sync_CurrentPrices");
 const {
   sync_AllUsersPortfolio,
 } = require("./sync_System/sync_AllusersPortfolio");
+const { registerModels } = require("./models/index_models");
 
 const app = express();
 
@@ -21,6 +22,7 @@ corAuth(app);
 DB_connect();
 cookieParser(app);
 bodyParser(app);
+registerModels();
 
 // !import routes
 const publicRoute = require("./routes/publicRoutes/publicRoutes");

@@ -1,9 +1,10 @@
-import React from "react";
+// ! components
 import ImgButton from "../../../UI/buttons/ImgButton";
 import PriceBadge from "../priceBadge/PriceBadge";
-
-import cardType2Style from "./cardtype2.module.css";
 import ImgPlaceholder from "../../../UI/others/imagePlaceholder/ImgPlaceholder";
+
+// ! styles
+import cardType2Style from "./cardtype2.module.css";
 
 const CardType2 = ({ content, onClick }) => {
   return (

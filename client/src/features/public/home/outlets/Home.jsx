@@ -1,6 +1,7 @@
-import React from "react";
-
+// ! styles
 import homeStyle from "./home.module.css";
+
+// ! components
 import MarketGlance from "../components/layout/MarketGlance/MarketGlance";
 import TodaysMarkets from "../components/layout/TodaysMarket/TodaysMarkets";
 import AboutUs from "../components/layout/About Us/AboutUs";
@@ -11,10 +12,8 @@ const Home = () => {
     <main className={homeStyle.home}>
       <MarketGlance />
       <TodaysMarkets />
-      
-      <AboutUs/>
-      <OurServices/>
-
+      <AboutUs />
+      <OurServices />
     </main>
   );
 };

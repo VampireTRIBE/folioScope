@@ -1,12 +1,14 @@
 import { useCallback, useMemo } from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { headerToggleActions } from "../redux/headerToggleState";
-import { ROUTES } from "../../../../constants/routes";
+import { publicheaderToggleActions } from "../redux/headerToggleState";
+import { useNavigationActions } from "../../../hooks/customHooks/useNavigationActions";
 
 export const useHeaderActions = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const { goToLogin, goToSignup } = useNavigationActions();
 
   // =========================
   // TOGGLE ACTION
@@ -15,40 +17,13 @@ export const useHeaderActions = () => {
   const toggle = useCallback(
     (key) => {
       dispatch(
-        headerToggleActions.TOGGLE({
+        publicheaderToggleActions.TOGGLE({
           key,
         }),
       );
     },
     [dispatch],
   );
-
-  // =========================
-  // NAVIGATION ACTIONS
-  // =========================
-
-  const goToHome = useCallback(() => {
-    navigate(ROUTES.HOME);
-  }, [navigate]);
-
-  const goToLogin = useCallback(() => {
-    navigate(ROUTES.LOGIN);
-  }, [navigate]);
-
-  const goToSignUp = useCallback(() => {
-    navigate(ROUTES.SIGNUP);
-  }, [navigate]);
-
-  const goToSecurityDashbord = useCallback(
-    (security) => {
-      navigate(ROUTES.SECURITYDASHBORD(security));
-    },
-    [navigate],
-  );
-
-  // =========================
-  // SHARED AUTH OPTIONS
-  // =========================
 
   const authOptions = useMemo(
     () => [
@@ -61,13 +36,13 @@ export const useHeaderActions = () => {
       },
       {
         id: "auth-option-signup",
-        onClick: goToSignUp,
+        onClick: goToSignup,
         children: "Sign Up",
         variant: "sideBarbtn",
         order: 2,
       },
     ],
-    [goToLogin, goToSignUp],
+    [goToLogin, goToSignup],
   );
 
   const menuOptions = useMemo(
@@ -81,13 +56,13 @@ export const useHeaderActions = () => {
       },
       {
         id: "auth-option-signup",
-        onClick: goToSignUp,
+        onClick: goToSignup,
         children: "Option-2",
         variant: "sideBarbtn",
         order: 2,
       },
     ],
-    [goToLogin, goToSignUp],
+    [goToLogin, goToSignup],
   );
 
   // =========================
@@ -144,8 +119,6 @@ export const useHeaderActions = () => {
 
   return {
     toggle,
-    goToHome,
-    goToSecurityDashbord,
     profileBtn,
     profileSidebarItems,
   };

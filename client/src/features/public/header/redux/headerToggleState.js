@@ -5,8 +5,8 @@ const initialState = {
   menuToggle: false,
 };
 
-const headerToggle = createSlice({
-  name: "headerToggle",
+const publicheaderToggle = createSlice({
+  name: "publicheaderToggle",
   initialState,
 
   reducers: {
@@ -29,5 +29,5 @@ const headerToggle = createSlice({
   },
 });
 
-export const headerToggleActions = headerToggle.actions;
-export default headerToggle.reducer;
+export const publicheaderToggleActions = publicheaderToggle.actions;
+export default publicheaderToggle.reducer;

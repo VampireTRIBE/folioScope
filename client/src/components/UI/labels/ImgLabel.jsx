@@ -1,4 +1,4 @@
-import React from "react";
+
 import ImgButton from "../buttons/ImgButton";
 
 const ImgLabel = ({ htmlFor, varient, children }) => {

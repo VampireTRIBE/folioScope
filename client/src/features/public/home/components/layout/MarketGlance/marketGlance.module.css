@@ -1,10 +1,17 @@
-.section1 {
+.container {
   padding: var(--space-4);
   border: var(--border-width-lg) solid var(--border-dark);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-lg);
   background-color: inherit;
   color: inherit;
+}
+
+
+.Title {
+  background-color: inherit;
+  color: inherit;
+  font-size: var(--text-xl);
 }
 
 .content {
@@ -16,10 +23,4 @@
   justify-content: space-between;
   gap: var(--space-3);
   border-top: var(--border-width-md) dotted var(--border-dark);
-}
-
-.sectionTitle {
-  background-color: inherit;
-  color: inherit;
-  font-size: var(--text-xl);
 }

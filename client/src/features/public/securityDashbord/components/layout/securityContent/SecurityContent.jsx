@@ -1,34 +1,23 @@
 import { useParams } from "react-router-dom";
+
+// ! componets
 import CardType3 from "../../../../../../components/layout/public/card/CardType3";
 import OverView from "../../../../../../components/layout/public/Overview/OverView";
-import securityContentStyles from "./securitycontent.module.css";
-import { useSecurityOverview } from "../../../hooks/RTK Query/useSecurityQuery";
 import DrawdownAnalysis from "../priceAnalysis/DrawdownAnalysis";
 import ComparisionAnalysis from "../priceAnalysis/ComparisionAnalysis";
 
-const dummyOverview = [
-  {
-    assetClass: {
-      id: "assetClass",
-      name: "Class",
-    },
-  },
-  {
-    assetCategory: {
-      id: "assetCategory",
-      name: "Category",
-    },
-  },
-  {
-    assetSubCategory: {
-      id: "assetSubCategory",
-      name: "Sub Category",
-    },
-  },
-];
+// ! Styles
+import securityContentStyles from "./securitycontent.module.css";
+
+// ! tanStack Query Hooks
+import { useSecurityOverview } from "../../../hooks/RTK Query/useSecurityQuery";
+
+// ! custom Hooks
+import { useStaticDataSecurityContent } from "../../../hooks/custom Hooks/useStaticData/useStaticData";
 
 const SecurityContent = () => {
   const { securityID } = useParams();
+  const { dummyOverview } = useStaticDataSecurityContent();
   const { data: overviewData } = useSecurityOverview(securityID);
 
   const classifications = overviewData?.classifications ?? dummyOverview;

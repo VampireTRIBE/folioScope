@@ -1,11 +1,12 @@
 import { Outlet } from "react-router-dom";
-import FinalHeader from "../../features/public/header/components/FinalHeader";
+
 import Footer from "../../components/layout/public/footer/Footer";
+import PublicHeader from "../../features/public/header/outlets/header/PublicHeader";
 
 const PublicLayout = () => {
   return (
     <>
-      <FinalHeader />
+      <PublicHeader />
       <Outlet />
       <Footer />
     </>

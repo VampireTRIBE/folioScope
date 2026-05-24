@@ -1,5 +1,3 @@
-import React from "react";
-
 import cardContentType1Style from "./cardContentType1.module.css";
 import PriceBadge from "../priceBadge/PriceBadge";
 

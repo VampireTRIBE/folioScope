@@ -1,9 +1,17 @@
-import React from "react";
-import headStyle from "./head.module.css";
-import TextImgButton from "../../../../../../components/UI/buttons/TextImgButton";
-import { useTodaysMarketActions } from "../../../hooks/useTodaysMarketActions";
 import { useSelector } from "react-redux";
+
+// ! custom Hooks
+import { useTodaysMarketActions } from "../../../hooks/customHooks/useTodaysMarketActions";
+
+// ! selectors
 import { selectActiveSubFilterByGroup } from "../../../redux/todaysMarketSelectors";
+
+// ! Styles
+import headStyle from "./head.module.css";
+
+// ! Components
+import TextImgButton from "../../../../../../components/UI/buttons/TextImgButton";
+
 
 const Head = ({ activeCategory = null }) => {
   const { activeFilter } = useSelector(

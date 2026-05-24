@@ -1,5 +1,7 @@
 import Home from "../../../features/public/home/outlets/Home";
-import SecurityDashbord from "../../../features/public/securityDashbord/outlets/SecurityDashbord";
+
+import { authRoutes } from "./authRoutes/authRoutes";
+import { securityRoutes } from "./securityRoutes/securityRoutes";
 
 export const publicSubRoutes = [
   {
@@ -7,15 +9,11 @@ export const publicSubRoutes = [
     element: <Home />,
   },
   {
-    path: "login",
-    element: <h1>LOGIN</h1>,
+    path: "auth",
+    children: authRoutes,
   },
   {
-    path: "signup",
-    element: <h1>SIGNUP</h1>,
-  },
-  {
-    path: "security/:securityID",
-    element: <SecurityDashbord />,
+    path: "security",
+    children: securityRoutes,
   },
 ];

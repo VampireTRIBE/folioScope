@@ -1,5 +1,9 @@
 import { Link } from "react-router-dom";
+
+// ! Styles
 import analysisCardStyle from "./analysisCard.module.css";
+
+// ! Components
 import DrawdonwAnalysisCard from "./drawdownCard/DrawdonwAnalysisCard";
 
 const DrawdownAnalysisCard = ({ drawdownDetails = [] }) => {

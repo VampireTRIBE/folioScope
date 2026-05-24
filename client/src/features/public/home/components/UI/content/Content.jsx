@@ -1,12 +1,21 @@
-import React from "react";
-
-import contentSytle from "./content.module.css";
 import { useSelector } from "react-redux";
-import { selectActiveSubFilterByGroup } from "../../../redux/todaysMarketSelectors";
 import { useQuery } from "@tanstack/react-query";
-import { FETCH_TODAYS_MARKETS } from "../../../api/fetchApis";
+
+// ! Selectors
+import { selectActiveSubFilterByGroup } from "../../../redux/todaysMarketSelectors";
+
+// ! APIs
+import { FETCH_TODAYS_MARKETS } from "../../../api/FETCH_APIs";
+
+// ! custom Hooks
+import { useNavigationActions } from "../../../../../hooks/customHooks/useNavigationActions";
+
+// ! styles
+import contentSytle from "./content.module.css";
+
+// ! componets
 import CardType2 from "../../../../../../components/layout/public/card/CardType2";
-import { useTodaysMarketActions } from "../../../hooks/useTodaysMarketActions";
+
 
 const Content = ({ activeCategory = null }) => {
   const activeContent = useSelector(
@@ -16,10 +25,9 @@ const Content = ({ activeCategory = null }) => {
     ),
   );
 
-  const { goToSecurityDashbord } = useTodaysMarketActions();
+  const { goToSecurityDashbord } = useNavigationActions();
 
   const { category, subCategory, activeFilter } = activeContent ?? null;
-
   const { data, isPending, isError, error } = useQuery({
     queryKey: ["TodaysMarkets"],
     queryFn: FETCH_TODAYS_MARKETS,

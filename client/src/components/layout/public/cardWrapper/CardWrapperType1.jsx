@@ -1,6 +1,4 @@
-import React from "react";
 import CardType1 from "../card/CardType1";
-
 import cardWrapperType1Style from "./cardwrapperType1.module.css";
 
 const CardWrapperType1 = ({

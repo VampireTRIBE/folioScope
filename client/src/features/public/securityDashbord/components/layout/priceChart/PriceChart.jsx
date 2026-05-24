@@ -1,12 +1,24 @@
+import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
+
+// ! componets
 import PriceChartCurve from "../../../../../../components/layout/public/priceChartCurve/PriceChartCurve";
 import PriceChartFilter from "../../../../../../components/layout/public/priceChartFilter/PriceChartFilter";
 import PriceChartHead from "../../../../../../components/layout/public/priceChartHead/PriceChartHead";
-import { selectActiveSecurityChartFilter } from "../../../redux/securityPriceChartSelectors";
-import { useSelector } from "react-redux";
+
+// ! styles
 import priceChartStyle from "./pricechart.module.css";
-import { useSecurityChartActions } from "../../../hooks/useSecurityChartActions";
-import { useChartRange } from "../../../../../../hooks/usePricesQuery";
-import { useParams } from "react-router-dom";
+
+// ! selectors
+import { selectActiveSecurityChartFilter } from "../../../redux/securityPriceChartSelectors";
+
+// ! Custom Hooks
+
+import { useSecurityChartActions } from "../../../hooks/custom Hooks/useSecurityChartActions";
+
+// ! tanStack Query Hooks
+import { useChartRange } from "../../../../../hooks/RKT Query/usePricesQuery";
+
 
 const PriceChart = () => {
   const { securityID } = useParams();

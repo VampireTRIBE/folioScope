@@ -1,21 +1,22 @@
-import React from "react";
+// ! Custom Hooks
+import { useNavigationActions } from "../../../features/hooks/customHooks/useNavigationActions";
 
-import BrandComponetStyle from "../../../styles/componetsStyles/brandComponent.module.css";
-import { useHeaderActions } from "../../../features/public/header/hooks/useHeadersActions";
+// ! styles
+import BrandComponetStyle from "./brandcomponet.module.css";
 
 const BrandComponet = ({ onClick = null }) => {
+  const { goToHome } = useNavigationActions();
   if (!onClick) {
-    const { goToHome } = useHeaderActions();
     onClick = goToHome;
   }
   return (
-    <figure className={`flex ${BrandComponetStyle.brand}`} onClick={onClick}>
+    <figure className={BrandComponetStyle.brand} onClick={onClick}>
       <img
-        className={`${BrandComponetStyle.brandlogo}`}
+        className={BrandComponetStyle.brandlogo}
         src="/assets/icons/logo.png"
         alt="Logo"
         title="Logo"></img>
-      <figcaption className={`${BrandComponetStyle.brandname} flex`}>
+      <figcaption className={BrandComponetStyle.brandname}>
         FolioScope
       </figcaption>
     </figure>

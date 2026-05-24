@@ -1,5 +1,4 @@
-import React from "react";
-import buttonStyle from "../../../styles/singleStyles/button.module.css";
+import buttonStyle from "./button.module.css";
 import ImgButton from "./ImgButton";
 
 const TextImgButton = ({ onClick, name, varient, imgAttibutes }) => {

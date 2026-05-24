@@ -1,6 +1,12 @@
 import React from "react";
-import { useNavigationActions } from "../../../../hooks/customHooks/useNavigationActions";
+
+// ! Custom Hooks
+import { useNavigationActions } from "../../../../features/hooks/customHooks/useNavigationActions";
+
+// ! components
 import Button from "../../../UI/buttons/Button";
+
+// ! styles
 import singupAdsStyles from "./SignupAds.module.css";
 
 const SignupAds = () => {
