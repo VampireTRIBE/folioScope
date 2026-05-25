@@ -24,15 +24,17 @@ export const useNavigationActions = () => {
     [navigate],
   );
 
-  const goToEmailVerification = useCallback(() => {
-    navigate(ROUTES.EMAILVARIFICATION);
-  }, [navigate]);
+  // const goToEmailVerification = useCallback(
+  //   (token) => {
+  //     navigate(ROUTES.EMAILVERIFICATION(token));
+  //   },
+  //   [navigate],
+  // );
 
   return {
     goToLogin,
     goToSignup,
     gotoHome,
     goToSecurityDashbord,
-    goToEmailVerification,
   };
 };

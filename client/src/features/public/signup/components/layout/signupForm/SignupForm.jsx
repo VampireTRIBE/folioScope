@@ -13,21 +13,30 @@ import { useFormDataActions } from "../../../hooks/customHooks/useFormData";
 
 // ! selectors
 import { selectActiveSingupFormError } from "../../../redux/singupFormSelector";
+import { useNavigationActions } from "../../../../../hooks/customHooks/useNavigationActions";
+import Success from "../../../../../../components/layout/public/success/success";
 
 const SignupForm = () => {
   const { imgAttributesBrandLogo } = useStaticData();
-  const { error, message } = useSelector(selectActiveSingupFormError);
+  const { status, error, errorMessage, success, successMessage } = useSelector(
+    selectActiveSingupFormError,
+  );
   const { submitFormSignupData } = useFormDataActions();
+  const { goToLogin } = useNavigationActions();
+
+  if (success) {
+    return <Success title={"Success"} message={successMessage} />;
+  }
 
   return (
     <form className={signupformStyle.form} onSubmit={submitFormSignupData}>
-      <fieldset className={signupformStyle.fieldset}>
+      <fieldset className={signupformStyle.fieldset} disabled={status}>
         <legend className={signupformStyle.legend}>
           <ImgButton {...imgAttributesBrandLogo} />
           <h3 className={signupformStyle.title}>SIGNUP FORM</h3>
         </legend>
 
-        {error && <div className={signupformStyle.error}>{message}</div>}
+        {error && <div className={signupformStyle.error}>{errorMessage}</div>}
 
         <div className={signupformStyle.inputGroup}>
           <label htmlFor="firstName" className={signupformStyle.label}>
@@ -124,15 +133,17 @@ const SignupForm = () => {
           </button>
 
           <button className={signupformStyle.submitButton} type="submit">
-            SignUp
+            {status ? "Loading...." : "SignUp"}
           </button>
         </div>
 
         <div className={signupformStyle.formFooter}>
           <p>Already have acount?</p>
-          <Link className={signupformStyle.loginBtn} to="/auth/login">
+          <p
+            className={signupformStyle.loginBtn}
+            onClick={status ? null : goToLogin}>
             Login
-          </Link>
+          </p>
         </div>
       </fieldset>
     </form>

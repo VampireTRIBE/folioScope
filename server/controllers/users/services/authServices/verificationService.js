@@ -1,9 +1,13 @@
 const crypto = require("node:crypto");
 
 const mongoose = require("mongoose");
+
 const {
   generateJWTToken,
 } = require("../../../../utils/authentication/authUtils");
+
+// ! MODELs
+const PORTOLIOGROUP_MODEL = mongoose.model("portfolioGroup");
 
 // ! sendMail utils
 const {
@@ -16,6 +20,7 @@ const {
   find_validate_user,
 } = require("../../../../utils/mongodb/aggregations/readModels/read_Auth_Models/validate_User");
 const { createSession } = require("../createSession");
+const { cookieObj } = require("../../../../utils/authentication/cookieObj");
 
 module.exports.emailVerification_Service = async (req, res, next) => {
   try {

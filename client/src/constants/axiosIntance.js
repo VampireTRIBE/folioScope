@@ -1,13 +1,11 @@
 import axios from "axios";
 const hostname = window.location.hostname;
 
-const BASE_URL = axios.create({
+export const BASE_URL = axios.create({
   baseURL: `http://${hostname}:3000`,
 });
 
-const BASE_URL_withCredentials = axios.create({
-  ...BASE_URL,
+export const BASE_URL_withCredentials = axios.create({
+  baseURL: `http://${hostname}:3000`,
   withCredentials: true,
 });
-
-export { BASE_URL, BASE_URL_withCredentials };

@@ -36,8 +36,8 @@ const {
 
 router.route("/signup").post(validate_RegisterData, register_NewUser);
 
-router.post("/verifyemail", verifyEmailTokenCheck, emailVerify);
 router.post("/sendverificationemail", validate_email, sendVerificationEmail);
+router.post("/verifyemail", verifyEmailTokenCheck, emailVerify);
 
 router.route("/login").post(validate_loginDATA, login_User);
 router.post("/refreshtoken", verifyRefreshToken, accessTokenRotation);

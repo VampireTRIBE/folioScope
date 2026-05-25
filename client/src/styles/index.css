@@ -27,6 +27,7 @@
   --border-default: #e2e8f0;
   --border-dark: #cbd5e1;
   --border-accent: var(--color-accent);
+  --color-success: #16a34a;
   --color-success-bg: #dcfce7;
   --color-danger: #dc2626;
   --color-danger-bg: #fee2e2;

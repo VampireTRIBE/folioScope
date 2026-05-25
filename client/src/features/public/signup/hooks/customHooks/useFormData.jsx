@@ -21,11 +21,20 @@ export const useFormDataActions = () => {
       try {
         const formData = new FormData(e.target);
         const values = Object.fromEntries(formData.entries());
+        dispatch(singupErrorStateActions.SET_FORM_STATUS_TRUE());
         const response = await POST_SIGNUPFORM(values);
-        console.log(response);
-        dispatch(singupErrorStateActions.RESET_ERROR());
-        goToEmailVerification();
+        dispatch(singupErrorStateActions.SET_FORM_STATUS_FALSE());
+        dispatch(
+          singupErrorStateActions.SET_SUCCESS({
+            success: response?.success || true,
+            message:
+              response?.message ||
+              "Signup Completed. Check your mail for Verification Link.",
+          }),
+        );
       } catch (err) {
+        dispatch(singupErrorStateActions.SET_FORM_STATUS_FALSE());
+        dispatch(singupErrorStateActions.RESET_SUCCESS());
         dispatch(
           singupErrorStateActions.SET_ERROR({
             error: true,

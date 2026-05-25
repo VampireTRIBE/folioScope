@@ -109,6 +109,7 @@
 
 .loginBtn {
   color: var(--color-info);
+  cursor: pointer;
 }
 
 .error {

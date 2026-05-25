@@ -1,24 +1,50 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  error: false,
-  message: "",
+  formStatus: false,
+  formError: {
+    error: false,
+    message: "",
+  },
+  formSuccess: {
+    success: false,
+    message: "",
+  },
 };
 
 const singupErrorState = createSlice({
   name: "singupErrorState",
-  initialState: {...initialState},
+  initialState: { ...initialState },
   reducers: {
     SET_ERROR: (state, action) => {
       const { error, message } = action.payload;
       if (!error || !message) return;
-      state.error = error;
-      state.message = message;
+      state.formError.error = error;
+      state.formError.message = message;
+    },
+    RESET_ERROR: (state) => {
+      state.formError.error = false;
+      state.formError.message = "";
     },
 
-    RESET_ERROR: (state) => {
-      state.error = false;
-      state.message = "";
+    SET_SUCCESS: (state, action) => {
+      const { success, message } = action.payload;
+      if (!success || !message) return;
+      state.formSuccess.success = success;
+      state.formSuccess.message = message;
+    },
+
+    RESET_SUCCESS: (state) => {
+      state.formSuccess.success = false;
+      state.formSuccess.message = "";
+    },
+
+    SET_FORM_STATUS_TRUE: (state) => {
+      state.formStatus = true;
+    },
+
+    SET_FORM_STATUS_FALSE: (state) => {
+      state.formStatus = false;
     },
   },
 });

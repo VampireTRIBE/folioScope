@@ -1,6 +1,9 @@
 export const selectActiveSingupFormError = (state) => {
   return {
-    error: state.singupErrorState.error,
-    message: state.singupErrorState.message,
+    status: state.singupErrorState.formStatus,
+    error: state.singupErrorState.formError.error,
+    errorMessage: state.singupErrorState.formError.message,
+    success: state.singupErrorState.formSuccess.success,
+    successMessage: state.singupErrorState.formSuccess.message,
   };
 };

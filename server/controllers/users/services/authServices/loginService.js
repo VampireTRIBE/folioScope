@@ -55,7 +55,6 @@ module.exports.register_Service = async (req, res, next) => {
       message: "Registration successful. Please verify your email.",
     });
   } catch (error) {
-    console.log(error);
     if (error.code === 11000) {
       throw new customError("User already exists", 409);
     }
