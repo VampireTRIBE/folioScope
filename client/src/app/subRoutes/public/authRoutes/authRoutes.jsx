@@ -1,6 +1,8 @@
 import Login from "../../../../features/public/login/outlets/Login";
 import SignupOutlet from "../../../../features/public/signup/outlets/SignupOutlet";
-import EmailVerificationOutlet from "../../../../features/public/emailvarification/outlets/EmailVerification";
+import EmailVerificationOutlet from "../../../../features/public/emailverification/outlets/EmailVerification";
+import SendVerificationMailOutlet from "../../../../features/public/sendVerificationMail/outlets/SendVerificationMail";
+
 
 export const authRoutes = [
   {
@@ -10,6 +12,10 @@ export const authRoutes = [
   {
     path: "signup",
     element: <SignupOutlet />,
+  },
+  {
+    path: "sendverificationmail",
+    element: <SendVerificationMailOutlet />,
   },
   {
     path: "emailverification/:emailToken",

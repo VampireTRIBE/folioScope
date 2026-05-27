@@ -12,3 +12,8 @@ export const POST_VERIFYEMAIL = async (token) => {
   );
   return response.data;
 };
+
+export const POST_SENDVERIFICATIONEMAIL = async (data) => {
+  const response = await BASE_URL.post("/sendverificationemail", data);
+  return response.data;
+};
