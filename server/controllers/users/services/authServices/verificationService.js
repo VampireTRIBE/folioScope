@@ -47,7 +47,7 @@ module.exports.emailVerification_Service = async (req, res, next) => {
     }
 
     if (now - lastVerificationTime < 60 * 1000) {
-      throw new customError("Retry after sometime", 429);
+      throw new customError("Retry after 1 minute", 429);
     }
 
     if (user.verificationRetry >= 10) {

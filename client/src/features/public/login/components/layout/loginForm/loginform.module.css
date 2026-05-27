@@ -1,0 +1,161 @@
+.fieldset {
+  padding: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  border-radius: var(--radius-md);
+}
+
+.legend {
+  padding: 0 var(--space-2);
+  display: flex;
+  gap: var(--space-2);
+  justify-content: center;
+  align-items: center;
+}
+
+.inputGroup {
+  flex: 1;
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+  gap: var(--space-1);
+}
+
+.label {
+  width: 50%;
+  font-size: var(--text-base);
+  font-weight: var(--fw-semibold);
+}
+
+.input {
+  flex: 1;
+  padding: var(--space-2) var(--space-2);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  border: 1px solid transparent;
+  outline: none;
+  transition: border var(--transition-fast);
+}
+
+.input:focus {
+  border: 1px solid var(--border-dark);
+}
+
+.forgotPassword {
+  margin-right: var(--space-3);
+  align-self: flex-end;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.forgotPassword .forgotPasswordBtn {
+  flex: 1;
+  padding: var(--space-1) var(--space-2);
+  background-color: var(--color-info-bg);
+  color: var(--text-primery);
+  border: none;
+  border-top: var(--border-width-sm) solid var(--border-dark);
+  border-radius: var(--radius-md);
+  font-size: var(--text-md);
+  font-weight: var(--fw-medium);
+  letter-spacing: 0.8px;
+  box-shadow: var(--shadow-md);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.roleContainer {
+  padding: var(--space-3);
+  display: flex;
+  gap: var(--space-2);
+}
+
+.roleLabel {
+  flex: 1;
+  padding: var(--space-2) var(--space-4);
+  color: var(--text-primery);
+  border: var(--border-width-md) solid var(--border-dark);
+  border-radius: var(--radius-md);
+  font-size: var(--text-md);
+  font-weight: var(--fw-medium);
+  letter-spacing: 1px;
+  white-space: nowrap;
+  cursor: pointer;
+  text-align: center;
+}
+
+.roleLabel:hover {
+  background-color: var(--color-primary-light-alpha);
+}
+
+.roleOption {
+  flex: 1;
+  display: flex;
+}
+
+.radioInput:checked + .roleLabel {
+  background-color: var(--color-primary);
+  color: var(--text-inverse);
+}
+
+.buttonContainer {
+  border-top: 1px solid var(--border-dark);
+  padding: var(--space-3) 0;
+  display: flex;
+  gap: var(--space-2);
+}
+
+.resetButton,
+.submitButton {
+  flex: 1;
+  padding: var(--space-2) var(--space-3);
+  color: var(--text-primery);
+  border: var(--border-width-md) solid var(--border-dark);
+  border-radius: var(--radius-md);
+  font-size: var(--text-md);
+  font-weight: var(--fw-medium);
+  letter-spacing: 1px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.resetButton:hover,
+.submitButton:hover,
+.forgotPassword .forgotPasswordBtn:hover {
+  background-color: var(--color-primary-light-alpha);
+}
+
+.formFooter {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.signupBtn {
+  color: var(--color-info);
+  cursor: pointer;
+}
+
+.error {
+  margin: var(--space-1);
+  padding: var(--space-1) var(--space-2);
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  border-left: var(--border-width-lg) solid var(--color-danger);
+}
+
+@media screen and (min-width: 580px) {
+  .label {
+    width: 35%;
+  }
+}
+@media screen and (min-width: 770px) {
+  .legend {
+    gap: var(--space-4);
+  }
+  .label {
+    width: 35%;
+  }
+}

@@ -7,6 +7,7 @@ const RequestStatus = ({
   isError,
   error,
   respData,
+  state = null,
 }) => {
   return (
     <div className={requestStatusStyle.container}>
@@ -17,9 +18,9 @@ const RequestStatus = ({
             className={`${requestStatusStyle.statusLebal} ${isPending ? requestStatusStyle.pending : ""} ${isSuccess ? requestStatusStyle.success : ""} ${isError ? requestStatusStyle.error : ""}`}>
             Status :
           </div>
-          {isPending && <p>Verifying...</p>}
-          {isSuccess && <p>Verified...</p>}
-          {isError && <p>Failed...</p>}
+          {isPending && <p> {state?.pending || "Verifying..."}</p>}
+          {isSuccess && <p>{state?.success || "Verified..."}</p>}
+          {isError && <p>{state?.error || "Failed..."}</p>}
         </div>
 
         <div className={requestStatusStyle.status}>

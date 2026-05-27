@@ -8,4 +8,8 @@ export const router = createBrowserRouter([
     element: <PublicLayout />,
     children: publicSubRoutes,
   },
+  {
+    path: "/portfolio",
+    element: <h1>User DashBord</h1>,
+  },
 ]);

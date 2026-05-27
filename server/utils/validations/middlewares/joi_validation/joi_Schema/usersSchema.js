@@ -43,6 +43,10 @@ module.exports.authValidationSchema = Joi.object({
     "string.min": "Password must be at least 6 characters",
     "string.max": "Password cannot exceed 128 characters",
   }),
+  role: Joi.string().valid("client", "admin").required().messages({
+    "string.empty": "Role is required",
+    "any.only": "Role must be client or admin",
+  }),
 });
 
 module.exports.changePasswordSchema = Joi.object({

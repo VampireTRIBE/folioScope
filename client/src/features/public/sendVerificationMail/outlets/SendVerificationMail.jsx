@@ -46,9 +46,21 @@ const SendVerificationMailOutlet = () => {
     : null;
 
   if (isSuccess) {
-    setTimeout(() => {
-      goToLogin();
-    }, 2000);
+    return (
+      <main className={sendverificationmailStyle.container}>
+        <section className={sendverificationmailStyle.section}>
+          <RequestStatus
+            name={"Send Verification Mail"}
+            isPending={isPending}
+            isSuccess={isSuccess}
+            isError={!!customError || isError}
+            error={customError || error}
+            respData={respData}
+            state={{ success: "Mail Sent" }}
+          />
+        </section>
+      </main>
+    );
   }
 
   return (
@@ -61,6 +73,7 @@ const SendVerificationMailOutlet = () => {
           isError={!!customError || isError}
           error={customError || error}
           respData={respData}
+          state={{ pending: "Sending Mail", error: "Failed to send Mail" }}
         />
 
         <form
@@ -78,7 +91,7 @@ const SendVerificationMailOutlet = () => {
               id="email"
               name="email"
               required
-              autoComplete
+              autoComplete="true"
             />
           </div>
           <TextButton

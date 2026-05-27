@@ -1,7 +1,8 @@
 .container {
   width: 100%;
-  min-height: 100vh;
+  min-height: 75vh;
   margin-top: var(--header-height);
   padding: var(--space-5) var(--container-padding);
   background-color: var(--bg-section);
 }
+

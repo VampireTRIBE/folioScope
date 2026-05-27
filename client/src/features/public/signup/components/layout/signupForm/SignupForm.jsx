@@ -10,10 +10,10 @@ import signupformStyle from "./signupform.module.css";
 // ! custom Hooks
 import { useStaticData } from "../../../hooks/customHooks/useStaticData/useStaticData";
 import { useFormDataActions } from "../../../hooks/customHooks/useFormData";
+import { useNavigationActions } from "../../../../../hooks/customHooks/useNavigationActions";
 
 // ! selectors
 import { selectActiveSingupFormError } from "../../../redux/singupFormSelector";
-import { useNavigationActions } from "../../../../../hooks/customHooks/useNavigationActions";
 import Success from "../../../../../../components/layout/public/success/success";
 
 const SignupForm = () => {

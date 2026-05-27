@@ -5,6 +5,10 @@ import { ROUTES } from "../../routes/routes";
 export const useNavigationActions = () => {
   const navigate = useNavigate();
 
+  const goToForgotPassword = useCallback(() => {
+    navigate(ROUTES.FORGOTPASSWORD);
+  }, [navigate]);
+
   const goToLogin = useCallback(() => {
     navigate(ROUTES.LOGIN);
   }, [navigate]);
@@ -33,11 +37,17 @@ export const useNavigationActions = () => {
     [navigate],
   );
 
+  const goToUserDashBord = useCallback(() => {
+    navigate(ROUTES.USERDASHBORD, { replace: true });
+  }, [navigate]);
+
   return {
     goToLogin,
+    goToForgotPassword,
     goToSignup,
     gotoHome,
     goToSecurityDashbord,
     goToSendVerificationMail,
+    goToUserDashBord,
   };
 };
