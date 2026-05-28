@@ -1,4 +1,8 @@
 const {
+  hashRefreshToken: hashCrypto,
+  hashPassword,
+} = require("../../../../utils/authentication/authUtils");
+const {
   sendOtpMail,
 } = require("../../../../utils/authentication/SendMail/sendOTPMail");
 const {
@@ -42,10 +46,11 @@ module.exports.forgotPassword_Service = async (req, res, next) => {
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const expiry = new Date(Date.now() + 10 * 60 * 1000);
+    const hashedOTP = hashCrypto(otp);
 
     await sendOtpMail(email, otp);
 
-    user.otp = otp;
+    user.otp = hashedOTP;
     user.otpExpiry = expiry;
     user.otpRetry += 1;
     user.otpLastSentAt = new Date();
@@ -54,6 +59,7 @@ module.exports.forgotPassword_Service = async (req, res, next) => {
     return res.status(200).json({
       success: true,
       message: `OTP sent to ${email}`,
+      email: email,
     });
   } catch (error) {
     next(error);
@@ -82,12 +88,15 @@ module.exports.verifyOtp_Service = async (req, res, next) => {
       throw new customError("OTP has expired, Please request a new one", 400);
     }
 
-    if (otp !== user.otp) {
+    const hashedOTP = hashCrypto(otp);
+
+    if (hashedOTP !== user.otp) {
       throw new customError("Invalid OTP", 400);
     }
 
     user.otp = null;
     user.otpExpiry = null;
+    user.otpRetry = null;
     await user.save();
 
     return res.status(200).json({

@@ -1,0 +1,72 @@
+.container {
+  width: 100%;
+  min-height: 50vh;
+  margin-top: var(--header-height);
+  padding: var(--space-5) var(--container-padding);
+  background-color: var(--bg-section);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.section {
+  height: 100%;
+  padding: var(--space-4);
+  border: var(--border-width-lg) solid var(--border-dark);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-lg);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.fieldset {
+  border: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+
+.fieldset > button {
+  align-self: self-end;
+}
+
+.inputGroup {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.label {
+  font-size: var(--text-base);
+  font-weight: var(--fw-semibold);
+}
+
+.input {
+  flex: 1;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-md);
+  font-size: var(--text-xs);
+  border: 1px solid transparent;
+  outline: none;
+  transition: border var(--transition-fast);
+}
+
+.input:focus {
+  border: 1px solid var(--border-dark);
+}
+
+.btnContainer:last-child {
+  align-self: center;
+}

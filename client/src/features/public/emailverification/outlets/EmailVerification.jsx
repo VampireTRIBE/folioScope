@@ -18,7 +18,7 @@ import { useFormDataActions } from "../hooks/customHooks/useSubmitForm";
 
 const EmailVerificationOutlet = () => {
   const { emailToken } = useParams();
-  const { goToLogin } = useNavigationActions();
+  const { goToUserDashBord } = useNavigationActions();
   const { submitFormEmailVerificationRetryData } = useFormDataActions();
 
   const {
@@ -38,7 +38,7 @@ const EmailVerificationOutlet = () => {
 
   if (isSuccess) {
     setTimeout(() => {
-      goToLogin();
+      goToUserDashBord();
     }, 2000);
   }
 

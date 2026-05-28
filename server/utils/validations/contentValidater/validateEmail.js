@@ -5,7 +5,7 @@ module.exports.validateParamsEmail = (paramName = "email") => {
       if (!email) {
         return res.status(400).json({
           success: false,
-          error: "Invalid Request EMAIL",
+          message: "Invalid Request EMAIL",
         });
       }
 
@@ -14,7 +14,7 @@ module.exports.validateParamsEmail = (paramName = "email") => {
       if (!emailRegex.test(email)) {
         return res.status(400).json({
           success: false,
-          error: "Invalid Email Format",
+          message: "Invalid Email Format",
         });
       }
 
@@ -23,7 +23,7 @@ module.exports.validateParamsEmail = (paramName = "email") => {
     } catch (error) {
       return res.status(500).json({
         success: false,
-        error: "Email Validation Failed",
+        message: "Email Validation Failed",
       });
     }
   };

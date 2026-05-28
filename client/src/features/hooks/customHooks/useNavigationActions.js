@@ -6,8 +6,22 @@ export const useNavigationActions = () => {
   const navigate = useNavigate();
 
   const goToForgotPassword = useCallback(() => {
-    navigate(ROUTES.FORGOTPASSWORD);
+    navigate(ROUTES.FORGOTPASSWORD, { replace: true });
   }, [navigate]);
+
+  const goToSubmitOtp = useCallback(
+    (email) => {
+      navigate(ROUTES.SUBMITOTP, { state: { email }, replace: true });
+    },
+    [navigate],
+  );
+
+  const goToConfirmPassword = useCallback(
+    (email) => {
+      navigate(ROUTES.CONFIRMPASSWORD, { state: { email }, replace: true });
+    },
+    [navigate],
+  );
 
   const goToLogin = useCallback(() => {
     navigate(ROUTES.LOGIN);
@@ -44,6 +58,8 @@ export const useNavigationActions = () => {
   return {
     goToLogin,
     goToForgotPassword,
+    goToSubmitOtp,
+    goToConfirmPassword,
     goToSignup,
     gotoHome,
     goToSecurityDashbord,

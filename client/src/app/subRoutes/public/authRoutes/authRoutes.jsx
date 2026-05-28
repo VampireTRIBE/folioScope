@@ -2,7 +2,9 @@ import SignupOutlet from "../../../../features/public/signup/outlets/SignupOutle
 import EmailVerificationOutlet from "../../../../features/public/emailverification/outlets/EmailVerification";
 import SendVerificationMailOutlet from "../../../../features/public/sendVerificationMail/outlets/SendVerificationMail";
 import LoginOutlet from "../../../../features/public/login/outlets/LoginOutlet";
-
+import SendOTPMailOutlet from "../../../../features/public/sendOTPMail/outlets/SendOTPMailOutlet";
+import SubmitOtpOutlet from "../../../../features/public/otpSubmit/outlets/submitOtpOutlet";
+import ConfirmPasswordOutlet from "../../../../features/public/conformPassword/outlets/ConfirmPasswordOutlet";
 
 export const authRoutes = [
   {
@@ -10,8 +12,16 @@ export const authRoutes = [
     element: <LoginOutlet />,
   },
   {
-    path:"forgotpassword",
-    element: <h1>forgotPassword</h1>
+    path: "forgotpassword",
+    element: <SendOTPMailOutlet />,
+  },
+  {
+    path: "otp",
+    element: <SubmitOtpOutlet />,
+  },
+  {
+    path: "confirmpassword",
+    element: <ConfirmPasswordOutlet />,
   },
   {
     path: "signup",

@@ -84,7 +84,7 @@ module.exports.forgotPassword = async (req, res, next) => {
   }
 };
 
-module.exports.verifyOtp = async (req, res) => {
+module.exports.verifyOtp = async (req, res,next) => {
   try {
     await verifyOtp_Service(req, res, next);
   } catch (error) {
@@ -92,7 +92,7 @@ module.exports.verifyOtp = async (req, res) => {
   }
 };
 
-module.exports.confirmPassword = async (req, res) => {
+module.exports.confirmPassword = async (req, res,next) => {
   try {
     await confirmPassword_Service(req, res, next);
   } catch (error) {
