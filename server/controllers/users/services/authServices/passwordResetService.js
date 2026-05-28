@@ -30,7 +30,7 @@ module.exports.forgotPassword_Service = async (req, res, next) => {
 
     // RESET RETRY COUNT AFTER 24 HOURS
     if (now - lastOtpTime > 24 * 60 * 60 * 1000) {
-      user.lastOtpTime = 0;
+      user.otpRetry = 0;
     }
 
     if (now - lastOtpTime < 60 * 1000) {
@@ -97,6 +97,8 @@ module.exports.verifyOtp_Service = async (req, res, next) => {
     user.otp = null;
     user.otpExpiry = null;
     user.otpRetry = null;
+    user.passwordResetVerified = true;
+    user.passwordResetVerifiedAt = new Date();
     await user.save();
 
     return res.status(200).json({
@@ -108,7 +110,7 @@ module.exports.verifyOtp_Service = async (req, res, next) => {
   }
 };
 
-module.exports.confirmPassword_Service = async (req, res) => {
+module.exports.confirmPassword_Service = async (req, res, next) => {
   try {
     const { newPassword, confirmPassword } = req.body;
     const { email } = req.params;
@@ -121,8 +123,24 @@ module.exports.confirmPassword_Service = async (req, res) => {
     if (!user.isVerified) {
       throw new customError("VERIFYEMAIL", 400);
     }
+    if (!user.passwordResetVerified) {
+      throw new customError("OTP verification required", 403);
+    }
+
+    const now = Date.now();
+    const verifiedAt = new Date(user.passwordResetVerifiedAt).getTime();
+    const tenMinutes = 10 * 60 * 1000;
+
+    if (now - verifiedAt > tenMinutes) {
+      user.passwordResetVerified = false;
+      user.passwordResetVerifiedAt = null;
+      await user.save();
+      throw new customError("Session expired. Please request a new OTP", 410);
+    }
 
     const hashedPassword = await hashPassword(newPassword);
+    user.passwordResetVerified = false;
+    user.passwordResetVerifiedAt = null;
 
     user.password = hashedPassword;
     await user.save();
