@@ -1,0 +1,1534 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Strategic Portfolio Command Center</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-annotation/2.1.0/chartjs-plugin-annotation.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet" />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+        background-color: #f8fafc;
+        color: #0f172a;
+      }
+      .font-mono {
+        font-family: "JetBrains Mono", monospace;
+      }
+      .glass-panel {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.75rem;
+        box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      }
+
+      /* Navigation Styles */
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        transition: all 0.2s;
+        border: 1px solid transparent;
+      }
+      .nav-item:hover {
+        background-color: #f1f5f9;
+      }
+      .nav-active {
+        background-color: #4f46e5;
+        color: white;
+        border-color: #4338ca;
+      }
+      .nav-active:hover {
+        background-color: #4338ca;
+      }
+      .nav-active-teal {
+        background-color: #0d9488;
+        color: white;
+        border-color: #0f766e;
+      }
+      .nav-active-teal:hover {
+        background-color: #0f766e;
+      }
+
+      /* Scrollbar */
+      .custom-scroll::-webkit-scrollbar {
+        width: 6px;
+      }
+      .custom-scroll::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .custom-scroll::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 3px;
+      }
+      .custom-scroll::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+
+      .animate-enter {
+        animation: enter 0.3s ease-out forwards;
+      }
+      @keyframes enter {
+        from {
+          opacity: 0;
+          transform: translateY(4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body
+    class="h-screen flex flex-col overflow-hidden bg-slate-50 text-slate-900">
+    <!-- Top Navigation Bar -->
+    <header class="bg-white border-b border-slate-200 z-30 shrink-0">
+      <div
+        class="max-w-[1920px] mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="bg-indigo-600 p-2 rounded-lg shadow-sm">
+            <i data-lucide="layers" class="text-white w-5 h-5"></i>
+          </div>
+          <div>
+            <h1 class="text-lg font-bold text-slate-900 leading-none">
+              Portfolio Command Center
+            </h1>
+            <div
+              class="text-[10px] text-slate-500 font-bold uppercase tracking-widest mt-1">
+              Strategic Asset Allocation • ID: W-GB20-SB05
+            </div>
+          </div>
+        </div>
+
+        <nav class="flex items-center gap-2">
+          <button
+            onclick="switchTab('dashboard')"
+            id="nav-dashboard"
+            class="nav-item nav-active">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+          </button>
+          <button
+            onclick="switchTab('charts')"
+            id="nav-charts"
+            class="nav-item">
+            <i data-lucide="bar-chart-2" class="w-4 h-4"></i> Analytics
+          </button>
+          <button
+            onclick="switchTab('holdings')"
+            id="nav-holdings"
+            class="nav-item">
+            <i data-lucide="list" class="w-4 h-4"></i> Holdings
+          </button>
+          <div class="h-6 w-px bg-slate-200 mx-1"></div>
+          <button
+            onclick="switchTab('sip-invested')"
+            id="nav-sip-invested"
+            class="nav-item text-indigo-600 border-indigo-100 hover:bg-indigo-50">
+            <i data-lucide="calculator" class="w-4 h-4"></i> SIP (Invested)
+          </button>
+          <button
+            onclick="switchTab('sip-value')"
+            id="nav-sip-value"
+            class="nav-item text-teal-600 border-teal-100 hover:bg-teal-50">
+            <i data-lucide="activity" class="w-4 h-4"></i> SIP (Value)
+          </button>
+          <div class="h-6 w-px bg-slate-200 mx-1"></div>
+          <button
+            onclick="switchTab('analysis')"
+            id="nav-analysis"
+            class="nav-item">
+            <i data-lucide="microscope" class="w-4 h-4"></i> Deep Dive
+          </button>
+          <button
+            onclick="switchTab('report')"
+            id="nav-report"
+            class="nav-item">
+            <i data-lucide="file-text" class="w-4 h-4"></i> Report
+          </button>
+        </nav>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <main class="flex-grow overflow-hidden relative w-full bg-slate-50/50">
+      <div class="max-w-[1920px] mx-auto h-full p-4 sm:p-6 lg:p-8 w-full">
+        <!-- VIEW: DASHBOARD -->
+        <div
+          id="view-dashboard"
+          class="h-full flex flex-col gap-6 animate-enter">
+          <!-- KPI Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-5 gap-4 shrink-0">
+            <div class="glass-panel p-5 border-l-4 border-slate-600">
+              <div
+                class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                Total Invested
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span
+                  id="kpi-invested"
+                  class="text-2xl font-bold text-slate-800"
+                  >₹--</span
+                >
+              </div>
+              <div class="text-xs text-slate-400 mt-1">Cost Basis</div>
+            </div>
+
+            <div class="glass-panel p-5 border-l-4 border-indigo-600">
+              <div
+                class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                Current Value
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span
+                  id="kpi-current"
+                  class="text-2xl font-bold text-indigo-600"
+                  >₹--</span
+                >
+              </div>
+              <div class="text-xs font-bold mt-1" id="kpi-pnl">--</div>
+            </div>
+
+            <div class="glass-panel p-5 border-l-4 border-emerald-500">
+              <div
+                class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                Weighted Expense Ratio
+              </div>
+              <div class="flex items-baseline gap-2">
+                <span
+                  id="kpi-expense"
+                  class="text-2xl font-bold text-emerald-600"
+                  >--%</span
+                >
+              </div>
+              <div class="text-xs text-slate-400 mt-1">
+                Portfolio Efficiency
+              </div>
+            </div>
+
+            <div class="glass-panel p-5 border-l-4 border-amber-500">
+              <div
+                class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                Portfolio Risk (Vol)
+              </div>
+              <div class="flex items-center gap-2 mt-1">
+                <span id="kpi-risk" class="text-2xl font-bold text-amber-600"
+                  >--%</span
+                >
+              </div>
+              <div class="text-xs text-slate-400 mt-1">
+                Weighted Standard Deviation
+              </div>
+            </div>
+
+            <div class="glass-panel p-5 border-l-4 border-rose-500">
+              <div
+                class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
+                Drift Alert
+              </div>
+              <div class="flex items-center gap-2 mt-1">
+                <i
+                  data-lucide="alert-triangle"
+                  class="w-4 h-4 text-rose-500"></i>
+                <span class="text-lg font-bold text-slate-800"
+                  >Commodity Skew</span
+                >
+              </div>
+              <div class="text-xs text-rose-500 mt-1 font-semibold">
+                Rebalancing Required
+              </div>
+            </div>
+          </div>
+
+          <!-- Main Charts -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-grow min-h-0">
+            <div class="glass-panel p-6 flex flex-col col-span-1">
+              <h3
+                class="text-slate-800 font-bold text-sm flex items-center gap-2 uppercase tracking-wide mb-4">
+                <i data-lucide="pie-chart" class="w-4 h-4 text-slate-400"></i>
+                Capital Allocation (Invested)
+              </h3>
+              <div
+                class="flex-grow relative w-full h-full min-h-[250px] chart-container">
+                <canvas id="chart-allocation"></canvas>
+              </div>
+            </div>
+
+            <div class="glass-panel p-6 flex flex-col col-span-1 lg:col-span-2">
+              <h3
+                class="text-slate-800 font-bold text-sm flex items-center gap-2 uppercase tracking-wide mb-4">
+                <i data-lucide="bar-chart-2" class="w-4 h-4 text-slate-400"></i>
+                Value vs. Cost Analysis
+              </h3>
+              <div
+                class="flex-grow relative w-full h-full min-h-[250px] chart-container">
+                <canvas id="chart-value"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW: ADVANCED CHARTS (NEW) -->
+        <div id="view-charts" class="hidden h-full flex flex-col animate-enter">
+          <div
+            class="grid grid-cols-1 lg:grid-cols-2 gap-6 h-full overflow-y-auto custom-scroll pb-6">
+            <!-- Chart 1: Category Exposure -->
+            <div class="glass-panel p-6 flex flex-col h-[400px]">
+              <h3
+                class="text-slate-800 font-bold text-sm flex items-center gap-2 uppercase tracking-wide mb-2">
+                <i data-lucide="layers" class="w-4 h-4 text-indigo-500"></i>
+                Macro Category Exposure
+              </h3>
+              <div
+                class="flex-grow relative w-full h-full min-h-[200px] chart-container">
+                <canvas id="chart-adv-cat"></canvas>
+              </div>
+              <div
+                class="mt-3 text-xs text-slate-500 bg-slate-50 p-2 rounded border border-slate-100">
+                <strong>Analysis:</strong>
+                <span id="text-adv-cat">Loading...</span>
+              </div>
+            </div>
+
+            <!-- Chart 2: P&L Drivers -->
+            <div class="glass-panel p-6 flex flex-col h-[400px]">
+              <h3
+                class="text-slate-800 font-bold text-sm flex items-center gap-2 uppercase tracking-wide mb-2">
+                <i
+                  data-lucide="trending-up"
+                  class="w-4 h-4 text-emerald-500"></i>
+                P&L Drivers (Absolute ₹)
+              </h3>
+              <div
+                class="flex-grow relative w-full h-full min-h-[200px] chart-container">
+                <canvas id="chart-adv-pnl"></canvas>
+              </div>
+              <div
+                class="mt-3 text-xs text-slate-500 bg-slate-50 p-2 rounded border border-slate-100">
+                <strong>Analysis:</strong>
+                <span id="text-adv-pnl">Loading...</span>
+              </div>
+            </div>
+
+            <!-- Chart 3: Risk Contribution -->
+            <div class="glass-panel p-6 flex flex-col h-[400px]">
+              <h3
+                class="text-slate-800 font-bold text-sm flex items-center gap-2 uppercase tracking-wide mb-2">
+                <i data-lucide="activity" class="w-4 h-4 text-amber-500"></i>
+                Weighted Risk Contribution
+              </h3>
+              <div
+                class="flex-grow relative w-full h-full min-h-[200px] chart-container">
+                <canvas id="chart-adv-risk"></canvas>
+              </div>
+              <div
+                class="mt-3 text-xs text-slate-500 bg-slate-50 p-2 rounded border border-slate-100">
+                <strong>Analysis:</strong>
+                <span id="text-adv-risk">Loading...</span>
+              </div>
+            </div>
+
+            <!-- Chart 4: Cost Efficiency -->
+            <div class="glass-panel p-6 flex flex-col h-[400px]">
+              <h3
+                class="text-slate-800 font-bold text-sm flex items-center gap-2 uppercase tracking-wide mb-2">
+                <i data-lucide="crosshair" class="w-4 h-4 text-rose-500"></i>
+                Cost Efficiency Matrix
+              </h3>
+              <div
+                class="flex-grow relative w-full h-full min-h-[200px] chart-container">
+                <canvas id="chart-adv-eff"></canvas>
+              </div>
+              <div
+                class="mt-3 text-xs text-slate-500 bg-slate-50 p-2 rounded border border-slate-100">
+                <strong>Analysis:</strong> X-Axis: Cost (TER) | Y-Axis:
+                Performance. Top Left quadrant (Low Cost, High Return) is ideal.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW: HOLDINGS -->
+        <div
+          id="view-holdings"
+          class="hidden h-full flex flex-col gap-6 animate-enter">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
+            <!-- Strategic Sidebar -->
+            <div class="col-span-1 flex flex-col gap-4">
+              <div class="glass-panel p-6 bg-slate-800 text-white">
+                <h2 class="text-lg font-bold mb-4 flex items-center gap-2">
+                  <i data-lucide="lightbulb" class="w-5 h-5 text-amber-400"></i>
+                  Strategic Insights
+                </h2>
+                <div
+                  class="space-y-3 overflow-y-auto custom-scroll max-h-[60vh]"
+                  id="insights-container">
+                  <!-- Injected via JS -->
+                </div>
+              </div>
+              <div class="glass-panel p-6 flex-grow">
+                <h3
+                  class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">
+                  Cost Structure
+                </h3>
+                <div class="space-y-4">
+                  <div>
+                    <div class="flex justify-between text-sm mb-1">
+                      <span class="text-slate-600">Total Expense Ratio</span>
+                      <span class="font-bold text-slate-800" id="stat-ter"
+                        >--%</span
+                      >
+                    </div>
+                    <div class="w-full bg-slate-100 rounded-full h-1.5">
+                      <div
+                        class="bg-indigo-500 h-1.5 rounded-full"
+                        style="width: 35%"></div>
+                    </div>
+                  </div>
+                  <div class="p-3 bg-slate-50 rounded border border-slate-100">
+                    <div class="text-xs text-slate-500 mb-1">
+                      Est. Annual Cost
+                    </div>
+                    <div
+                      class="text-xl font-bold text-slate-800"
+                      id="stat-cost">
+                      ₹--
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Holdings Table -->
+            <div
+              class="col-span-1 lg:col-span-2 glass-panel p-0 overflow-hidden flex flex-col">
+              <div
+                class="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between items-center">
+                <h3
+                  class="font-bold text-slate-800 text-sm uppercase tracking-wide">
+                  Detailed Holdings
+                </h3>
+                <span class="text-xs text-slate-400 font-mono"
+                  >Live Estimates</span
+                >
+              </div>
+              <div class="overflow-y-auto custom-scroll flex-grow">
+                <table class="w-full text-left border-collapse">
+                  <thead
+                    class="bg-slate-50 sticky top-0 z-10 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                    <tr>
+                      <th class="p-4 border-b border-slate-200">Asset</th>
+                      <th class="p-4 border-b border-slate-200 text-right">
+                        Qty
+                      </th>
+                      <th class="p-4 border-b border-slate-200 text-right">
+                        Avg Price
+                      </th>
+                      <th class="p-4 border-b border-slate-200 text-right">
+                        Invested
+                      </th>
+                      <th class="p-4 border-b border-slate-200 text-right">
+                        Value
+                      </th>
+                      <th class="p-4 border-b border-slate-200 text-right">
+                        P&L
+                      </th>
+                      <th class="p-4 border-b border-slate-200 text-center">
+                        TER
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody
+                    id="table-holdings"
+                    class="text-sm font-medium text-slate-700 divide-y divide-slate-100">
+                    <!-- Injected via JS -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW: SIP INVESTED -->
+        <div
+          id="view-sip-invested"
+          class="hidden h-full flex flex-col gap-6 animate-enter">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
+            <div class="col-span-1 flex flex-col gap-4">
+              <div class="glass-panel p-6 bg-indigo-600 text-white">
+                <h2 class="text-xl font-bold mb-1">Accumulation Planner</h2>
+                <p
+                  class="text-indigo-100 text-xs mb-6 opacity-80 uppercase tracking-wide">
+                  Basis: Invested Capital
+                </p>
+
+                <div class="mb-6">
+                  <label
+                    class="text-xs font-semibold uppercase tracking-wider opacity-75 block mb-2"
+                    >Monthly Contribution</label
+                  >
+                  <div
+                    class="bg-white/10 rounded-lg p-3 backdrop-blur-sm border border-white/20 flex items-center gap-2">
+                    <span class="text-indigo-200 font-mono">₹</span>
+                    <input
+                      type="number"
+                      id="input-sip-inv"
+                      value="11000"
+                      class="bg-transparent text-2xl font-bold w-full focus:outline-none font-mono"
+                      oninput="calcSIP('inv')" />
+                  </div>
+                </div>
+                <div
+                  class="text-xs bg-indigo-700/50 p-3 rounded border border-indigo-500/30 leading-relaxed">
+                  <strong>Strategy:</strong> Allocates more capital to assets
+                  where your <em>cost basis</em> is below target. Ignores market
+                  pumps. Best for long-term building.
+                </div>
+              </div>
+              <div
+                class="glass-panel p-6 flex-grow overflow-y-auto custom-scroll">
+                <h3
+                  class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
+                  Buy Orders
+                </h3>
+                <div
+                  id="summary-sip-inv"
+                  class="space-y-2 text-sm text-slate-600"></div>
+              </div>
+            </div>
+
+            <div
+              class="col-span-1 lg:col-span-2 glass-panel p-0 overflow-hidden flex flex-col">
+              <div
+                class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                <h3
+                  class="font-bold text-slate-800 text-sm uppercase tracking-wide">
+                  Allocation Plan (Invested)
+                </h3>
+              </div>
+              <div class="overflow-y-auto custom-scroll flex-grow">
+                <table class="w-full text-left border-collapse">
+                  <thead
+                    class="bg-slate-50 sticky top-0 z-10 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                    <tr>
+                      <th class="p-4 border-b border-slate-200">Asset</th>
+                      <th class="p-4 border-b border-slate-200 text-right">
+                        Target
+                      </th>
+                      <th class="p-4 border-b border-slate-200 text-right">
+                        Curr %
+                      </th>
+                      <th class="p-4 border-b border-slate-200 text-right">
+                        Gap (₹)
+                      </th>
+                      <th
+                        class="p-4 border-b border-slate-200 text-right bg-indigo-50 text-indigo-700">
+                        SIP Amt
+                      </th>
+                      <th
+                        class="p-4 border-b border-slate-200 text-right bg-indigo-50 text-indigo-700">
+                        Units
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody
+                    id="table-sip-inv"
+                    class="text-sm font-medium text-slate-700 divide-y divide-slate-100"></tbody>
+                </table>
+              </div>
+              <div
+                class="p-4 border-t border-slate-200 bg-slate-50 flex justify-between items-center">
+                <span class="text-xs text-slate-500 font-mono"
+                  >TOTAL DEPLOYMENT</span
+                >
+                <span
+                  id="total-sip-inv"
+                  class="text-lg font-bold text-indigo-700 font-mono"
+                  >₹0</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW: SIP VALUE -->
+        <div
+          id="view-sip-value"
+          class="hidden h-full flex flex-col gap-6 animate-enter">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
+            <div class="col-span-1 flex flex-col gap-4">
+              <div class="glass-panel p-6 bg-teal-600 text-white">
+                <h2 class="text-xl font-bold mb-1">Rebalancing Planner</h2>
+                <p
+                  class="text-teal-100 text-xs mb-6 opacity-80 uppercase tracking-wide">
+                  Basis: Market Value
+                </p>
+
+                <div class="mb-6">
+                  <label
+                    class="text-xs font-semibold uppercase tracking-wider opacity-75 block mb-2"
+                    >Monthly Contribution</label
+                  >
+                  <div
+                    class="bg-white/10 rounded-lg p-3 backdrop-blur-sm border border-white/20 flex items-center gap-2">
+                    <span class="text-teal-200 font-mono">₹</span>
+                    <input
+                      type="number"
+                      id="input-sip-val"
+                      value="11000"
+                      class="bg-transparent text-2xl font-bold w-full focus:outline-none font-mono"
+                      oninput="calcSIP('val')" />
+                  </div>
+                </div>
+                <div
+                  class="text-xs bg-teal-700/50 p-3 rounded border border-teal-500/30 leading-relaxed">
+                  <strong>Strategy:</strong> Allocates capital to assets where
+                  <em>current value</em> is below target. Reduces buying in
+                  pumped assets (e.g. Silver). Best for risk management.
+                </div>
+              </div>
+              <div
+                class="glass-panel p-6 flex-grow overflow-y-auto custom-scroll">
+                <h3
+                  class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">
+                  Buy Orders
+                </h3>
+                <div
+                  id="summary-sip-val"
+                  class="space-y-2 text-sm text-slate-600"></div>
+              </div>
+            </div>
+
+            <div
+              class="col-span-1 lg:col-span-2 glass-panel p-0 overflow-hidden flex flex-col">
+              <div
+                class="p-4 border-b border-slate-100 bg-slate-50 flex justify-between items-center">
+                <h3
+                  class="font-bold text-slate-800 text-sm uppercase tracking-wide">
+                  Allocation Plan (Market Value)
+                </h3>
+              </div>
+              <div class="overflow-y-auto custom-scroll flex-grow">
+                <table class="w-full text-left border-collapse">
+                  <thead
+                    class="bg-slate-50 sticky top-0 z-10 text-xs font-bold text-slate-500 uppercase tracking-wider">
+                    <tr>
+                      <th class="p-4 border-b border-slate-200">Asset</th>
+                      <th class="p-4 border-b border-slate-200 text-right">
+                        Target
+                      </th>
+                      <th class="p-4 border-b border-slate-200 text-right">
+                        Curr %
+                      </th>
+                      <th class="p-4 border-b border-slate-200 text-right">
+                        Gap (₹)
+                      </th>
+                      <th
+                        class="p-4 border-b border-slate-200 text-right bg-teal-50 text-teal-700">
+                        SIP Amt
+                      </th>
+                      <th
+                        class="p-4 border-b border-slate-200 text-right bg-teal-50 text-teal-700">
+                        Units
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody
+                    id="table-sip-val"
+                    class="text-sm font-medium text-slate-700 divide-y divide-slate-100"></tbody>
+                </table>
+              </div>
+              <div
+                class="p-4 border-t border-slate-200 bg-slate-50 flex justify-between items-center">
+                <span class="text-xs text-slate-500 font-mono"
+                  >TOTAL DEPLOYMENT</span
+                >
+                <span
+                  id="total-sip-val"
+                  class="text-lg font-bold text-teal-700 font-mono"
+                  >₹0</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW: ANALYSIS (DEEP DIVE) -->
+        <div
+          id="view-analysis"
+          class="hidden h-full flex flex-col animate-enter">
+          <div class="grid grid-cols-12 gap-6 h-full">
+            <!-- Asset List -->
+            <div
+              class="col-span-12 lg:col-span-3 glass-panel flex flex-col overflow-hidden">
+              <div class="p-4 border-b border-slate-100 bg-slate-50">
+                <h3
+                  class="font-bold text-slate-800 text-xs uppercase tracking-wide">
+                  Select Asset
+                </h3>
+              </div>
+              <div
+                class="overflow-y-auto custom-scroll p-2 space-y-1"
+                id="list-analysis">
+                <!-- Injected -->
+              </div>
+            </div>
+            <!-- Detail View -->
+            <div
+              class="col-span-12 lg:col-span-9 glass-panel flex flex-col overflow-hidden">
+              <div
+                id="detail-empty"
+                class="h-full flex flex-col items-center justify-center text-slate-400">
+                <i
+                  data-lucide="mouse-pointer-2"
+                  class="w-12 h-12 mb-3 opacity-20"></i>
+                <p class="text-sm font-medium">
+                  Select an asset to view deep analysis
+                </p>
+              </div>
+              <div
+                id="detail-content"
+                class="hidden h-full flex flex-col overflow-y-auto custom-scroll">
+                <div class="bg-indigo-600 text-white p-8">
+                  <div class="flex items-center gap-2 mb-2">
+                    <span
+                      id="d-cat"
+                      class="px-2 py-0.5 rounded bg-white/20 text-[10px] font-bold uppercase tracking-wide"
+                      >Category</span
+                    >
+                    <span id="d-id" class="text-xs font-mono opacity-70"
+                      >TICKER</span
+                    >
+                  </div>
+                  <h2 id="d-name" class="text-3xl font-bold">Asset Name</h2>
+                </div>
+                <div class="p-8 space-y-8">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                      <h4
+                        class="text-sm font-bold text-slate-900 uppercase tracking-wide mb-2 flex items-center gap-2">
+                        <i
+                          data-lucide="info"
+                          class="w-4 h-4 text-indigo-500"></i>
+                        Investment Thesis
+                      </h4>
+                      <p
+                        id="d-thesis"
+                        class="text-slate-600 text-sm leading-relaxed"></p>
+                    </div>
+                    <div>
+                      <h4
+                        class="text-sm font-bold text-slate-900 uppercase tracking-wide mb-2 flex items-center gap-2">
+                        <i
+                          data-lucide="crosshair"
+                          class="w-4 h-4 text-indigo-500"></i>
+                        Portfolio Role
+                      </h4>
+                      <p
+                        id="d-role"
+                        class="text-slate-600 text-sm leading-relaxed"></p>
+                    </div>
+                  </div>
+                  <div
+                    class="bg-slate-50 rounded-xl p-6 border border-slate-100">
+                    <h4
+                      class="text-sm font-bold text-slate-900 uppercase tracking-wide mb-2">
+                      Performance Context
+                    </h4>
+                    <p
+                      id="d-context"
+                      class="text-slate-600 text-sm leading-relaxed"></p>
+                  </div>
+                  <div class="bg-rose-50 rounded-xl p-6 border border-rose-100">
+                    <h4
+                      class="text-sm font-bold text-rose-800 uppercase tracking-wide mb-2 flex items-center gap-2">
+                      <i data-lucide="alert-triangle" class="w-4 h-4"></i> Risk
+                      Factors
+                    </h4>
+                    <p
+                      id="d-risk"
+                      class="text-rose-800 text-sm leading-relaxed"></p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- VIEW: REPORT -->
+        <div id="view-report" class="hidden h-full flex flex-col animate-enter">
+          <div class="glass-panel h-full overflow-hidden flex flex-col">
+            <div class="p-8 border-b border-slate-200 bg-white shrink-0">
+              <h2 class="text-2xl font-bold text-slate-900">
+                Strategic Portfolio Report
+              </h2>
+              <p class="text-slate-500 mt-1">
+                Executive Macroeconomic Synthesis
+              </p>
+            </div>
+            <div class="flex-grow overflow-y-auto custom-scroll p-8 bg-white">
+              <article
+                class="prose prose-slate max-w-4xl mx-auto prose-headings:font-bold prose-headings:text-slate-800 prose-p:text-slate-600">
+                <h3>1. Executive Macroeconomic Synthesis</h3>
+                <p>
+                  The investment landscape of January 2026 presents a divergence
+                  from historical norms. This portfolio—a multi-asset
+                  construct—represents a sophisticated, high-conviction
+                  strategy. It is heavily weighted towards non-yielding assets
+                  (Precious Metals) and satellite equity positions, suggesting
+                  an investment thesis predicated on INR depreciation and a
+                  Commodity Supercycle.
+                </p>
+
+                <h3>2. Asset Class Decomposition</h3>
+                <h4>The Commodity Supercycle (25% Allocation)</h4>
+                <p>
+                  <strong>GOLDBEES (20%):</strong> Acts as the monetary anchor.
+                  Currently, Gold is rising in tandem with equities
+                  ("Dual-Engine Phenomenon") due to liquidity injections,
+                  reducing its hedging efficacy but boosting returns.
+                </p>
+                <p>
+                  <strong>SILVERBEES (5%):</strong> The portfolio's volatility
+                  engine. Silver has decoupled to post explosive gains, driven
+                  by industrial demand (solar/EV).
+                  <strong>Risk:</strong> "Portfolio Drift" can push this
+                  allocation significantly higher in value terms, concentrating
+                  risk.
+                </p>
+
+                <h4>Domestic Equity Architecture (50% Allocation)</h4>
+                <p>
+                  The portfolio uses a modified Core-Satellite approach. The
+                  Core (Nifty 50) is underweight (18%), while Satellites (Next
+                  50, Mid, Small, Alpha) make up the bulk.
+                </p>
+                <ul>
+                  <li>
+                    <strong>Smallcap (HDFCSML250):</strong> High risk/reward
+                    satellite. Vulnerable to liquidity crunches.
+                  </li>
+                  <li>
+                    <strong>Alpha Factor (ALPHAETF):</strong> Smart Beta
+                    strategies are cyclical and currently out of favor.
+                  </li>
+                </ul>
+
+                <h3>3. Strategic Categorization</h3>
+                <p>
+                  <strong>Identity:</strong> "Aggressive Global Multi-Asset
+                  Opportunities Strategy"
+                </p>
+                <p>
+                  <strong>Suitability:</strong> Sophisticated investors with 7+
+                  year horizons who can withstand 20% drawdowns.
+                </p>
+              </article>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      // --- MASTER DATA ---
+      const TARGETS = {
+        GOLDBEES: 20,
+        SILVERBEES: 5,
+        SETFNIF50: 18,
+        JUNIORBEES: 12,
+        MIDCAPETF: 8,
+        HDFCSML250: 7,
+        MON100: 10,
+        HNGSNGBEES: 5,
+        PHARMABEES: 5,
+        FMCGIETF: 5,
+        ALPHAETF: 5,
+      };
+
+      const RAW_DATA = [
+        {
+          id: "GOLDBEES",
+          name: "Gold BeES",
+          qty: 1150,
+          buyPrice: 127.45,
+          return: 12.0,
+          risk: 12.98,
+          cat: "Commodity",
+          expenseRatio: 0.79,
+          thesis: "Monetary anchor and hedge against currency debasement.",
+          role: "Defensive Stabilizer",
+          context: "Rising with equities due to liquidity injections.",
+          riskFactor: "Real rate spikes.",
+        },
+        {
+          id: "SILVERBEES",
+          name: "Silver BeES",
+          qty: 129,
+          buyPrice: 297.44,
+          return: 15.0,
+          risk: 30.27,
+          cat: "Commodity",
+          expenseRatio: 0.51,
+          thesis: "Industrial demand (Solar/EV) meets monetary premium.",
+          role: "Volatility/Alpha Driver",
+          context: "Decoupled from Gold with explosive gains.",
+          riskFactor: "Extreme volatility and industrial slowdown.",
+        },
+        {
+          id: "SETFNIF50",
+          name: "Nifty Financials",
+          qty: 616,
+          buyPrice: 268.12,
+          return: 16.0,
+          risk: 13.5,
+          cat: "Core Equity",
+          expenseRatio: 0.21,
+          thesis: "Proxy for the Indian credit cycle and economic backbone.",
+          role: "Core Beta",
+          context: "Steady performer tied to GDP growth.",
+          riskFactor: "NPA cycles and regulatory caps.",
+        },
+        {
+          id: "JUNIORBEES",
+          name: "Nifty Next 50",
+          qty: 125,
+          buyPrice: 726.07,
+          return: 18.0,
+          risk: 17.64,
+          cat: "Core Equity",
+          expenseRatio: 0.2,
+          thesis: "Future blue-chips with higher growth runway.",
+          role: "Aggressive Core",
+          context: "High beta to Nifty 50.",
+          riskFactor: "Drawdowns deeper than large caps.",
+        },
+        {
+          id: "MIDCAPETF",
+          name: "Midcap 150",
+          qty: 2710,
+          buyPrice: 22.11,
+          return: 20.3,
+          risk: 16.5,
+          cat: "Growth Equity",
+          expenseRatio: 0.25,
+          thesis:
+            "Sweet spot of the Indian economy; high growth phase companies.",
+          role: "Cyclical Growth",
+          context: "Outperforming in bull runs.",
+          riskFactor: "Liquidity risk during corrections.",
+        },
+        {
+          id: "HDFCSML250",
+          name: "Smallcap 250",
+          qty: 313,
+          buyPrice: 168.98,
+          return: 30.0,
+          risk: 18.17,
+          cat: "Growth Equity",
+          expenseRatio: 0.3,
+          thesis: "Pure alpha generation via under-discovered companies.",
+          role: "High Risk Satellite",
+          context: "Highest return potential but highest volatility.",
+          riskFactor: "Severe liquidity crunch risk.",
+        },
+        {
+          id: "MON100",
+          name: "Nasdaq 100",
+          qty: 210,
+          buyPrice: 238.62,
+          return: 27.59,
+          risk: 15.31,
+          cat: "Global Equity",
+          expenseRatio: 0.58,
+          thesis: "Global tech dominance and USD hedge.",
+          role: "Geographic Diversifier",
+          context: "Driven by AI boom.",
+          riskFactor: "Tech valuation compression & INR appreciation.",
+        },
+        {
+          id: "HNGSNGBEES",
+          name: "Hang Seng",
+          qty: 28,
+          buyPrice: 548.74,
+          return: 10.0,
+          risk: 21.2,
+          cat: "Global Equity",
+          expenseRatio: 0.88,
+          thesis: "Contrarian value play on China recovery.",
+          role: "Deep Value / Tactical",
+          context: "Historic low valuations.",
+          riskFactor: "Geopolitical and regulatory intervention.",
+        },
+        {
+          id: "PHARMABEES",
+          name: "Pharma",
+          qty: 1951,
+          buyPrice: 23.01,
+          return: -2.29,
+          risk: 16.59,
+          cat: "Defensive",
+          expenseRatio: 0.22,
+          thesis: "Defensive sector with export tailwinds.",
+          role: "Sectoral Rotation",
+          context: "Laggard offering safety.",
+          riskFactor: "US FDA inspections.",
+        },
+        {
+          id: "FMCGIETF",
+          name: "FMCG",
+          qty: 616,
+          buyPrice: 59.51,
+          return: -5.79,
+          risk: 13.97,
+          cat: "Defensive",
+          expenseRatio: 0.25,
+          thesis: "Recession-proof consumption demand.",
+          role: "Low Beta Anchor",
+          context: "Value zone due to underperformance.",
+          riskFactor: "Input cost inflation.",
+        },
+        {
+          id: "ALPHAETF",
+          name: "Nifty Alpha",
+          qty: 1517,
+          buyPrice: 24.83,
+          return: -1.79,
+          risk: 20.89,
+          cat: "Factor",
+          expenseRatio: 0.35,
+          thesis: "Momentum factor strategy.",
+          role: "Smart Beta",
+          context: "Currently out of favor (regime mismatch).",
+          riskFactor: "Strategy decay in sideways markets.",
+        },
+      ];
+
+      const COLORS = {
+        Commodity: "#f59e0b",
+        "Core Equity": "#2563eb",
+        "Growth Equity": "#7c3aed",
+        "Global Equity": "#06b6d4",
+        Defensive: "#10b981",
+        Factor: "#f43f5e",
+      };
+
+      let portfolio = [];
+      let totalInvested = 0;
+      let totalCurrentValue = 0;
+      let myCharts = {};
+
+      // --- CORE LOGIC ---
+      function initApp() {
+        processData();
+        initCharts();
+        renderHoldings();
+        renderDeepDiveList();
+        calcSIP("inv");
+        calcSIP("val");
+        switchTab("dashboard"); // Default tab
+      }
+
+      function processData() {
+        totalInvested = 0;
+        totalCurrentValue = 0;
+        let weightedExpense = 0;
+
+        portfolio = RAW_DATA.map((asset) => {
+          const invested = asset.qty * asset.buyPrice;
+          // Estimating CMP based on provided returns for realism based on prompt requirements
+          const cmp = asset.buyPrice * (1 + asset.return / 100);
+          const currentVal = asset.qty * cmp;
+
+          totalInvested += invested;
+          totalCurrentValue += currentVal;
+          weightedExpense += asset.expenseRatio * invested;
+
+          return {
+            ...asset,
+            invested,
+            cmp,
+            currentVal,
+            pnl: currentVal - invested,
+            annualCost: (invested * asset.expenseRatio) / 100,
+            targetWeight: TARGETS[asset.id],
+            investedWeight: 0,
+            valueWeight: 0,
+            riskContribution: 0,
+          };
+        });
+
+        // Calc Weights & Risk Contribution
+        const totalRiskScore = portfolio.reduce(
+          (acc, p) => acc + p.risk * p.invested,
+          0,
+        );
+        portfolio.forEach((p) => {
+          p.investedWeight = (p.invested / totalInvested) * 100;
+          p.valueWeight = (p.currentVal / totalCurrentValue) * 100;
+          // Weighted risk contribution calculation
+          p.riskContribution = ((p.risk * p.invested) / totalRiskScore) * 100;
+        });
+
+        updateKPIs(weightedExpense);
+      }
+
+      function updateKPIs(weightedExpense) {
+        document.getElementById("kpi-invested").innerText =
+          formatCurrency(totalInvested);
+        document.getElementById("kpi-current").innerText =
+          formatCurrency(totalCurrentValue);
+
+        const totalPnL = totalCurrentValue - totalInvested;
+        const pnlP = (totalPnL / totalInvested) * 100;
+        const pnlEl = document.getElementById("kpi-pnl");
+        pnlEl.innerHTML = `${pnlP >= 0 ? "+" : ""}${formatCurrency(totalPnL)} <span class="opacity-75">(${pnlP.toFixed(2)}%)</span>`;
+        pnlEl.className = `text-xs font-bold mt-1 ${pnlP >= 0 ? "text-emerald-600" : "text-rose-600"}`;
+
+        document.getElementById("kpi-expense").innerText =
+          (weightedExpense / totalInvested).toFixed(2) + "%";
+
+        // Portfolio Risk (Weighted)
+        const wRisk =
+          portfolio.reduce((acc, p) => acc + p.risk * p.investedWeight, 0) /
+          100;
+        document.getElementById("kpi-risk").innerText = wRisk.toFixed(2) + "%";
+
+        // Stats in Holdings Tab
+        document.getElementById("stat-ter").innerText =
+          (weightedExpense / totalInvested).toFixed(2) + "%";
+        document.getElementById("stat-cost").innerText = formatCurrency(
+          portfolio.reduce((acc, p) => acc + p.annualCost, 0),
+        );
+      }
+
+      // --- RENDERING ---
+      function renderHoldings() {
+        const tbody = document.getElementById("table-holdings");
+        const insights = document.getElementById("insights-container");
+        tbody.innerHTML = "";
+        insights.innerHTML = "";
+
+        portfolio.forEach((a) => {
+          // Table Row
+          const tr = document.createElement("tr");
+          tr.className =
+            "hover:bg-slate-50 border-b border-slate-50 transition-colors";
+          tr.innerHTML = `
+                    <td class="p-4 font-bold text-slate-700">${a.name} <div class="text-[10px] text-slate-400 font-mono font-normal">${a.id}</div></td>
+                    <td class="p-4 text-right text-slate-600 font-mono text-xs">${a.qty.toLocaleString()}</td>
+                    <td class="p-4 text-right text-slate-600 font-mono text-xs">${formatCurrency(a.buyPrice)}</td>
+                    <td class="p-4 text-right text-slate-800 font-medium font-mono text-xs">${formatCurrency(a.invested)}</td>
+                    <td class="p-4 text-right text-slate-800 font-medium font-mono text-xs">${formatCurrency(a.currentVal)}</td>
+                    <td class="p-4 text-right font-bold font-mono text-xs ${a.pnl >= 0 ? "text-emerald-600" : "text-rose-600"}">${formatCurrency(a.pnl)}</td>
+                    <td class="p-4 text-center"><span class="bg-slate-100 text-slate-600 px-2 py-1 rounded text-[10px] font-bold">${a.expenseRatio}%</span></td>
+                `;
+          tbody.appendChild(tr);
+
+          // Insights
+          const drift = a.investedWeight - a.targetWeight;
+          if (Math.abs(drift) > 2) {
+            const div = document.createElement("div");
+            div.className = `p-3 rounded text-sm border ${drift > 0 ? "bg-amber-500/10 border-amber-500/20" : "bg-emerald-500/10 border-emerald-500/20"}`;
+            div.innerHTML = `
+                        <div class="font-bold ${drift > 0 ? "text-amber-400" : "text-emerald-400"} mb-1">${a.name}: ${drift > 0 ? "Over" : "Under"}weight</div>
+                        <p class="text-slate-300 text-xs opacity-80">Actual: <strong>${a.investedWeight.toFixed(1)}%</strong> vs Target: <strong>${a.targetWeight}%</strong></p>
+                    `;
+            insights.appendChild(div);
+          }
+        });
+      }
+
+      function renderDeepDiveList() {
+        const list = document.getElementById("list-analysis");
+        portfolio.forEach((a) => {
+          const item = document.createElement("div");
+          item.className =
+            "p-3 rounded hover:bg-slate-50 cursor-pointer transition-colors border-l-4 border-transparent hover:border-indigo-500 group";
+          item.onclick = () => showDeepDive(a);
+          item.innerHTML = `
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <div class="font-bold text-slate-700 text-sm group-hover:text-indigo-700">${a.name}</div>
+                            <div class="text-[10px] text-slate-400 uppercase tracking-wider">${a.cat}</div>
+                        </div>
+                        <div class="text-right">
+                             <div class="text-xs font-bold ${a.return >= 0 ? "text-emerald-600" : "text-rose-600"}">${a.return}%</div>
+                        </div>
+                    </div>
+                `;
+          list.appendChild(item);
+        });
+      }
+
+      function showDeepDive(a) {
+        document.getElementById("detail-empty").classList.add("hidden");
+        document.getElementById("detail-content").classList.remove("hidden");
+
+        document.getElementById("d-name").innerText = a.name;
+        document.getElementById("d-id").innerText = a.id;
+        document.getElementById("d-cat").innerText = a.cat;
+
+        document.getElementById("d-thesis").innerText = a.thesis;
+        document.getElementById("d-role").innerText = a.role;
+        document.getElementById("d-context").innerText = a.context;
+        document.getElementById("d-risk").innerText = a.riskFactor;
+      }
+
+      // --- SIP ENGINE (UNIFIED) ---
+      function calcSIP(mode) {
+        const inputId = mode === "inv" ? "input-sip-inv" : "input-sip-val";
+        const tableId = mode === "inv" ? "table-sip-inv" : "table-sip-val";
+        const sumId = mode === "inv" ? "summary-sip-inv" : "summary-sip-val";
+        const totalId = mode === "inv" ? "total-sip-inv" : "total-sip-val";
+        const accent =
+          mode === "inv"
+            ? "text-indigo-700 bg-indigo-50"
+            : "text-teal-700 bg-teal-50";
+
+        const amount = parseFloat(document.getElementById(inputId).value) || 0;
+        const tbody = document.getElementById(tableId);
+        const sumDiv = document.getElementById(sumId);
+
+        tbody.innerHTML = "";
+        sumDiv.innerHTML = "";
+
+        const baseTotal = mode === "inv" ? totalInvested : totalCurrentValue;
+        const futureTotal = baseTotal + amount;
+
+        let deficits = [];
+        let totalDeficit = 0;
+
+        portfolio.forEach((a) => {
+          const currAmt = mode === "inv" ? a.invested : a.currentVal;
+          const currW = mode === "inv" ? a.investedWeight : a.valueWeight;
+          const targetAmt = futureTotal * (a.targetWeight / 100);
+          const gap = targetAmt - currAmt;
+
+          if (gap > 0) {
+            deficits.push({ ...a, gap, currW });
+            totalDeficit += gap;
+          } else {
+            deficits.push({ ...a, gap: 0, currW });
+          }
+        });
+
+        deficits.sort((a, b) => b.gap - a.gap);
+        let deployed = 0;
+
+        deficits.forEach((a) => {
+          let alloc = 0;
+          let units = 0;
+          if (a.gap > 0 && totalDeficit > 0) {
+            const share = a.gap / totalDeficit;
+            alloc = Math.floor(share * amount);
+            if (alloc >= a.cmp) {
+              units = Math.floor(alloc / a.cmp);
+              alloc = units * a.cmp;
+            } else {
+              alloc = 0;
+              units = 0;
+            }
+          }
+          deployed += alloc;
+
+          const tr = document.createElement("tr");
+          tr.className = "hover:bg-slate-50 border-b border-slate-50";
+          const activeClass =
+            alloc > 0 ? `font-bold ${accent}` : "text-slate-400";
+
+          tr.innerHTML = `
+                    <td class="p-4 font-medium text-slate-800">${a.name}</td>
+                    <td class="p-4 text-right text-xs font-mono">${a.targetWeight}%</td>
+                    <td class="p-4 text-right text-xs font-mono">${a.currW.toFixed(1)}%</td>
+                    <td class="p-4 text-right text-xs font-mono text-slate-400">${formatCurrency(a.gap > 0 ? a.gap : 0)}</td>
+                    <td class="p-4 text-right text-xs font-mono ${activeClass}">${alloc > 0 ? formatCurrency(alloc) : "-"}</td>
+                    <td class="p-4 text-right text-xs font-mono ${activeClass}">${units > 0 ? units : "-"}</td>
+                `;
+          tbody.appendChild(tr);
+
+          if (alloc > 0) {
+            const d = document.createElement("div");
+            d.className = "flex justify-between";
+            d.innerHTML = `<span>${a.name}</span> <span class="font-bold">${formatCurrency(alloc)}</span>`;
+            sumDiv.appendChild(d);
+          }
+        });
+        document.getElementById(totalId).innerText = formatCurrency(deployed);
+      }
+
+      // --- CHARTS & ADVANCED ANALYTICS ---
+      function initCharts() {
+        // 1. Dashboard Allocation
+        const ctxAlloc = document
+          .getElementById("chart-allocation")
+          .getContext("2d");
+        myCharts.alloc = new Chart(ctxAlloc, {
+          type: "doughnut",
+          data: {
+            labels: portfolio.map((a) => a.name),
+            datasets: [
+              {
+                data: portfolio.map((a) => a.investedWeight),
+                backgroundColor: portfolio.map((a) => COLORS[a.cat]),
+                borderWidth: 2,
+                borderColor: "#fff",
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            cutout: "70%",
+          },
+        });
+
+        // 2. Dashboard Value vs Cost
+        const ctxVal = document.getElementById("chart-value").getContext("2d");
+        myCharts.val = new Chart(ctxVal, {
+          type: "bar",
+          data: {
+            labels: portfolio.map((a) => a.id),
+            datasets: [
+              {
+                label: "Invested",
+                data: portfolio.map((a) => a.invested),
+                backgroundColor: "#cbd5e1",
+                borderRadius: 2,
+              },
+              {
+                label: "Current Value",
+                data: portfolio.map((a) => a.currentVal),
+                backgroundColor: "#4f46e5",
+                borderRadius: 2,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: { display: false },
+              x: { grid: { display: false }, ticks: { font: { size: 9 } } },
+            },
+            plugins: { legend: { position: "top", align: "end" } },
+          },
+        });
+
+        // --- ADVANCED CHARTS TAB ---
+
+        // 3. Category Aggregation Data Prep
+        const cats = {};
+        portfolio.forEach((p) => {
+          if (!cats[p.cat]) cats[p.cat] = 0;
+          cats[p.cat] += p.currentVal;
+        });
+
+        // Update Analysis Text for Category
+        const maxCat = Object.keys(cats).reduce((a, b) =>
+          cats[a] > cats[b] ? a : b,
+        );
+        document.getElementById("text-adv-cat").innerText =
+          `Your portfolio is heavily weighted towards ${maxCat} (${((cats[maxCat] / totalCurrentValue) * 100).toFixed(1)}%). Ensure this aligns with your macro view.`;
+
+        // Chart: Advanced Category
+        const ctxAdvCat = document
+          .getElementById("chart-adv-cat")
+          .getContext("2d");
+        myCharts.advCat = new Chart(ctxAdvCat, {
+          type: "doughnut",
+          data: {
+            labels: Object.keys(cats),
+            datasets: [
+              {
+                data: Object.values(cats),
+                backgroundColor: Object.keys(cats).map((c) => COLORS[c]),
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: "right" } },
+          },
+        });
+
+        // 4. P&L Drivers
+        const sortedByPnL = [...portfolio].sort((a, b) => b.pnl - a.pnl);
+        // Update Analysis Text for P&L
+        const winner = sortedByPnL[0];
+        const loser = sortedByPnL[sortedByPnL.length - 1];
+        document.getElementById("text-adv-pnl").innerHTML =
+          `<span class="text-emerald-600 font-bold">${winner.name}</span> is carrying the portfolio with ${formatCurrency(winner.pnl)} profit. <span class="text-rose-600 font-bold">${loser.name}</span> is the biggest drag.`;
+
+        const ctxAdvPnL = document
+          .getElementById("chart-adv-pnl")
+          .getContext("2d");
+        myCharts.advPnL = new Chart(ctxAdvPnL, {
+          type: "bar",
+          data: {
+            labels: sortedByPnL.map((a) => a.id),
+            datasets: [
+              {
+                label: "Profit/Loss",
+                data: sortedByPnL.map((a) => a.pnl),
+                backgroundColor: sortedByPnL.map((a) =>
+                  a.pnl >= 0 ? "#10b981" : "#f43f5e",
+                ),
+                borderRadius: 4,
+              },
+            ],
+          },
+          options: {
+            indexAxis: "y",
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+              x: { grid: { color: "#f1f5f9" } },
+              y: { grid: { display: false } },
+            },
+          },
+        });
+
+        // 5. Risk Contribution
+        const sortedByRisk = [...portfolio].sort(
+          (a, b) => b.riskContribution - a.riskContribution,
+        );
+        document.getElementById("text-adv-risk").innerHTML =
+          `<span class="text-amber-600 font-bold">${sortedByRisk[0].name}</span> contributes ${sortedByRisk[0].riskContribution.toFixed(1)}% to total volatility despite having a weight of ${sortedByRisk[0].investedWeight.toFixed(1)}%.`;
+
+        const ctxAdvRisk = document
+          .getElementById("chart-adv-risk")
+          .getContext("2d");
+        myCharts.advRisk = new Chart(ctxAdvRisk, {
+          type: "pie",
+          data: {
+            labels: sortedByRisk.map((a) => a.id),
+            datasets: [
+              {
+                data: sortedByRisk.map((a) => a.riskContribution),
+                backgroundColor: sortedByRisk.map((a) => COLORS[a.cat]),
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+          },
+        });
+
+        // 6. Cost Efficiency (Scatter)
+        const ctxAdvEff = document
+          .getElementById("chart-adv-eff")
+          .getContext("2d");
+        myCharts.advEff = new Chart(ctxAdvEff, {
+          type: "scatter",
+          data: {
+            datasets: [
+              {
+                data: portfolio.map((a) => ({
+                  x: a.expenseRatio,
+                  y: a.return,
+                })),
+                backgroundColor: portfolio.map((a) => COLORS[a.cat]),
+                pointRadius: 6,
+                pointHoverRadius: 8,
+              },
+            ],
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: (c) =>
+                    `${portfolio[c.dataIndex].id}: Cost ${c.raw.x}% / Ret ${c.raw.y}%`,
+                },
+              },
+            },
+            scales: {
+              x: {
+                title: { display: true, text: "Expense Ratio (%)" },
+                grid: { color: "#f1f5f9" },
+              },
+              y: {
+                title: { display: true, text: "Return (%)" },
+                grid: { color: "#f1f5f9" },
+              },
+            },
+          },
+        });
+      }
+
+      // --- UTILS ---
+      function formatCurrency(val) {
+        return "₹" + Math.round(val).toLocaleString("en-IN");
+      }
+
+      function switchTab(id) {
+        // Hide all views
+        [
+          "dashboard",
+          "holdings",
+          "sip-invested",
+          "sip-value",
+          "charts",
+          "analysis",
+          "report",
+        ].forEach((v) => {
+          document.getElementById(`view-${v}`).classList.add("hidden");
+          const btn = document.getElementById(`nav-${v}`);
+          // Reset Nav Style
+          if (btn) {
+            if (v === "sip-value")
+              btn.className =
+                "nav-item text-teal-600 border-teal-100 hover:bg-teal-50";
+            else if (v === "sip-invested")
+              btn.className =
+                "nav-item text-indigo-600 border-indigo-100 hover:bg-indigo-50";
+            else btn.className = "nav-item";
+          }
+        });
+
+        // Show active
+        document.getElementById(`view-${id}`).classList.remove("hidden");
+        const activeBtn = document.getElementById(`nav-${id}`);
+
+        if (activeBtn) {
+          if (id === "sip-value")
+            activeBtn.className = "nav-item nav-active-teal";
+          else activeBtn.className = "nav-item nav-active";
+        }
+
+        // Resize charts
+        setTimeout(() => {
+          Object.values(myCharts).forEach((c) => c.resize());
+        }, 50);
+      }
+
+      // --- BOOTSTRAP ---
+      document.addEventListener("DOMContentLoaded", () => {
+        if (window.lucide) lucide.createIcons();
+        initApp();
+      });
+    </script>
+  </body>
+</html>

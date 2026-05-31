@@ -2,6 +2,7 @@ import Home from "../../../features/public/home/outlets/Home";
 
 import { authRoutes } from "./authRoutes/authRoutes";
 import { securityRoutes } from "./securityRoutes/securityRoutes";
+import { portfolioRoutes } from "./portfolioRoutes/portfolioRoutes";
 
 export const publicSubRoutes = [
   {
@@ -15,5 +16,9 @@ export const publicSubRoutes = [
   {
     path: "security",
     children: securityRoutes,
+  },
+  {
+    path: "portfolio",
+    children: portfolioRoutes,
   },
 ];

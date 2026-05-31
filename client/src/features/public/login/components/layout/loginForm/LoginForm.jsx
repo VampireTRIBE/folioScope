@@ -1,3 +1,5 @@
+import { useContext, useEffect } from "react";
+
 // ! componets
 import ImgButton from "../../../../../../components/UI/buttons/ImgButton";
 
@@ -11,9 +13,12 @@ import { useNavigationActions } from "../../../../../hooks/customHooks/useNaviga
 // ! tanStack Query hooks
 import { useLoginFormMutation } from "../../../hooks/RTK Query/useformMutation";
 import { useFormDataActions } from "../../../hooks/customHooks/useFormData";
-import { useEffect } from "react";
+
+// ! context
+import { AuthenticationContext } from "../../../../../../context/authenticationContext";
 
 const LoginForm = () => {
+  const { setUser } = useContext(AuthenticationContext);
   const { imgAttributesBrandLogo } = useStaticData();
   const {
     goToSignup,
@@ -42,9 +47,10 @@ const LoginForm = () => {
 
   useEffect(() => {
     if (isSuccessLoginForm) {
+      setUser(respLoginForm?.accessToken || null);
       const timer = setTimeout(() => {
         goToUserDashBord();
-      }, 2000);
+      }, 200);
 
       return () => clearTimeout(timer);
     }

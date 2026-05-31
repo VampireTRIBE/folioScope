@@ -5,12 +5,11 @@ import { useNavigationActions } from "../../../features/hooks/customHooks/useNav
 import BrandComponetStyle from "./brandcomponet.module.css";
 
 const BrandComponet = ({ onClick = null }) => {
-  const { goToHome } = useNavigationActions();
-  if (!onClick) {
-    onClick = goToHome;
-  }
+  const { gotoHome } = useNavigationActions();
   return (
-    <figure className={BrandComponetStyle.brand} onClick={onClick}>
+    <figure
+      className={BrandComponetStyle.brand}
+      onClick={onClick ? onClick : gotoHome}>
       <img
         className={BrandComponetStyle.brandlogo}
         src="/assets/icons/logo.png"

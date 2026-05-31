@@ -49,14 +49,14 @@ app.listen(PORT, (err) => {
 
 // ! Update Live Price
 
-(async function () {
-  await sync_CurrentPrices();
-})();
+// (async function () {
+//   await sync_CurrentPrices();
+// })();
 
 // ! Update for all users
-(async function () {
-  await sync_AllUsersPortfolio();
-})();
+// (async function () {
+//   await sync_AllUsersPortfolio();
+// })();
 
 // ! Only for Testing purpouse In Devlopment
 app.use("/test", testRoutes);

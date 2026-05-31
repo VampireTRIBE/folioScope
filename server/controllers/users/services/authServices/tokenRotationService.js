@@ -10,6 +10,7 @@ const {
 const {
   find_validate_user,
 } = require("../../../../utils/mongodb/aggregations/readModels/read_Auth_Models/validate_User");
+const { cookieObj } = require("../../../../utils/authentication/cookieObj");
 
 module.exports.accessTokenRotation_Service = async (req, res, next) => {
   try {

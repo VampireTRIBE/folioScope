@@ -1,7 +1,7 @@
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import { useParams } from "react-router-dom";
 
-// ! components 
+// ! components
 import TextButton from "../../../../components/UI/buttons/TextButton";
 import RequestStatus from "../../../../components/layout/public/requestStatus/RequestStatus";
 
@@ -16,7 +16,11 @@ import {
 import { useNavigationActions } from "../../../hooks/customHooks/useNavigationActions";
 import { useFormDataActions } from "../hooks/customHooks/useSubmitForm";
 
+// ! Context
+import { AuthenticationContext } from "../../../../context/authenticationContext";
+
 const EmailVerificationOutlet = () => {
+  const { setUser } = useContext(AuthenticationContext);
   const { emailToken } = useParams();
   const { goToUserDashBord } = useNavigationActions();
   const { submitFormEmailVerificationRetryData } = useFormDataActions();
@@ -37,9 +41,10 @@ const EmailVerificationOutlet = () => {
   }, [emailToken, mutate]);
 
   if (isSuccess) {
+    setUser(respLoginForm?.accessToken);
     setTimeout(() => {
       goToUserDashBord();
-    }, 2000);
+    }, 200);
   }
 
   return (
