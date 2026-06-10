@@ -1,0 +1,30 @@
+.container {
+  padding: var(--space-2) var(--space-1);
+  background-color: inherit;
+  color: inherit;
+}
+
+.shimmer {
+  margin: var(--space-2) var(--space-1);
+  width: 100%;
+  height: 20rem;
+  position: relative;
+  overflow: hidden;
+  background: var(--text-muted);
+  border-radius: 1rem;
+}
+
+.shimmer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--color-primary-light-alpha);
+  transform: translateX(-100%);
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}

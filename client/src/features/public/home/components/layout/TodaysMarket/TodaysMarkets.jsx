@@ -1,3 +1,4 @@
+import { useContext } from "react";
 import { useSelector } from "react-redux";
 
 // ! components
@@ -21,7 +22,12 @@ import {
 } from "../../../redux/todaysMarketSelectors";
 import { todaysMarketToggleActions } from "../../../redux/todaysMarketsState";
 
+// ! Context
+import { AuthenticationContext } from "../../../../../../context/authenticationContext";
+
 const TodaysMarkets = () => {
+  const { user } = useContext(AuthenticationContext);
+
   const activeStockCategory = useSelector(selectActiveFilterByGroup("Stocks"));
   const activeEtfCategory = useSelector(selectActiveFilterByGroup("Etfs"));
   const activeMfCategory = useSelector(
@@ -31,7 +37,7 @@ const TodaysMarkets = () => {
   return (
     <section className={TodaysMarketStyle.section2}>
       <div className={TodaysMarketStyle.containerMarketData}>
-        <PortfolioAdd />
+        {!user && <PortfolioAdd />}
         <div className={TodaysMarketStyle.cardcontainer}>
           <Head activeCategory={activeStockCategory} />
           <Content activeCategory={activeStockCategory} />
@@ -45,12 +51,14 @@ const TodaysMarkets = () => {
           <Content activeCategory={activeMfCategory} />
         </div>
       </div>
-      <aside className={TodaysMarketStyle.adsContainer}>
-        <h3>Connect with us</h3>
-        <LoginAds />
-        <ImgSliderAds />
-        <SignupAds />
-      </aside>
+      {!user && (
+        <aside className={TodaysMarketStyle.adsContainer}>
+          <h3>Connect with us</h3>
+          <LoginAds />
+          <ImgSliderAds />
+          <SignupAds />
+        </aside>
+      )}
     </section>
   );
 };

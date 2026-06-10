@@ -1,0 +1,14 @@
+.navlinkContainer {
+  padding: var(--space-2) 0;
+  background-color: inherit;
+  color: inherit;
+  position: sticky;
+  top: var(--header-height);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
+  box-shadow: var(--shadow-md);
+  border-bottom: var(--border-width-sm) solid var(--border-dark);
+  z-index: 900;
+}

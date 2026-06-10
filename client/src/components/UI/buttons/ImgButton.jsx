@@ -1,5 +1,7 @@
 import buttonStyle from "./button.module.css";
 
+import ImgPlaceholder from "../others/imagePlaceholder/ImgPlaceholder";
+
 const ImgButton = ({
   onClick,
   variantButton,
@@ -7,9 +9,18 @@ const ImgButton = ({
   src,
   alt,
   title,
+  imgplaceHolder = false,
+  letter,
   ...rest
 }) => {
-  return (
+  return imgplaceHolder ? (
+    <ImgPlaceholder
+      onClick={onClick}
+      containerVarient={variantButton}
+      letterVarient={variantImg}
+      letter={letter}
+    />
+  ) : (
     <figure onClick={onClick} className={buttonStyle[variantButton]}>
       <img
         className={buttonStyle[variantImg]}
@@ -17,7 +28,8 @@ const ImgButton = ({
         alt={alt}
         title={title}
         loading="lazy"
-        {...rest}></img>
+        {...rest}
+      />
     </figure>
   );
 };

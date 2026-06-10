@@ -18,7 +18,7 @@ export const publicSubRoutes = [
     children: securityRoutes,
   },
   {
-    path: "portfolio",
+    path: "dashboard",
     children: portfolioRoutes,
   },
 ];

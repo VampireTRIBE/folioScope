@@ -1,9 +1,27 @@
 import imgPlaceholderStyle from "./imgplaceholder.module.css";
 
-const ImgPlaceholder = ({ letter = null }) => {
+const ImgPlaceholder = ({
+  containerVarient = null,
+  letterVarient = null,
+  letter = null,
+  onClick = null,
+}) => {
   return (
-    <div className={imgPlaceholderStyle.container}>
-      <div className={imgPlaceholderStyle.letter}>{letter}</div>
+    <div
+      className={
+        containerVarient
+          ? imgPlaceholderStyle[containerVarient]
+          : imgPlaceholderStyle.container
+      }
+      onClick={onClick}>
+      <div
+        className={
+          letterVarient
+            ? imgPlaceholderStyle[letterVarient]
+            : imgPlaceholderStyle.letter
+        }>
+        {letter ?? "*"}
+      </div>
     </div>
   );
 };

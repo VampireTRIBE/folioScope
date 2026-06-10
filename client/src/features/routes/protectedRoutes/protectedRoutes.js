@@ -1,3 +1,4 @@
 export const USERROUTES = {
-  USERDASHBORD: "/portfolio",
+  USERDASHBORD: "/dashboard",
+  USERPROFILE: "/dashboard/profile",
 };

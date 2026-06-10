@@ -55,6 +55,10 @@ export const useNavigationActions = () => {
     navigate(ROUTES.USERDASHBORD, { replace: true });
   }, [navigate]);
 
+  const goToUserProfile = useCallback(() => {
+    navigate(ROUTES.USERPROFILE);
+  }, [navigate]);
+
   return {
     goToLogin,
     goToForgotPassword,
@@ -65,5 +69,6 @@ export const useNavigationActions = () => {
     goToSecurityDashbord,
     goToSendVerificationMail,
     goToUserDashBord,
+    goToUserProfile,
   };
 };

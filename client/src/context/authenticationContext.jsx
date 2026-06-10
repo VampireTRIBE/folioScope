@@ -3,7 +3,7 @@ import { useRotateTokenMutation } from "../hooks/RTK Query Hooks/useRotateToken"
 
 export const AuthenticationContext = createContext();
 
-const ROTATE_TIME = 1 * 60 * 1000;
+const ROTATE_TIME = 8 * 60 * 1000;
 
 export const AuthenticationProvider = ({ children }) => {
   const [user, setUser] = useState(null);
@@ -56,7 +56,7 @@ export const AuthenticationProvider = ({ children }) => {
   if (loading) return <h1>loading</h1>;
 
   return (
-    <AuthenticationContext.Provider value={{ user, setUser, loading }}>
+    <AuthenticationContext.Provider value={{ user, setUser }}>
       {children}
     </AuthenticationContext.Provider>
   );

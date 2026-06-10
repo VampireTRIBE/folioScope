@@ -3,6 +3,10 @@ import UserDashboardOutlet from "../../../../features/protected/userDashboard/ou
 export const portfolioRoutes = [
   {
     index: true,
-    element: <UserDashboardOutlet />, 
+    element: <UserDashboardOutlet />,
+  },
+  {
+    path: "profile",
+    element: <UserDashboardOutlet />,
   },
 ];
