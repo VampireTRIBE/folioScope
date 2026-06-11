@@ -27,6 +27,7 @@ const {
   confirmPassword,
   verifyOtp,
   accessTokenRotation,
+  get_User_Details,
 } = require("../../controllers/users/userControllers");
 const {
   validateParamsEmail,
@@ -34,6 +35,10 @@ const {
 
 // routes
 
+// ! Read Routes
+router.route("/userdetails").get(verifyAccessToken, get_User_Details);
+
+// ! Post Routes
 router.route("/signup").post(validate_RegisterData, register_NewUser);
 
 router.post("/sendverificationemail", validate_email, sendVerificationEmail);

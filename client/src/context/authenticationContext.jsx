@@ -1,12 +1,18 @@
 import { createContext, useEffect, useRef, useState } from "react";
+
+// ! Tanstack Query
 import { useRotateTokenMutation } from "../hooks/RTK Query Hooks/useRotateToken";
 
-export const AuthenticationContext = createContext();
+// ! APIs
+import { FETCH_USERDETAILS } from "../features/apis/FETCH_APIs";
+
+export const AuthenticationContext = createContext(null);
 
 const ROTATE_TIME = 8 * 60 * 1000;
 
 export const AuthenticationProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const { mutateAsync: rotateToken } = useRotateTokenMutation();
@@ -14,8 +20,18 @@ export const AuthenticationProvider = ({ children }) => {
   const timeoutRef = useRef(null);
   const isRunning = useRef(false);
 
+  const clearTimer = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
+    }
+  };
+
   const schedule = () => {
-    timeoutRef.current = setTimeout(refresh, ROTATE_TIME);
+    clearTimer();
+    timeoutRef.current = setTimeout(() => {
+      refresh();
+    }, ROTATE_TIME);
   };
 
   const refresh = async () => {
@@ -23,10 +39,19 @@ export const AuthenticationProvider = ({ children }) => {
     isRunning.current = true;
     try {
       const res = await rotateToken();
-      setUser(res.accessToken);
+      const accessToken = res?.accessToken || null;
+      setUser(accessToken);
+      if (!accessToken) {
+        setUserData(null);
+        clearTimer();
+        return;
+      }
+
       schedule();
     } catch (err) {
       setUser(null);
+      setUserData(null);
+      clearTimer();
     } finally {
       isRunning.current = false;
     }
@@ -36,11 +61,20 @@ export const AuthenticationProvider = ({ children }) => {
     const bootstrap = async () => {
       try {
         const res = await rotateToken();
-        setUser(res.accessToken);
+        const accessToken = res?.accessToken || null;
+        setUser(accessToken);
+        if (!accessToken) {
+          setUserData(null);
+          return;
+        }
 
+        const userDetails = await FETCH_USERDETAILS(accessToken);
+        setUserData(userDetails?.user || null);
         schedule();
       } catch (err) {
         setUser(null);
+        setUserData(null);
+        clearTimer();
       } finally {
         setLoading(false);
       }
@@ -49,14 +83,21 @@ export const AuthenticationProvider = ({ children }) => {
     bootstrap();
 
     return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      clearTimer();
     };
   }, []);
 
   if (loading) return <h1>loading</h1>;
 
   return (
-    <AuthenticationContext.Provider value={{ user, setUser }}>
+    <AuthenticationContext.Provider
+      value={{
+        user,
+        setUser,
+        userData,
+        setUserData,
+      }}
+    >
       {children}
     </AuthenticationContext.Provider>
   );

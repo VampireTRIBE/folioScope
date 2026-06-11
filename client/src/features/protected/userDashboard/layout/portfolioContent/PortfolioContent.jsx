@@ -14,6 +14,7 @@ import portfolioContentStyles from "./portfoliocontent.module.css";
 // ! test
 import { useStaticDataSecurityContent } from "../../../../public/securityDashbord/hooks/custom Hooks/useStaticData/useStaticData";
 import { useSecurityOverview } from "../../../../public/securityDashbord/hooks/RTK Query/useSecurityQuery";
+import PorfolioSnapshot from "../portfolioSnapshot/PorfolioSnapshot";
 
 // ! tanStack Query Hooks
 // import { useSecurityOverview } from "../../../hooks/RTK Query/useSecurityQuery";
@@ -51,6 +52,8 @@ const PortfolioContent = () => {
             );
           })}
       </div>
+
+      <PorfolioSnapshot />
 
       <OverView {...overview} />
 

@@ -1,12 +1,14 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useContext, useMemo } from "react";
 
 import { useDispatch } from "react-redux";
 
 import { useNavigate } from "react-router-dom";
 import { useNavigationActions } from "../../../hooks/customHooks/useNavigationActions";
 import { publicheaderToggleActions } from "../redux/headerToggleState";
+import { AuthenticationContext } from "../../../../context/authenticationContext";
 
 export const useHeaderUserActions = () => {
+  const { userData } = useContext(AuthenticationContext);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -53,10 +55,10 @@ export const useHeaderUserActions = () => {
         variantButton: "containerType2",
         variantImg: "letterType2",
         imgplaceHolder: true,
-        letter: "U",
+        letter: userData?.firstName[0].toString().toUpperCase() || "U",
       },
     ],
-    [toggle],
+    [toggle, userData],
   );
 
   // =========================

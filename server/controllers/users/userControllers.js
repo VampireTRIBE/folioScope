@@ -19,6 +19,15 @@ const {
   verifyOtp_Service,
   confirmPassword_Service,
 } = require("./services/authServices/passwordResetService");
+const { Read_UserDetails_Service } = require("./services/ReadServices/userServiece");
+
+module.exports.get_User_Details = async (req, res, next) => {
+  try {
+    await Read_UserDetails_Service(req, res, next);
+  } catch (error) {
+    next(error);
+  }
+};
 
 module.exports.register_NewUser = async (req, res, next) => {
   try {

@@ -9,4 +9,11 @@ export const FETCH_RANGEPRICE = async (securityID, range = null) => {
   return response.data.data;
 };
 
-
+export const FETCH_USERDETAILS = async (accessToken) => {
+  const response = await BASE_URL.get(`/userdetails`, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  return response.data;
+};

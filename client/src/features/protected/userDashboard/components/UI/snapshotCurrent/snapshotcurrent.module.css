@@ -1,0 +1,33 @@
+.container {
+  margin-top: var(--space-1);
+  padding: var(--space-2);
+  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.subContainer {
+  min-width: fit-content;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  font-weight: var(--fw-bold);
+}
+.subContainerPnl {
+  min-width: fit-content;
+  width: 100%;
+  font-weight: var(--fw-bold);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.xirrButton {
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-md);
+  border: 1px solid black;
+  background-color: var(--color-success);
+  cursor: pointer;
+}
