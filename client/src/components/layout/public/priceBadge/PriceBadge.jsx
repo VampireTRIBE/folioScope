@@ -10,6 +10,7 @@ const PriceBadge = ({
   percentage = true,
   priceValue = true,
 }) => {
+  const amount = Number(price?.price ?? 0);
   const today = price?.today?.toString() ?? "";
   const isNegative = today?.startsWith("-");
   let displayValue = isNegative ? today.slice(1) : today;
@@ -33,7 +34,7 @@ const PriceBadge = ({
     <>
       {priceValue && (
         <div className={`${pricebadgeStyle.price}`}>
-          {currency ? `₹${price?.price ?? "0.00"}` : price?.price}
+          {currency ? `₹${amount.toFixed(2)}` : price?.price}
         </div>
       )}
       {percentage && (

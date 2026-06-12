@@ -68,7 +68,9 @@ module.exports.groupstatementTransaction = async (req, res) => {
   let lockedGroupId = null;
 
   try {
-    const u_id = req.user._id;
+    const userID = req.userId;
+    const sessionDocID = req.sessionDocId;
+    const sessionDoc = req.sessionDoc;
     const { pg_id } = req.params;
     let { type, date, amount } = req.body;
     let result = null;
@@ -83,10 +85,10 @@ module.exports.groupstatementTransaction = async (req, res) => {
         await Promise.all([
           is_Leaf(PortfolioGroupModel, pg_id),
           PortfolioGroupStatementModel.findOne({
-            userId: u_id,
+            userId: userID,
           }).sort({ date: -1 }),
           LedgerStatementModel.findOne({
-            userId: u_id,
+            userId: userID,
           }).sort({ date: -1 }),
         ]);
 
@@ -100,7 +102,7 @@ module.exports.groupstatementTransaction = async (req, res) => {
         throw new Error("Transaction not allowed in Default Group");
       }
 
-      if (userId.toString() !== u_id.toString()) {
+      if (userId.toString() !== userID.toString()) {
         throw new Error("Unauthorized");
       }
 
@@ -149,14 +151,14 @@ module.exports.groupstatementTransaction = async (req, res) => {
 
       if (startDate) {
         result = await fill_MissingNAVs(
-          u_id,
+          userID,
           session,
           startDate,
           new Date(date),
         );
       } else {
         result = await fill_MissingNAVs(
-          u_id,
+          userID,
           session,
           new Date(date),
           new Date(date),
@@ -168,7 +170,7 @@ module.exports.groupstatementTransaction = async (req, res) => {
         [
           {
             portfolioGroupId: pg_id,
-            userId: u_id,
+            userId: userID,
             date,
             type,
             amount,
@@ -207,7 +209,7 @@ module.exports.groupstatementTransaction = async (req, res) => {
           update_GroupNAV({
             session,
             portfolioGroupId: id,
-            userId: u_id,
+            userId: userID,
             date,
             type,
             amount: Number(amount),
@@ -220,7 +222,7 @@ module.exports.groupstatementTransaction = async (req, res) => {
       await releaseGroupLock(lockedGroupId);
     }
 
-    const { success } = await sync_FillFutureNAVs(u_id, date);
+    const { success } = await sync_FillFutureNAVs(userID, date);
 
     return res.status(201).json({
       success: "Transaction completed successfully",

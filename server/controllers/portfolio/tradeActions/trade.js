@@ -71,7 +71,9 @@ module.exports.tradeTransaction = async (req) => {
   try {
     session.startTransaction();
 
-    const u_id = req.user._id;
+    const userID = req.userId;
+    const sessionDocID = req.sessionDocId;
+    const sessionDoc = req.sessionDoc;
     const { pg_id, a_id } = req.params;
     const { type, date, qty, price, dividendAmount } = req.body;
 
@@ -97,7 +99,7 @@ module.exports.tradeTransaction = async (req) => {
     );
 
     if (!isLeaf) throw new Error("Allowed only on leaf nodes");
-    if (userId.toString() !== u_id.toString()) throw new Error("Unauthorized");
+    if (userId.toString() !== userID.toString()) throw new Error("Unauthorized");
 
     // ================= ASSET FETCH =================
     const { name } = get_SingleAssetMetaDataID(a_id);
@@ -110,7 +112,7 @@ module.exports.tradeTransaction = async (req) => {
     asset = await FinantialAssetModel.findOne({
       assetMetadataId: a_id,
       portfolioGroupId: pg_id,
-      userId: u_id,
+      userId: userID,
     });
 
     // ================= CREATE + LOCK (FIRST BUY) =================
@@ -121,7 +123,7 @@ module.exports.tradeTransaction = async (req) => {
             name,
             assetMetadataId: a_id,
             portfolioGroupId: pg_id,
-            userId: u_id,
+            userId: userID,
             dateAdded: txDate,
             lock: { isLocked: true, lockedAt: new Date() },
           },
@@ -142,9 +144,9 @@ module.exports.tradeTransaction = async (req) => {
     // ================= BACKDATED CHECK =================
 
     const [lastTx, groupLastStatement] = await Promise.all([
-      LedgerStatementModel.findOne({ userId: u_id }).sort({ date: -1 }),
+      LedgerStatementModel.findOne({ userId: userID }).sort({ date: -1 }),
       PortfolioGroupStatementModel.findOne({
-        userId: u_id,
+        userId: userID,
       }).sort({ date: -1 }),
     ]);
 
@@ -172,9 +174,9 @@ module.exports.tradeTransaction = async (req) => {
       startDate = tradeDate;
     }
     if (startDate) {
-      await fill_MissingNAVs(u_id, session, startDate, new Date(date));
+      await fill_MissingNAVs(userID, session, startDate, new Date(date));
     } else {
-      await fill_MissingNAVs(u_id, session, new Date(date), new Date(date));
+      await fill_MissingNAVs(userID, session, new Date(date), new Date(date));
     }
 
     // =====================================================
@@ -192,7 +194,7 @@ module.exports.tradeTransaction = async (req) => {
           [
             {
               financialAssetId: asset._id,
-              userId: u_id,
+              userId: userID,
               buyQty: qty,
               remainingQty: qty,
               buyPrice: price,
@@ -208,7 +210,7 @@ module.exports.tradeTransaction = async (req) => {
               type: "buy",
               financialAssetId: asset._id,
               portfolioGroupId: pg_id,
-              userId: u_id,
+              userId: userID,
               qty,
               price,
               amount: totalAmount,
@@ -228,7 +230,7 @@ module.exports.tradeTransaction = async (req) => {
           {
             assetMetadataId: a_id,
             portfolioGroupId: pg_id,
-            userId: u_id,
+            userId: userID,
           },
           {
             $inc: { "snapshot.totalQty": qty },
@@ -291,7 +293,7 @@ module.exports.tradeTransaction = async (req) => {
               type: "sell",
               financialAssetId: asset._id,
               portfolioGroupId: pg_id,
-              userId: u_id,
+              userId: userID,
               qty,
               price,
               amount: totalSellAmount,
@@ -344,7 +346,7 @@ module.exports.tradeTransaction = async (req) => {
               type: "dividend",
               financialAssetId: asset._id,
               portfolioGroupId: pg_id,
-              userId: u_id,
+              userId: userID,
               dividendAmount,
               amount: dividendAmount,
               date: txDate,
@@ -385,7 +387,6 @@ module.exports.tradeTransaction = async (req) => {
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
-    console.log(error);
     // 🔓 ENSURE UNLOCK
     if (asset?._id) {
       await releaseLock(asset._id);

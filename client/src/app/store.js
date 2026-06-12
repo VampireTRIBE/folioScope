@@ -4,6 +4,8 @@ import publicheaderToggle from "../features/public/header/redux/headerToggleStat
 import todaysMarketToggle from "../features/public/home/redux/todaysMarketsState";
 import securitychartRangeFilterState from "../features/public/securityDashbord/redux/securityPriceChartState";
 
+import groupchartRangeFilterState from "../features/protected/userDashboard/redux/groupPriceChartState";
+
 import singupErrorState from "../features/public/signup/redux/singupFomState";
 
 const store = configureStore({
@@ -11,6 +13,7 @@ const store = configureStore({
     publicheaderToggle,
     todaysMarketToggle,
     securitychartRangeFilterState,
+    groupchartRangeFilterState,
     singupErrorState,
   },
 });

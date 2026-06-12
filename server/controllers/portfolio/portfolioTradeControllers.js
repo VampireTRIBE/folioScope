@@ -23,7 +23,7 @@ module.exports.trade = async (req, res) => {
 
     // 🔴 1. Future Nav Fill upto current Date
     const { date } = req.body;
-    const { success } = await sync_FillFutureNAVs(req.user.id, date);
+    const { success } = await sync_FillFutureNAVs(req.userId, date);
     if (!success) {
       return res.status(400).json({
         error: true,
@@ -33,7 +33,7 @@ module.exports.trade = async (req, res) => {
     }
 
     // 🔴 1. group syncPortfolio only currnet Snapshot
-    const syncPortfolioResult = await sync_Portfolio(req.user.id);
+    const syncPortfolioResult = await sync_Portfolio(req.userId);
 
     if (!syncPortfolioResult.success) {
       return res.status(400).json({

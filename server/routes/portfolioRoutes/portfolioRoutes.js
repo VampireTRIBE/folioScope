@@ -6,6 +6,7 @@ const {
   addGroup,
   deleteGroup,
   updateGroup,
+  get_GroupMetadata,
 } = require("../../controllers/portfolio/portfolioGroupControllers");
 const {
   groupstatementTransaction,
@@ -22,22 +23,25 @@ const {
   validate_GroupStatementData,
   validate_tradeData,
 } = require("../../utils/validations/middlewares/joi_validation/validate_Data/portfolioData");
-const { isLogedIn } = require("../../utils/authentication/isLogedIn");
+
+// ! Auth Middlewares
+const { verifyAccessToken } = require("../../middlewares/authentication");
 
 // ! routes
 
-// ! Portfolio Group Routes
+// ! Portfolio Group POST Routes
 router
   .route("/:pg_id")
-  .post(isLogedIn, validateID("pg_id"), addGroup)
-  .patch(isLogedIn, validateID("pg_id"), updateGroup)
-  .delete(isLogedIn, validateID("pg_id"), deleteGroup);
+  .get(verifyAccessToken, get_GroupMetadata)
+  .post(verifyAccessToken, validateID("pg_id"), addGroup)
+  .patch(verifyAccessToken, validateID("pg_id"), updateGroup)
+  .delete(verifyAccessToken, validateID("pg_id"), deleteGroup);
 
 // ! Portfolio Group Statement Ledger Routes
 router
   .route("/:pg_id/grouptransaction")
   .post(
-    isLogedIn,
+    verifyAccessToken,
     validateID("pg_id"),
     validate_GroupStatementData,
     groupstatementTransaction,
@@ -46,7 +50,7 @@ router
 router
   .route("/:pg_id/trade/:a_id")
   .post(
-    isLogedIn,
+    verifyAccessToken,
     validateID("pg_id"),
     validateID("a_id"),
     validate_tradeData,

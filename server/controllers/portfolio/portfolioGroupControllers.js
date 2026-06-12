@@ -1,9 +1,106 @@
-const PortfolioGroupModel = require("../../models/Portfolio_Models/PortfolioGroup_Models/portfolioGroup");
-const financialAssetModel = require("../../models/Portfolio_Models/PortfolioMetrix_Models/financialAsset");
+// ! Models
+
+const PORTFOLIOGROUP_MODEL = require("../../models/Portfolio_Models/PortfolioGroup_Models/portfolioGroup");
+const FINANCIALASSET_MODEL = require("../../models/Portfolio_Models/PortfolioMetrix_Models/financialAsset");
+
+// ! utils
+const {
+  find_validate_user,
+} = require("../../utils/mongodb/aggregations/readModels/read_Auth_Models/validate_User");
+const {
+  find_validate_portfolioGroup,
+} = require("../../utils/mongodb/aggregations/readModels/read_PortfolioGroup_Models/read_PortoflioGroup_Metadata");
+
+module.exports.get_GroupMetadata = async (req, res) => {
+  try {
+    const userID = req.userId;
+    const sessionDocID = req.sessionDocId;
+    const sessionDoc = req.sessionDoc;
+    let { pg_id = "null" } = req.params;
+
+    const userfilterObj = {
+      _id: userID,
+    };
+
+    let protfolioGroupFilterObj = null;
+
+    if ("null" === pg_id) {
+      protfolioGroupFilterObj = {
+        level: 1,
+        userId: userID,
+      };
+    } else {
+      protfolioGroupFilterObj = {
+        _id: pg_id,
+        userId: userID,
+      };
+    }
+
+    const [user, portfolioGroup] = await Promise.all([
+      find_validate_user({ filterObj: userfilterObj }),
+      find_validate_portfolioGroup({
+        filterObj: protfolioGroupFilterObj,
+      }),
+    ]);
+
+    const respData = {
+      _id: portfolioGroup._id,
+      groupName: portfolioGroup.name,
+      description: portfolioGroup.description,
+      level: portfolioGroup.level,
+      consolidatedSnapshot: {
+        netcurrentvalue: portfolioGroup.consolidatedCurrentValue,
+        consolidatedcash: portfolioGroup.consolidatedCash,
+        consolidatedtax: portfolioGroup.consolidatedTax,
+      },
+      currentInvestment: {
+        investmentvalue: portfolioGroup.groupSnapshot.investmentValue,
+        currentvalue: portfolioGroup.groupSnapshot.currentValue,
+        pl: (
+          Number(portfolioGroup.groupSnapshot.currentValue) -
+          Number(portfolioGroup.groupSnapshot.investmentValue)
+        ).toFixed(2),
+        "pl%": (
+          (Number(portfolioGroup.groupSnapshot.currentValue) -
+            Number(portfolioGroup.groupSnapshot.investmentValue)) /
+          Number(portfolioGroup.groupSnapshot.investmentValue)
+        ).toFixed(2),
+      },
+      currentyear: {
+        realizedgain: portfolioGroup.groupSnapshot.financialYear.realizedGain,
+        dividend: portfolioGroup.groupSnapshot.financialYear.dividend,
+        unrealizedgain:
+          portfolioGroup.groupSnapshot.financialYear.unrealizedGain,
+        totalgain: portfolioGroup.groupSnapshot.financialYear.totalGain,
+      },
+      lifetime: {
+        realized: portfolioGroup.groupSnapshot.lifetime.realizedGain,
+        dividend: portfolioGroup.groupSnapshot.lifetime.dividend,
+        totalgain: (
+          Number(portfolioGroup.groupSnapshot.lifetime.realizedGain) +
+          Number(portfolioGroup.groupSnapshot.lifetime.dividend)
+        ).toFixed(2),
+      },
+    };
+
+    return res.status(200).json({
+      success: true,
+      message: "Metadata Fetched",
+      data: respData,
+    });
+  } catch (error) {
+    if (error.code === 11000) {
+      return res.status(400).json({ error: "Duplicate group name" });
+    }
+    return res.status(500).json({ error: error.message });
+  }
+};
 
 module.exports.addGroup = async (req, res) => {
   try {
-    const u_id = req.user._id;
+    const userID = req.userId;
+    const sessionDocID = req.sessionDocId;
+    const sessionDoc = req.sessionDoc;
     const { pg_id } = req.params;
 
     if (!req.body || !req.body.name || !req.body.description) {
@@ -16,10 +113,11 @@ module.exports.addGroup = async (req, res) => {
     }
 
     const [parent, financialAsset] = await Promise.all([
-      PortfolioGroupModel.findById(pg_id).select("level path userId").lean(),
-      financialAssetModel
-        .findOne({ portfolioGroupId: pg_id, userId: u_id })
-        .lean(),
+      PORTFOLIOGROUP_MODEL.findById(pg_id).select("level path userId").lean(),
+      FINANCIALASSET_MODEL.findOne({
+        portfolioGroupId: pg_id,
+        userId: userID,
+      }).lean(),
     ]);
 
     if (financialAsset) {
@@ -32,18 +130,18 @@ module.exports.addGroup = async (req, res) => {
       return res.status(404).json({ error: "Invalid Group ID" });
     }
 
-    if (parent.userId.toString() !== u_id.toString()) {
+    if (parent.userId.toString() !== userID.toString()) {
       return res.status(403).json({ error: "Unauthorized" });
     }
 
     if (parent.level >= 4) {
       return res.status(400).json({ error: "Max depth reached" });
     }
-    const doc = new PortfolioGroupModel({
+    const doc = new PORTFOLIOGROUP_MODEL({
       name: name.trim(),
       description,
       parentId: pg_id,
-      userId: u_id,
+      userId: userID,
     });
     doc.$locals.parent = parent;
     await doc.save();
@@ -61,7 +159,9 @@ module.exports.addGroup = async (req, res) => {
 
 module.exports.updateGroup = async (req, res) => {
   try {
-    const u_id = req.user._id;
+    const userID = req.userId;
+    const sessionDocID = req.sessionDocId;
+    const sessionDoc = req.sessionDoc;
     const { pg_id } = req.params;
 
     if (!req.body || !req.body.name || !req.body.description) {
@@ -75,8 +175,8 @@ module.exports.updateGroup = async (req, res) => {
       return res.status(400).json({ error: "Name is required" });
     }
 
-    const updatedDoc = await PortfolioGroupModel.findOneAndUpdate(
-      { _id: pg_id, userId: u_id },
+    const updatedDoc = await PORTFOLIOGROUP_MODEL.findOneAndUpdate(
+      { _id: pg_id, userId: userID },
       { $set: { name: cleanName, description } },
       { new: true, runValidators: true },
     );
@@ -101,10 +201,12 @@ module.exports.updateGroup = async (req, res) => {
 
 module.exports.deleteGroup = async (req, res) => {
   try {
-    const u_id = req.user._id;
+    const userID = req.userId;
+    const sessionDocID = req.sessionDocId;
+    const sessionDoc = req.sessionDoc;
     const { pg_id } = req.params;
 
-    const node = await PortfolioGroupModel.findById(pg_id)
+    const node = await PORTFOLIOGROUP_MODEL.findById(pg_id)
       .select("level userId path")
       .lean();
 
@@ -112,7 +214,7 @@ module.exports.deleteGroup = async (req, res) => {
       return res.status(404).json({ error: "Group not found" });
     }
 
-    if (node.userId.toString() !== u_id.toString()) {
+    if (node.userId.toString() !== userID.toString()) {
       return res.status(403).json({ error: "Unauthorized" });
     }
 
@@ -122,7 +224,7 @@ module.exports.deleteGroup = async (req, res) => {
       });
     }
 
-    await PortfolioGroupModel.updateMany(
+    await PORTFOLIOGROUP_MODEL.updateMany(
       {
         $or: [{ _id: pg_id }, { path: pg_id }],
       },

@@ -10,7 +10,7 @@ const CardType2 = ({ content, onClick }) => {
   return (
     <div className={cardType2Style.card}>
       <div className={cardType2Style.cardInfo}>
-        <ImgPlaceholder letter={content?.name[0]} />
+        <ImgPlaceholder letter={content?.name ? content?.name[0] : "N"} />
         <div
           onClick={() => onClick?.(content?.name)}
           className={cardType2Style.infoDetails}>

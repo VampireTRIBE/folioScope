@@ -10,25 +10,24 @@ import PriceChartFilter from "../../../../../components/layout/public/priceChart
 import priceChartStyle from "./pricechart.module.css";
 
 // ! selectors
+import { selectActiveGroupChartFilter } from "../../redux/groupPriceChartSelectors";
 
 // ! Custom Hooks
-import { useSecurityChartActions } from "../../../../public/securityDashbord/hooks/custom Hooks/useSecurityChartActions";
+import { useGroupChartActions } from "../../redux/dispatchActions";
 
 // ! tanStack Query Hooks
-// import { useChartRange } from "../../../../../hooks/RKT Query/usePricesQuery";
 
 const PriceChart = () => {
   const { securityID } = useParams();
-  const { FILTER_CHART_RANGE } = useSecurityChartActions();
-  // const active = useSelector(selectActiveSecurityChartFilter);
-  // const { data: chartRangeData } = useChartRange(securityID, active);
+  const { FILTER_CHART_RANGE } = useGroupChartActions();
+  const active = useSelector(selectActiveGroupChartFilter);
+
   const chartRangeData = null;
   const highLowReturn = {
     high: chartRangeData?.high ?? null,
     low: chartRangeData?.low ?? null,
     price: { today: chartRangeData?.periodReturn ?? null },
   };
-  const active = "W";
 
   const seriesData = chartRangeData?.series ?? [];
 

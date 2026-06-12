@@ -4,7 +4,6 @@ const SESSION_MODEL = require("../models/Users_Models/session");
 module.exports.verifyAccessToken = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
-    console.log(authHeader)
 
     if (!authHeader?.startsWith("Bearer ")) {
       return res.status(401).json({
