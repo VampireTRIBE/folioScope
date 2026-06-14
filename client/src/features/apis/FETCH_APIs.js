@@ -1,4 +1,4 @@
-import { BASE_URL } from "../../constants/axiosIntance";
+import { BASE_URL } from "../../constants/axiosInstance";
 
 export const FETCH_RANGEPRICE = async (securityID, range = null) => {
   if (!range) {

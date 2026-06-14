@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 // ! Styles
 import portfolioNavlinkStyle from "./portfolionavlink.module.css";
 
-// ! Componets
+// ! Components
 import Button from "../../../../../components/UI/buttons/Button";
 
 const PortfolioNavlink = () => {

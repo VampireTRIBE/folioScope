@@ -12,7 +12,7 @@ export const useHeaderUserActions = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const { goToUserDashBord, goToUserProfile, gotoHome } =
+  const { goToUserDashboard, goToUserProfile, gotoHome } =
     useNavigationActions();
 
   // =========================
@@ -113,7 +113,7 @@ export const useHeaderUserActions = () => {
       },
       {
         id: "menu-dashboard",
-        onClick: goToUserDashBord,
+        onClick: goToUserDashboard,
         children: "Dashboard",
         variant: "sideBarbtn",
         order: 1,

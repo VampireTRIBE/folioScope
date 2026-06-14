@@ -1,6 +1,6 @@
 import { useContext, useEffect } from "react";
 
-// ! componets
+// ! components
 import ImgButton from "../../../../../../components/UI/buttons/ImgButton";
 
 // ! styles
@@ -24,7 +24,7 @@ const LoginForm = () => {
     goToSignup,
     goToForgotPassword,
     goToSendVerificationMail,
-    goToUserDashBord,
+    goToUserDashboard,
   } = useNavigationActions();
   const {
     mutateAsync: loginformMutationFn,
@@ -49,12 +49,12 @@ const LoginForm = () => {
     if (isSuccessLoginForm) {
       setUser(respLoginForm?.accessToken || null);
       const timer = setTimeout(() => {
-        goToUserDashBord();
+        goToUserDashboard();
       }, 200);
 
       return () => clearTimeout(timer);
     }
-  }, [isSuccessLoginForm, goToUserDashBord]);
+  }, [isSuccessLoginForm, goToUserDashboard]);
 
   return (
     <form

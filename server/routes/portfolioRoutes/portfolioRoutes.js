@@ -18,7 +18,7 @@ const {
 // ! Validate Request Data
 const {
   validateID,
-} = require("../../utils/validations/contentValidater/validateID");
+} = require("../../utils/validations/contentValidator/validateID");
 const {
   validate_GroupStatementData,
   validate_tradeData,

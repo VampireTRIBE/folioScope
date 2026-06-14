@@ -53,7 +53,7 @@ const Head = ({ activeCategory = null }) => {
       imgAttibutes: {
         variantButton: "iconInharit",
         variantImg: "iconInharit",
-        src: "assets/icons/losser.png",
+        src: "assets/icons/loser.png",
         alt: "losers Icon",
       },
     },

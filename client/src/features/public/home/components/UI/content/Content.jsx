@@ -11,9 +11,9 @@ import { FETCH_TODAYS_MARKETS } from "../../../api/FETCH_APIs";
 import { useNavigationActions } from "../../../../../hooks/customHooks/useNavigationActions";
 
 // ! styles
-import contentSytle from "./content.module.css";
+import contentStyle from "./content.module.css";
 
-// ! componets
+// ! components
 import CardType2 from "../../../../../../components/layout/public/card/CardType2";
 
 
@@ -25,7 +25,7 @@ const Content = ({ activeCategory = null }) => {
     ),
   );
 
-  const { goToSecurityDashbord } = useNavigationActions();
+  const { goToSecurityDashboard } = useNavigationActions();
 
   const { category, subCategory, activeFilter } = activeContent ?? null;
   const { data, isPending, isError, error } = useQuery({
@@ -35,23 +35,23 @@ const Content = ({ activeCategory = null }) => {
   });
 
   if (isPending) {
-    return <div className={contentSytle.contentShimer}></div>;
+    return <div className={contentStyle.contentShimmer}></div>;
   }
 
   const activeContentData =
     data?.[category]?.[subCategory]?.[activeFilter] || [];
 
   if (activeContentData.length === 0) {
-    return <div className={contentSytle.noContent}>No Data Available</div>;
+    return <div className={contentStyle.noContent}>No Data Available</div>;
   }
 
   return (
-    <div className={contentSytle.content}>
+    <div className={contentStyle.content}>
       {activeContentData.map((content, indx) => (
         <CardType2
           key={content.id ?? indx}
           content={content}
-          onClick={goToSecurityDashbord}
+          onClick={goToSecurityDashboard}
         />
       ))}
     </div>

@@ -1,4 +1,4 @@
-// ! componets
+// ! components
 import SignUp from "../components/layout/signup/SignUp";
 
 // ! styles

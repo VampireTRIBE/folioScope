@@ -15,7 +15,7 @@ const RequestStatus = ({
       <div className={requestStatusStyle.content}>
         <div className={requestStatusStyle.status}>
           <div
-            className={`${requestStatusStyle.statusLebal} ${isPending ? requestStatusStyle.pending : ""} ${isSuccess ? requestStatusStyle.success : ""} ${isError ? requestStatusStyle.error : ""}`}>
+            className={`${requestStatusStyle.statusLabel} ${isPending ? requestStatusStyle.pending : ""} ${isSuccess ? requestStatusStyle.success : ""} ${isError ? requestStatusStyle.error : ""}`}>
             Status :
           </div>
           {isPending && <p> {state?.pending || "Verifying..."}</p>}
@@ -25,7 +25,7 @@ const RequestStatus = ({
 
         <div className={requestStatusStyle.status}>
           <div
-            className={`${requestStatusStyle.statusLebal} ${isPending ? requestStatusStyle.pending : ""} ${isSuccess ? requestStatusStyle.success : ""} ${isError ? requestStatusStyle.error : ""}`}>
+            className={`${requestStatusStyle.statusLabel} ${isPending ? requestStatusStyle.pending : ""} ${isSuccess ? requestStatusStyle.success : ""} ${isError ? requestStatusStyle.error : ""}`}>
             Message :{" "}
           </div>
           {isSuccess && <p>{respData?.message || "Request Success"} ✅</p>}

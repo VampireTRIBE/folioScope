@@ -19,7 +19,7 @@ const {
   verifyOtp_Service,
   confirmPassword_Service,
 } = require("./services/authServices/passwordResetService");
-const { Read_UserDetails_Service } = require("./services/ReadServices/userServiece");
+const { Read_UserDetails_Service } = require("./services/ReadServices/userService");
 
 module.exports.get_User_Details = async (req, res, next) => {
   try {

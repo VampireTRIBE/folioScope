@@ -2,7 +2,7 @@
 import PriceBadge from "../../../../../../components/layout/public/priceBadge/PriceBadge";
 
 // ! Styles
-import snapshotCurrentyearSytles from "./snapshotcurrentyear.module.css";
+import snapshotCurrentyearStyles from "./snapshotcurrentyear.module.css";
 
 const CurrentYearPerformence = ({ currentyear = null }) => {
   const realizedgains = {
@@ -19,21 +19,21 @@ const CurrentYearPerformence = ({ currentyear = null }) => {
     price: currentyear?.totalgain || 0.0,
   };
   return (
-    <div className={snapshotCurrentyearSytles.container}>
-      <h4 className={snapshotCurrentyearSytles.text}>Current Year PNL</h4>
-      <div className={snapshotCurrentyearSytles.subContainer}>
+    <div className={snapshotCurrentyearStyles.container}>
+      <h4 className={snapshotCurrentyearStyles.text}>Current Year PNL</h4>
+      <div className={snapshotCurrentyearStyles.subContainer}>
         <div>Realized Gains : </div>
         <PriceBadge price={realizedgains} currency={true} percentage={false} />
       </div>
-      <div className={snapshotCurrentyearSytles.subContainerPnl}>
+      <div className={snapshotCurrentyearStyles.subContainerPnl}>
         <div>Unrealized Gain : </div>
         <PriceBadge price={unrealizedgain} currency={true} percentage={false} />
       </div>
-      <div className={snapshotCurrentyearSytles.subContainer}>
+      <div className={snapshotCurrentyearStyles.subContainer}>
         <div>Dividend : </div>
         <PriceBadge price={dividend} currency={true} percentage={false} />
       </div>
-      <div className={snapshotCurrentyearSytles.subContainerPnl}>
+      <div className={snapshotCurrentyearStyles.subContainerPnl}>
         <div>Total Gain : </div>
         <PriceBadge price={totalgain} currency={true} percentage={false} />
       </div>

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const {
   normalizeToIST5PM,
-  normalizeToCurrentFinacialYear,
+  normalizeToCurrentFinancialYear,
 } = require("../../transformData/normalizeDates");
 
 module.exports.update_AllGroupsSnapshots = async (
@@ -221,7 +221,7 @@ module.exports.update_AllGroupsSnapshots = async (
 
     const consolidatedCurrentValue =
       snapshot.currentValue + (group.consolidatedCash || 0);
-    snapshot.financialYear.startDate = normalizeToCurrentFinacialYear();
+    snapshot.financialYear.startDate = normalizeToCurrentFinancialYear();
     bulkOps.push({
       updateOne: {
         filter: { _id: group._id },

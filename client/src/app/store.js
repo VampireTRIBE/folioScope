@@ -2,11 +2,11 @@ import { configureStore } from "@reduxjs/toolkit";
 
 import publicheaderToggle from "../features/public/header/redux/headerToggleState";
 import todaysMarketToggle from "../features/public/home/redux/todaysMarketsState";
-import securitychartRangeFilterState from "../features/public/securityDashbord/redux/securityPriceChartState";
+import securitychartRangeFilterState from "../features/public/securityDashboard/redux/securityPriceChartState";
 
 import groupchartRangeFilterState from "../features/protected/userDashboard/redux/groupPriceChartState";
 
-import singupErrorState from "../features/public/signup/redux/singupFomState";
+import signupErrorState from "../features/public/signup/redux/signupFormState";
 
 const store = configureStore({
   reducer: {
@@ -14,7 +14,7 @@ const store = configureStore({
     todaysMarketToggle,
     securitychartRangeFilterState,
     groupchartRangeFilterState,
-    singupErrorState,
+    signupErrorState,
   },
 });
 

@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 
-// ! componets
+// ! components
 import PriceChartCurve from "../../../../../components/layout/public/priceChartCurve/PriceChartCurve";
 import PriceChartHead from "../../../../../components/layout/public/priceChartHead/PriceChartHead";
 import PriceChartFilter from "../../../../../components/layout/public/priceChartFilter/PriceChartFilter";

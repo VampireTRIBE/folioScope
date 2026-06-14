@@ -1,4 +1,4 @@
-const AssetPriceHistoryModel = require("../../../../models/AssetsData_Models/Metrix_Models/AssetPriceHistory");
+const AssetPriceHistoryModel = require("../../../../models/AssetsData_Models/Metrics_Models/AssetPriceHistory");
 const {
   callAppsScript,
 } = require("../../../../services/appsScript/appsScriptService");
@@ -6,7 +6,7 @@ const customError = require("../../../../utils/shared/error/customError");
 const log = require("../../../../utils/shared/console_loggers/consoleLoggers");
 const {
   validate_AssetPriceHistory,
-} = require("../../../../utils/validations/contentValidater/validate_AssetPriceHistory");
+} = require("../../../../utils/validations/contentValidator/validate_AssetPriceHistory");
 const {
   get_AssetMetaDataGFTickerName,
 } = require("../../../init_Cache/AssetsData_Models_Cache/init_cacheFiles/assetMetaDataCache");

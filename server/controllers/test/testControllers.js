@@ -27,7 +27,7 @@ module.exports.clearDatabase = async (req, res, next) => {
     ]);
     await session.commitTransaction();
     log.success("CLEARING DATABASE END");
-    res.status(200).json({ success: "Clearing Database SuccessFull" });
+    res.status(200).json({ success: "Clearing Database Successful" });
   } catch (err) {
     next(err);
   } finally {

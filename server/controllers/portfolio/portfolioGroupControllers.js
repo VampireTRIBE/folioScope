@@ -1,7 +1,7 @@
 // ! Models
 
 const PORTFOLIOGROUP_MODEL = require("../../models/Portfolio_Models/PortfolioGroup_Models/portfolioGroup");
-const FINANCIALASSET_MODEL = require("../../models/Portfolio_Models/PortfolioMetrix_Models/financialAsset");
+const FINANCIALASSET_MODEL = require("../../models/Portfolio_Models/PortfolioMetrics_Models/financialAsset");
 
 // ! utils
 const {
@@ -9,7 +9,7 @@ const {
 } = require("../../utils/mongodb/aggregations/readModels/read_Auth_Models/validate_User");
 const {
   find_validate_portfolioGroup,
-} = require("../../utils/mongodb/aggregations/readModels/read_PortfolioGroup_Models/read_PortoflioGroup_Metadata");
+} = require("../../utils/mongodb/aggregations/readModels/read_PortfolioGroup_Models/read_PortfolioGroup_Metadata");
 
 module.exports.get_GroupMetadata = async (req, res) => {
   try {

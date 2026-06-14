@@ -2,11 +2,11 @@
 import SignupForm from "../signupForm/SignupForm";
 
 // ! styles
-import singupStyle from "./singupstyle.module.css";
+import signupStyle from "./signupstyle.module.css";
 
 const SignUp = () => {
   return (
-    <section className={singupStyle.container}>
+    <section className={signupStyle.container}>
       <SignupForm />
     </section>
   );

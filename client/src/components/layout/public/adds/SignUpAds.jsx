@@ -7,7 +7,7 @@ import { useNavigationActions } from "../../../../features/hooks/customHooks/use
 import Button from "../../../UI/buttons/Button";
 
 // ! styles
-import singupAdsStyles from "./SignupAds.module.css";
+import signupAdsStyles from "./SignupAds.module.css";
 
 const SignupAds = () => {
   const { goToSignup } = useNavigationActions();
@@ -18,9 +18,9 @@ const SignupAds = () => {
     onClick: goToSignup,
   };
   return (
-    <div className={singupAdsStyles.container}>
-      <div className={singupAdsStyles.text}>
-        Singup To Start your Investments jounery and grow with us...
+    <div className={signupAdsStyles.container}>
+      <div className={signupAdsStyles.text}>
+        Sing up To Start your Investments journey and grow with us...
       </div>
       <Button {...buttonATTR} />
     </div>

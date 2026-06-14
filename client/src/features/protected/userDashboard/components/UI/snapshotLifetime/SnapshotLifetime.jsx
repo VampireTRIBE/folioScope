@@ -2,7 +2,7 @@
 import PriceBadge from "../../../../../../components/layout/public/priceBadge/PriceBadge";
 
 // ! Styles
-import snapshotLifetimeSytles from "./snapshotlifetime.module.css";
+import snapshotLifetimeStyles from "./snapshotlifetime.module.css";
 
 const LifetimePerformence = ({ lifetime = null }) => {
   const dividend = {
@@ -15,17 +15,17 @@ const LifetimePerformence = ({ lifetime = null }) => {
     price: lifetime?.totalgain || 0.0,
   };
   return (
-    <div className={snapshotLifetimeSytles.container}>
-      <h4 className={snapshotLifetimeSytles.text}>Lifetime PNL</h4>
-      <div className={snapshotLifetimeSytles.subContainer}>
+    <div className={snapshotLifetimeStyles.container}>
+      <h4 className={snapshotLifetimeStyles.text}>Lifetime PNL</h4>
+      <div className={snapshotLifetimeStyles.subContainer}>
         <div>Total Gains : </div>
         <PriceBadge price={totalgain} currency={true} percentage={false} />
       </div>
-      <div className={snapshotLifetimeSytles.subContainer}>
+      <div className={snapshotLifetimeStyles.subContainer}>
         <div>Realized Gains : </div>
         <PriceBadge price={realized} currency={true} percentage={false} />
       </div>
-      <div className={snapshotLifetimeSytles.subContainer}>
+      <div className={snapshotLifetimeStyles.subContainer}>
         <div>Dividend : </div>
         <PriceBadge price={dividend} currency={true} percentage={false} />
       </div>

@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 const {
   validate_ISIN,
-} = require("../../../utils/validations/contentValidater/ISIN_Validater");
+} = require("../../../utils/validations/contentValidator/ISIN_Validator");
 
 const AssetMetaDataSchema = new Schema(
   {

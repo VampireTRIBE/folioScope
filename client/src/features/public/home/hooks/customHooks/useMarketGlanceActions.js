@@ -8,13 +8,13 @@ export const useSection1Actions = () => {
   // NAVIGATION ACTIONS
   // =========================
 
-  const goToSecurityDashbord = useCallback(
+  const goToSecurityDashboard = useCallback(
     (security) => {
-      navigate(ROUTES.SECURITYDASHBORD(security));
+      navigate(ROUTES.SECURITYDASHBOARD(security));
     },
     [navigate],
   );
   return {
-    goToSecurityDashbord,
+    goToSecurityDashboard,
   };
 };

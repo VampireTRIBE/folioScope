@@ -2,12 +2,12 @@
 import PriceBadge from "../../../../../../components/layout/public/priceBadge/PriceBadge";
 
 // ! Styles
-import snapshotHeadSytles from "./snapshothead.module.css";
+import snapshotHeadStyles from "./snapshothead.module.css";
 
 const SnapshotHead = ({ snapshotHead = null }) => {
   return (
-    <div className={snapshotHeadSytles.container}>
-      <h4 className={snapshotHeadSytles.text}>
+    <div className={snapshotHeadStyles.container}>
+      <h4 className={snapshotHeadStyles.text}>
         {snapshotHead?.text || "Group Name"}
       </h4>
       <div>

@@ -5,7 +5,7 @@ import { useDispatch } from "react-redux";
 import { POST_SIGNUPFORM } from "../../api/POST_apis";
 
 // ! Disptch Actions
-import { singupErrorStateActions } from "../../redux/singupFomState";
+import { signupErrorStateActions } from "../../redux/signupFormState";
 
 // ! Custom Hooks
 import { useNavigationActions } from "../../../../hooks/customHooks/useNavigationActions";
@@ -21,11 +21,11 @@ export const useFormDataActions = () => {
       try {
         const formData = new FormData(e.target);
         const values = Object.fromEntries(formData.entries());
-        dispatch(singupErrorStateActions.SET_FORM_STATUS_TRUE());
+        dispatch(signupErrorStateActions.SET_FORM_STATUS_TRUE());
         const response = await POST_SIGNUPFORM(values);
-        dispatch(singupErrorStateActions.SET_FORM_STATUS_FALSE());
+        dispatch(signupErrorStateActions.SET_FORM_STATUS_FALSE());
         dispatch(
-          singupErrorStateActions.SET_SUCCESS({
+          signupErrorStateActions.SET_SUCCESS({
             success: response?.success || true,
             message:
               response?.message ||
@@ -33,10 +33,10 @@ export const useFormDataActions = () => {
           }),
         );
       } catch (err) {
-        dispatch(singupErrorStateActions.SET_FORM_STATUS_FALSE());
-        dispatch(singupErrorStateActions.RESET_SUCCESS());
+        dispatch(signupErrorStateActions.SET_FORM_STATUS_FALSE());
+        dispatch(signupErrorStateActions.RESET_SUCCESS());
         dispatch(
-          singupErrorStateActions.SET_ERROR({
+          signupErrorStateActions.SET_ERROR({
             error: true,
             message:
               err?.response?.data?.message || err.message || "Signup failed",

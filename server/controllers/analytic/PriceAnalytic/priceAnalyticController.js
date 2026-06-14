@@ -1,6 +1,6 @@
 const {
   priceDrawdownAnalysis,
-} = require("../../../utils/analytics/NonComparisionAnalytics/PRICE_Drawdown_Analytics");
+} = require("../../../utils/analytics/NonComparisonAnalytics/PRICE_Drawdown_Analytics");
 const customError = require("../../../utils/shared/error/customError");
 
 module.exports.priceDrawdownAnalytic = async (req, res, next) => {

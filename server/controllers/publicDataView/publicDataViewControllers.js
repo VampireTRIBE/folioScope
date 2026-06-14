@@ -7,8 +7,8 @@ const {
   get_AssetMetaDataName,
 } = require("../../init_Scripts/init_Cache/AssetsData_Models_Cache/init_cacheFiles/assetMetaDataCache");
 const {
-  readTodaysTopSecurites,
-} = require("../../utils/mongodb/aggregations/readModels/readTodaysTopSecurites");
+  readTodaysTopSecurities,
+} = require("../../utils/mongodb/aggregations/readModels/readTodaysTopSecurities");
 const {
   readSecurityOverview,
 } = require("../../utils/mongodb/aggregations/readModels/readSecurityDetails");
@@ -41,7 +41,7 @@ module.exports.getAllSecuritiesList = async (req, res, next) => {
 
 module.exports.getTodaysSecurities = async (req, res, next) => {
   try {
-    const data = await readTodaysTopSecurites();
+    const data = await readTodaysTopSecurities();
     res.status(200).json({
       success: true,
       data,

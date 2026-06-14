@@ -1,4 +1,4 @@
-module.exports.normalizeToCurrentFinacialYear = () => {
+module.exports.normalizeToCurrentFinancialYear = () => {
   const now = new Date();
   const year = now.getUTCFullYear();
   const fyYear = now.getUTCMonth() < 3 ? year - 1 : year;

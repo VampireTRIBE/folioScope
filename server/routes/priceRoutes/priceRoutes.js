@@ -12,7 +12,7 @@ const {
 const { verifyAccessToken } = require("../../middlewares/authentication");
 const {
   validateID,
-} = require("../../utils/validations/contentValidater/validateID");
+} = require("../../utils/validations/contentValidator/validateID");
 
 // ! Validate Request Data
 

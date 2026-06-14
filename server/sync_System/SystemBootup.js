@@ -43,13 +43,13 @@ module.exports.systemBootup = async () => {
     // 1. INIT CACHE
     // =========================
     await runWithRetry(() => init_CacheMaster(), "INIT CACHE");
-    log.success("INIT CACHE SUCCESSFULL");
+    log.success("INIT CACHE SUCCESSFUL");
 
     // =========================
     // 2. INIT APPSCRIPT
     // =========================
     await runWithRetry(() => init_AppscriptMaster(), "INIT APPSCRIPT");
-    log.success("INIT APPSCRIPT SUCCESSFULL");
+    log.success("INIT APPSCRIPT SUCCESSFUL");
 
     // =========================
     // 3. UPDATE NAV
@@ -60,7 +60,7 @@ module.exports.systemBootup = async () => {
     ]);
     if (!userIds.length) {
       log.error("No UserId Found...");
-      log.success("BOOTSTRAP COMPLETED SUCCESSFULLY");
+      log.success("BOOTSTRAP COMPLETED SUCCESSFULY");
       return;
     }
     const BATCH_SIZE = 10;
@@ -106,7 +106,7 @@ module.exports.systemBootup = async () => {
     // =========================
     // DONE
     // =========================
-    log.success("BOOTSTRAP COMPLETED SUCCESSFULLY");
+    log.success("BOOTSTRAP COMPLETED SUCCESSFULY");
   } catch (err) {
     console.error("FATAL ERROR:", err.message);
   }

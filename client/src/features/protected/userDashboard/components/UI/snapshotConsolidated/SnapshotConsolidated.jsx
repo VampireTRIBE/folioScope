@@ -2,7 +2,7 @@
 import PriceBadge from "../../../../../../components/layout/public/priceBadge/PriceBadge";
 
 // ! Styles
-import snapshotConsolidatedSytles from "./snapshotconsolidated.module.css";
+import snapshotConsolidatedStyles from "./snapshotconsolidated.module.css";
 
 const SnapshotConsolidated = ({ snapshot = null }) => {
   const currentValue = {
@@ -16,17 +16,17 @@ const SnapshotConsolidated = ({ snapshot = null }) => {
   };
 
   return (
-    <div className={snapshotConsolidatedSytles.container}>
-      <h4 className={snapshotConsolidatedSytles.text}>Consolidated Snapshot</h4>
-      <div className={snapshotConsolidatedSytles.subContainer}>
+    <div className={snapshotConsolidatedStyles.container}>
+      <h4 className={snapshotConsolidatedStyles.text}>Consolidated Snapshot</h4>
+      <div className={snapshotConsolidatedStyles.subContainer}>
         <div>Net Current Value : </div>
         <PriceBadge price={currentValue} currency={true} percentage={false} />
       </div>
-      <div className={snapshotConsolidatedSytles.subContainer}>
+      <div className={snapshotConsolidatedStyles.subContainer}>
         <div>Consolidated Cash : </div>
         <PriceBadge price={cash} currency={true} percentage={false} />
       </div>
-      <div className={snapshotConsolidatedSytles.subContainerPnl}>
+      <div className={snapshotConsolidatedStyles.subContainerPnl}>
         <div>Consolidated Tax : </div>
         <div>
           <PriceBadge price={tax} currency={true} percentage={false} />

@@ -25,7 +25,7 @@ module.exports.update_Classification = async (req, res, next) => {
     await AssetClassification_Seeder();
     await init_CacheAssetDataStructure();
     return res.status(200).json({
-      success: "Classification Seeding SuccessFull",
+      success: "Classification Seeding Successful",
     });
   } catch (error) {
     next(error);
@@ -40,7 +40,7 @@ module.exports.update_AssetMetaData = async (req, res, next) => {
     await init_CacheAssetMetaData();
     await init_LivePriceTicker();
     return res.status(200).json({
-      success: "AssetMetaData Update SuccessFull",
+      success: "AssetMetaData Update Successful",
       summary,
     });
   } catch (error) {

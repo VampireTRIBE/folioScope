@@ -12,7 +12,7 @@ import { useHeaderUserActions } from "../../../hooks/useHeadersActionsUser";
 import mobileHeaderStyle from "./mobileheader.module.css";
 
 // ! Components
-import BrandComponet from "../../../../../../components/UI/others/BrandComponet";
+import BrandComponent from "../../../../../../components/UI/others/BrandComponent";
 import ProfileSideBar from "../../../../../../components/layout/public/sideBar/ProfileSideBar";
 import ImgButton from "../../../../../../components/UI/buttons/ImgButton";
 import MobileViewSearchBar from "../../mobileSearchbar/MobileViewSearchBar";
@@ -40,7 +40,7 @@ const MobileHeader = () => {
   const view = true;
   return (
     <header className={mobileHeaderStyle.header}>
-      <BrandComponet />
+      <BrandComponent />
       <nav className={mobileHeaderStyle.nav}>
         {navbarButtons.map((el, index) => (
           <ImgButton key={el.id || index} {...el} />

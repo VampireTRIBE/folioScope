@@ -13,13 +13,13 @@ import { useFormDataActions } from "../../../hooks/customHooks/useFormData";
 import { useNavigationActions } from "../../../../../hooks/customHooks/useNavigationActions";
 
 // ! selectors
-import { selectActiveSingupFormError } from "../../../redux/singupFormSelector";
+import { selectActiveSignupFormError } from "../../../redux/signupFormSelector";
 import Success from "../../../../../../components/layout/public/success/success";
 
 const SignupForm = () => {
   const { imgAttributesBrandLogo } = useStaticData();
   const { status, error, errorMessage, success, successMessage } = useSelector(
-    selectActiveSingupFormError,
+    selectActiveSignupFormError,
   );
   const { submitFormSignupData } = useFormDataActions();
   const { goToLogin } = useNavigationActions();

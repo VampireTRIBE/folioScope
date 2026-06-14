@@ -1,4 +1,4 @@
-const AssetPriceHistoryModel = require("../../../models/AssetsData_Models/Metrix_Models/AssetPriceHistory");
+const AssetPriceHistoryModel = require("../../../models/AssetsData_Models/Metrics_Models/AssetPriceHistory");
 const {
   callAppsScript,
 } = require("../../../services/appsScript/appsScriptService");
@@ -10,7 +10,7 @@ const {
 } = require("../../../init_Scripts/init_Cache/AssetsData_Models_Cache/init_cacheFiles/assetMetaDataCache");
 const {
   validate_AssetPriceHistory,
-} = require("../../../utils/validations/contentValidater/validate_AssetPriceHistory");
+} = require("../../../utils/validations/contentValidator/validate_AssetPriceHistory");
 
 module.exports.PriceHistory_Seeder = async (name = null) => {
   try {

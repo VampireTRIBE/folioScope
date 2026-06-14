@@ -13,7 +13,7 @@ import { useNavigationActions } from "../../../../../hooks/customHooks/useNaviga
 import { FETCH_MARKETGLANCE } from "../../../api/FETCH_APIs.js";
 
 const MarketGlance = () => {
-  const { goToSecurityDashbord } = useNavigationActions();
+  const { goToSecurityDashboard } = useNavigationActions();
 
   const { data, isPending, isError, error } = useQuery({
     queryKey: ["MarketGlance"],
@@ -46,9 +46,9 @@ const MarketGlance = () => {
       <h3 className={marketGlanceStyle.sectionTitle}>Market Glance</h3>
 
       <div className={marketGlanceStyle.content}>
-        <CardWrapperType1 cardData={data1} onClick={goToSecurityDashbord} />
-        <CardWrapperType1 cardData={data2} onClick={goToSecurityDashbord} />
-        <CardWrapperType1 cardData={data3} onClick={goToSecurityDashbord} />
+        <CardWrapperType1 cardData={data1} onClick={goToSecurityDashboard} />
+        <CardWrapperType1 cardData={data2} onClick={goToSecurityDashboard} />
+        <CardWrapperType1 cardData={data3} onClick={goToSecurityDashboard} />
       </div>
     </section>
   );

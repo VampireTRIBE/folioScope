@@ -1,4 +1,4 @@
-import { BASE_URL } from "../../../../constants/axiosIntance";
+import { BASE_URL } from "../../../../constants/axiosInstance";
 
 export const FETCH_GROUPMETADATA = async (accessToken, gp_id = "null") => {
   const response = await BASE_URL.get(`/portfolio/${gp_id}`, {

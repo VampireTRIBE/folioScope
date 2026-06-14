@@ -1,14 +1,14 @@
 import { useContext } from "react";
 import { useParams } from "react-router-dom";
 
-// ! componets
+// ! components
 import CardType3 from "../../../../../components/layout/public/card/CardType3";
 import OverView from "../../../../../components/layout/public/Overview/OverView";
 
 // ! layouts
 import DrawdownAnalysis from "../priceAnalysis/DrawdownAnalysis";
-import ComparisionAnalysis from "../priceAnalysis/ComparisionAnalysis";
-import PorfolioSnapshot from "../portfolioSnapshot/PorfolioSnapshot";
+import ComparisonAnalysis from "../priceAnalysis/ComparisonAnalysis";
+import PortfolioSnapshot from "../portfolioSnapshot/PortfolioSnapshot";
 
 // ! Styles
 import portfolioContentStyles from "./portfoliocontent.module.css";
@@ -20,7 +20,7 @@ import { AuthenticationContext } from "../../../../../context/authenticationCont
 import { useGROUPMETADATA } from "../../hooks/ReactQuery/useQuery";
 
 // ! custom Hooks
-import { useStaticDataSecurityContent } from "../../../../public/securityDashbord/hooks/custom Hooks/useStaticData/useStaticData";
+import { useStaticDataSecurityContent } from "../../../../public/securityDashboard/hooks/custom Hooks/useStaticData/useStaticData";
 
 const PortfolioContent = () => {
   const { gp_id } = useParams();
@@ -55,12 +55,12 @@ const PortfolioContent = () => {
           })}
       </div>
 
-      <PorfolioSnapshot />
+      <PortfolioSnapshot />
 
       <OverView {...overview} />
 
       <DrawdownAnalysis />
-      <ComparisionAnalysis />
+      <ComparisonAnalysis />
     </div>
   );
 };

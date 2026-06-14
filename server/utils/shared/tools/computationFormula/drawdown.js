@@ -1,4 +1,4 @@
-module.exports.comparisionDrawdownFuntion = (
+module.exports.comparisonDrawdownFunction = (
   currentDate = null,
   startDate = null,
   normalizeNavsSeries,
@@ -168,7 +168,7 @@ module.exports.comparisionDrawdownFuntion = (
 
 
 
-module.exports.singleDrawdownFuntion = (
+module.exports.singleDrawdownFunction = (
   currentDate = null,
   startDate = null,
   normalizeNavsSeries,

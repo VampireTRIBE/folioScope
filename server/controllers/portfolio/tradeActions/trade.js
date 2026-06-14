@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const PortfolioGroupModel = require("../../../models/Portfolio_Models/PortfolioGroup_Models/portfolioGroup");
 const PortfolioGroupStatementModel = require("../../../models/Portfolio_Models/ledger_Models/groupStatement");
-const FinantialAssetModel = require("../../../models/Portfolio_Models/PortfolioMetrix_Models/financialAsset");
+const FinancialAssetModel = require("../../../models/Portfolio_Models/PortfolioMetrics_Models/financialAsset");
 const LedgerStatementModel = require("../../../models/Portfolio_Models/ledger_Models/ledgerStatement");
 const FifoLotModel = require("../../../models/Portfolio_Models/ledger_Models/fifoLedgerStatement");
 
@@ -27,7 +27,7 @@ const LOCK_TIMEOUT = 1000 * 60; // 1 minute
 // =====================================================
 const acquireLock = async (assetId, session) => {
   const now = new Date();
-  const locked = await FinantialAssetModel.findOneAndUpdate(
+  const locked = await FinancialAssetModel.findOneAndUpdate(
     {
       _id: assetId,
       $or: [
@@ -51,7 +51,7 @@ const acquireLock = async (assetId, session) => {
 };
 
 const releaseLock = async (assetId) => {
-  await FinantialAssetModel.updateOne(
+  await FinancialAssetModel.updateOne(
     { _id: assetId },
     {
       $set: {
@@ -109,7 +109,7 @@ module.exports.tradeTransaction = async (req) => {
       throw new Error("Cannot transact index directly");
     }
 
-    asset = await FinantialAssetModel.findOne({
+    asset = await FinancialAssetModel.findOne({
       assetMetadataId: a_id,
       portfolioGroupId: pg_id,
       userId: userID,
@@ -117,7 +117,7 @@ module.exports.tradeTransaction = async (req) => {
 
     // ================= CREATE + LOCK (FIRST BUY) =================
     if (!asset && type === "buy") {
-      const created = await FinantialAssetModel.create(
+      const created = await FinancialAssetModel.create(
         [
           {
             name,
@@ -226,7 +226,7 @@ module.exports.tradeTransaction = async (req) => {
           { session },
         ),
 
-        FinantialAssetModel.findOneAndUpdate(
+        FinancialAssetModel.findOneAndUpdate(
           {
             assetMetadataId: a_id,
             portfolioGroupId: pg_id,
@@ -320,7 +320,7 @@ module.exports.tradeTransaction = async (req) => {
           { session },
         ),
 
-        FinantialAssetModel.updateOne(
+        FinancialAssetModel.updateOne(
           { _id: asset._id },
           {
             $inc: {
@@ -366,7 +366,7 @@ module.exports.tradeTransaction = async (req) => {
           { session },
         ),
 
-        FinantialAssetModel.updateOne(
+        FinancialAssetModel.updateOne(
           { _id: asset._id },
           {
             $inc: {

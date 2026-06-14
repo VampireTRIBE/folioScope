@@ -1,4 +1,4 @@
-import { BASE_URL_withCredentials } from "../../../../constants/axiosIntance";
+import { BASE_URL_withCredentials } from "../../../../constants/axiosInstance";
 
 export const POST_VERIFYEMAIL = async (token) => {
   const response = await BASE_URL.post(

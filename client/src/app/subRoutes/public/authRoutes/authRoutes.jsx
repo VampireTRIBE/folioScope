@@ -4,7 +4,7 @@ import SendVerificationMailOutlet from "../../../../features/public/sendVerifica
 import LoginOutlet from "../../../../features/public/login/outlets/LoginOutlet";
 import SendOTPMailOutlet from "../../../../features/public/sendOTPMail/outlets/SendOTPMailOutlet";
 import SubmitOtpOutlet from "../../../../features/public/otpSubmit/outlets/submitOtpOutlet";
-import ConfirmPasswordOutlet from "../../../../features/public/conformPassword/outlets/ConfirmPasswordOutlet";
+import ConfirmPasswordOutlet from "../../../../features/public/confirmPassword/outlets/ConfirmPasswordOutlet";
 
 export const authRoutes = [
   {

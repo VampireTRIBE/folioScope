@@ -35,9 +35,9 @@ export const useNavigationActions = () => {
     navigate(ROUTES.HOME);
   }, [navigate]);
 
-  const goToSecurityDashbord = useCallback(
+  const goToSecurityDashboard = useCallback(
     (security) => {
-      navigate(ROUTES.SECURITYDASHBORD(security));
+      navigate(ROUTES.SECURITYDASHBOARD(security));
     },
     [navigate],
   );
@@ -51,8 +51,8 @@ export const useNavigationActions = () => {
     [navigate],
   );
 
-  const goToUserDashBord = useCallback(() => {
-    navigate(ROUTES.USERDASHBORD, { replace: true });
+  const goToUserDashboard = useCallback(() => {
+    navigate(ROUTES.USERDASHBOARD, { replace: true });
   }, [navigate]);
 
   const goToUserProfile = useCallback(() => {
@@ -66,9 +66,9 @@ export const useNavigationActions = () => {
     goToConfirmPassword,
     goToSignup,
     gotoHome,
-    goToSecurityDashbord,
+    goToSecurityDashboard,
     goToSendVerificationMail,
-    goToUserDashBord,
+    goToUserDashboard,
     goToUserProfile,
   };
 };

@@ -3,7 +3,7 @@ import { useState } from "react";
 import PriceBadge from "../../../../../../components/layout/public/priceBadge/PriceBadge";
 
 // ! Styles
-import snapshotCurrentSytles from "./snapshotcurrent.module.css";
+import snapshotCurrentStyles from "./snapshotcurrent.module.css";
 
 const CurrentStatus = ({ currentStatus = null }) => {
   const [xirr, setXirr] = useState(false);
@@ -20,8 +20,8 @@ const CurrentStatus = ({ currentStatus = null }) => {
   };
 
   return (
-    <div className={snapshotCurrentSytles.container}>
-      <div className={snapshotCurrentSytles.subContainer}>
+    <div className={snapshotCurrentStyles.container}>
+      <div className={snapshotCurrentStyles.subContainer}>
         <div>Investment Value : </div>
         <PriceBadge
           price={investmentValue}
@@ -29,17 +29,17 @@ const CurrentStatus = ({ currentStatus = null }) => {
           percentage={false}
         />
       </div>
-      <div className={snapshotCurrentSytles.subContainer}>
+      <div className={snapshotCurrentStyles.subContainer}>
         <div>Current Value : </div>
         <PriceBadge price={currentValue} currency={true} percentage={false} />
       </div>
-      <div className={snapshotCurrentSytles.subContainerPnl}>
+      <div className={snapshotCurrentStyles.subContainerPnl}>
         <div>Unrealized P/L : </div>
         <div>
           <PriceBadge price={pl} currency={true} />
         </div>
       </div>
-      <div className={snapshotCurrentSytles.subContainerPnl}>
+      <div className={snapshotCurrentStyles.subContainerPnl}>
         <div>XIRR : </div>
         {xirr ? (
           <div>
@@ -47,7 +47,7 @@ const CurrentStatus = ({ currentStatus = null }) => {
           </div>
         ) : (
           <button
-            className={snapshotCurrentSytles.xirrButton}
+            className={snapshotCurrentStyles.xirrButton}
             onClick={() => setXirr(true)}>
             View
           </button>

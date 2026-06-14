@@ -1,8 +1,8 @@
-import SecurityDashbord from "../../../../features/public/securityDashbord/outlets/SecurityDashbord";
+import SecurityDashboard from "../../../../features/public/securityDashboard/outlets/SecurityDashboard";
 
 export const securityRoutes = [
   {
     path: ":securityID",
-    element: <SecurityDashbord />,
+    element: <SecurityDashboard />,
   },
 ];

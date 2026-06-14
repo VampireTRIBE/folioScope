@@ -31,7 +31,7 @@ const {
 } = require("../../controllers/users/userControllers");
 const {
   validateParamsEmail,
-} = require("../../utils/validations/contentValidater/validateEmail");
+} = require("../../utils/validations/contentValidator/validateEmail");
 
 // routes
 

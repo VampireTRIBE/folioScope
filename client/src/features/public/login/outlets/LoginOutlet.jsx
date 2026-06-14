@@ -1,4 +1,4 @@
-// ! componets
+// ! components
 import Login from "../components/layout/login/Login";
 
 // ! styles

@@ -22,7 +22,7 @@ import { AuthenticationContext } from "../../../../context/authenticationContext
 const EmailVerificationOutlet = () => {
   const { setUser } = useContext(AuthenticationContext);
   const { emailToken } = useParams();
-  const { goToUserDashBord } = useNavigationActions();
+  const { goToUserDashboard } = useNavigationActions();
   const { submitFormEmailVerificationRetryData } = useFormDataActions();
 
   const {
@@ -43,7 +43,7 @@ const EmailVerificationOutlet = () => {
   if (isSuccess) {
     setUser(respLoginForm?.accessToken);
     setTimeout(() => {
-      goToUserDashBord();
+      goToUserDashboard();
     }, 200);
   }
 

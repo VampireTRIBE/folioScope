@@ -201,13 +201,13 @@ The frontend is organized using a feature-based structure.
 ### Main Frontend Areas
 
 - `features/public/home` - homepage, market sections, about section, service section, advertisements
-- `features/public/securityDashbord` - security overview, price chart, metadata, and analysis views
+- `features/public/securityDashboard` - security overview, price chart, metadata, and analysis views
 - `features/public/login` - login flow
 - `features/public/signup` - signup flow
 - `features/public/emailverification` - email verification flow
 - `features/public/otpSubmit` - OTP verification flow
 - `features/public/sendOTPMail` - forgot password OTP request flow
-- `features/public/conformPassword` - password reset confirmation flow
+- `features/public/confirmPassword` - password reset confirmation flow
 - `features/protected/userDashboard` - protected portfolio dashboard area
 - `components/layout/public` - reusable public layout components
 - `components/UI` - buttons, inputs, labels, and shared UI primitives

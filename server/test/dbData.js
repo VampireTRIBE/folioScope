@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const {
   normalizeToIST330PM,
-} = require("../utils/shared_Utils/helpers/getCurrentFinacialyear");
+} = require("../utils/transformData/normalizeDates");
 
 module.exports.fetchAssetPriceHistories = async (assetid, startDate) => {
   const AssetPriceHistory = mongoose.model("AssetPriceHistory");

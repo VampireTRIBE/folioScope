@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import analysisCardStyle from "./analysisCard.module.css";
 
 // ! Components
-import DrawdonwAnalysisCard from "./drawdownCard/DrawdonwAnalysisCard";
+import DrawdownPeriodCard from "./drawdownCard/DrawdownAnalysisCard";
 
 const DrawdownAnalysisCard = ({ drawdownDetails = [] }) => {
   const periods = ["3 Months", "1 Year", "3 Year", "Max"];
@@ -24,13 +24,13 @@ const DrawdownAnalysisCard = ({ drawdownDetails = [] }) => {
       <h4 className={analysisCardStyle.cardTitle}>Drawdown Analysis</h4>
       <div className={analysisCardStyle.cardContent}>
         {drawdownDetails.map((period, indx) => (
-          <DrawdonwAnalysisCard key={period?.id ?? indx} {...period} />
+          <DrawdownPeriodCard key={period?.id ?? indx} {...period} />
         ))}
       </div>
       <div className={analysisCardStyle.disclaimer}>
         <div className={analysisCardStyle.disclaimerDetail}>
-          <span>Disclaimer : </span> Drawdown Analysis this include weekend and
-          holdays days with Caried Forwarded Price.
+          <span>Disclaimer : </span> Drawdown analysis includes weekends and
+          holidays with carried-forward prices.
           <Link to={"/disclaimer/drawdown"}> Learn More</Link>
         </div>
       </div>

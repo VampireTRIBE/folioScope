@@ -3,11 +3,11 @@ import { useParams } from "react-router-dom";
 // ! styles
 import drawdownAnalysisStyle from "./drawdownanalysis.module.css";
 
-// ! Componets
+// ! Components
 import DrawdownAnalysisCard from "../../../../../components/layout/public/analysis/DrawdownAnalysisCard";
 
 // ! tanStack Query Hook
-import { useSecurityDrawdown } from "../../../../public/securityDashbord/hooks/RTK Query/useSecurityQuery";
+import { useSecurityDrawdown } from "../../../../public/securityDashboard/hooks/RTK Query/useSecurityQuery";
 
 const DrawdownAnalysis = () => {
   const { securityID } = useParams();

@@ -2,10 +2,10 @@ const mongoose = require("mongoose");
 
 const LedgerStatementModel = require("../../../models/Portfolio_Models/ledger_Models/ledgerStatement");
 const FifoLotModel = require("../../../models/Portfolio_Models/ledger_Models/fifoLedgerStatement");
-const FinantialAssetModel = require("../../../models/Portfolio_Models/PortfolioMetrix_Models/financialAsset");
+const FinancialAssetModel = require("../../../models/Portfolio_Models/PortfolioMetrics_Models/financialAsset");
 
 const {
-  normalizeToCurrentFinacialYear,
+  normalizeToCurrentFinancialYear,
 } = require("../../transformData/normalizeDates");
 
 const { get_AllFinancialAsset } = require("./get_financialAssets");
@@ -21,7 +21,7 @@ module.exports.update_AssetSnapshots = async (
   if (!userId) {
     throw new CustomError(400, "UserID Required");
   }
-  const start = new Date(normalizeToCurrentFinacialYear());
+  const start = new Date(normalizeToCurrentFinancialYear());
   const assetMap = await get_AllFinancialAsset(userId, session);
   const assetIds = Object.keys(assetMap);
   if (assetIds.length === 0) return;
@@ -155,7 +155,7 @@ module.exports.update_AssetSnapshots = async (
   });
 
   if (bulkOps.length > 0) {
-    await FinantialAssetModel.bulkWrite(bulkOps, { session });
+    await FinancialAssetModel.bulkWrite(bulkOps, { session });
   }
   return { result: true };
 };

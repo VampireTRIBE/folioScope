@@ -1,4 +1,4 @@
-// ! componets
+// ! components
 import LoginForm from "../loginForm/LoginForm";
 
 // ! styles

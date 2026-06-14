@@ -8,7 +8,7 @@ const log = require("../../../utils/shared/console_Loggers/consoleLoggers");
 
 const {
   validate_AssetMetadata,
-} = require("../../../utils/validations/contentValidater/validate_AssetMetadata");
+} = require("../../../utils/validations/contentValidator/validate_AssetMetadata");
 
 module.exports.AssetMetadata_Seeder = async () => {
   try {
