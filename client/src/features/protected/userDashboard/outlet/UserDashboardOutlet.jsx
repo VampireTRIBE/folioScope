@@ -11,40 +11,49 @@ import { AuthenticationContext } from "../../../../context/authenticationContext
 import { useNavigationActions } from "../../../hooks/customHooks/useNavigationActions";
 
 // ! Tanstck Query
-import { useGROUPMETADATA } from "../hooks/ReactQuery/useQuery";
+import {
+  use1DNavRangeGroup,
+  useGROUPMETADATA,
+} from "../hooks/ReactQuery/useQuery";
 
 // ! Layout Components
 import PortfolioMetadata from "../layout/portfolioMetaData/PortfolioMetadata";
 import PortfolioDetails from "../layout/portfolioDetails/portfolioDetails";
 
 const UserDashboardOutlet = () => {
-  const { gp_id } = useParams();
-  const { user } = useContext(AuthenticationContext);
+  const { gp_id, level } = useParams();
+  const { accessToken, userData } = useContext(AuthenticationContext);
   const { goToLogin } = useNavigationActions();
+  const groupId = `${userData?.groups?.[`level${level}`]?.[gp_id]?._id}`;
 
   const {
     data: GroupMeatadataData,
     isPending: GroupMeatadataPending,
     isError: GroupMeatadataisError,
     error: GroupMeatadataError,
-  } = useGROUPMETADATA(user, gp_id);
+  } = useGROUPMETADATA(accessToken, groupId);
 
-  
+  const {
+    data: nav1DData,
+    isPending: nav1DPending,
+    isError: nav1DisError,
+    error: nav1DError,
+  } = use1DNavRangeGroup(groupId, accessToken);
 
-  let content = {
+  const content = {
     name: GroupMeatadataData?.data?.groupName || "Name",
     category: `Level ${GroupMeatadataData?.data?.level || "-"}`,
     price: {
-      currentPrice: 0.0,
-      todayChangePercent: "0.00",
+      currentPrice: nav1DData?.currentPrice,
+      todayChangePercent: nav1DData?.todayChange,
     },
   };
 
   useEffect(() => {
-    if (!user) {
+    if (!accessToken) {
       goToLogin();
     }
-  }, [user, goToLogin]);
+  }, [accessToken, goToLogin]);
 
   return (
     <main className={userDashboardOutletStyles.outlet}>

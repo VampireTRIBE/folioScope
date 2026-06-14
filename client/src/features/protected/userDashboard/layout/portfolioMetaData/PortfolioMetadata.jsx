@@ -12,7 +12,6 @@ import { AuthenticationContext } from "../../../../../context/authenticationCont
 
 // ! tanStack Query Hooks
 import { useGROUPMETADATA } from "../../hooks/ReactQuery/useQuery";
-// import { use1DPriceRange } from "../../../../hooks/RKT Query/usePricesQuery";
 
 const PortfolioMetadata = ({ content = {} }) => {
   return (

@@ -24,6 +24,9 @@ const {
 } = require("../../../../utils/mongodb/aggregations/readModels/read_Auth_Models/validate_User");
 const { createSession } = require("../createSession");
 const { cookieObj } = require("../../../../utils/authentication/cookieObj");
+const {
+  find_AllPortfolioGroups_BY_Level,
+} = require("../../../../utils/mongodb/aggregations/readModels/read_PortfolioGroup_Models/read_PortfolioGroupIDsBylevel");
 
 module.exports.register_Service = async (req, res, next) => {
   try {
@@ -111,10 +114,44 @@ module.exports.login_Service = async (req, res, next) => {
     res.cookie("refreshToken", refreshToken, cookieObj);
     res.cookie("sessionId", sessionId, cookieObj);
 
+    // find Users portolio Groups
+
+    const filterObjLevel1 = { userId: user._id, level: 1 };
+    const filterObjLevel2 = { userId: user._id, level: 2 };
+    const filterObjLevel3 = { userId: user._id, level: 3 };
+    const filterObjLevel4 = { userId: user._id, level: 4 };
+
+    const [level1_Groups, level2_Groups, level3_Groups, level4_Groups] =
+      await Promise.all([
+        find_AllPortfolioGroups_BY_Level({
+          filterObj: filterObjLevel1,
+        }),
+        find_AllPortfolioGroups_BY_Level({
+          filterObj: filterObjLevel2,
+        }),
+        find_AllPortfolioGroups_BY_Level({
+          filterObj: filterObjLevel3,
+        }),
+        find_AllPortfolioGroups_BY_Level({
+          filterObj: filterObjLevel4,
+        }),
+      ]);
+
     return res.status(200).json({
       success: true,
       message: "Login successful",
       accessToken,
+      user: {
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        groups: {
+          level1: level1_Groups,
+          level2: level2_Groups,
+          level3: level3_Groups,
+          level4: level4_Groups,
+        },
+      },
     });
   } catch (error) {
     return next(error);

@@ -125,9 +125,9 @@ module.exports.read_PriceRange = async (securityId, startDate = null) => {
 
 module.exports.read_GroupPriceRange1D = async (groupid, userId) => {
   try {
-    const GROUP_NAV_MODEL = mongoose.model("portfolioGroup");
+    const GROUP_NAV_MODEL = mongoose.model("navPerformence");
     if (!groupid || !userId) {
-      throw new customErrortomError("Group or User Id Required", 400);
+      throw new customError("Group or User Id Required", 400);
     }
 
     const prices = await GROUP_NAV_MODEL.find({
@@ -161,24 +161,21 @@ module.exports.read_GroupPriceRange1D = async (groupid, userId) => {
   }
 };
 
-module.exports.read_GroupPriceRange = async (securityId, startDate = null) => {
+module.exports.read_GroupPriceRange = async (
+  groupid,
+  userId,
+  startDate = null,
+) => {
   try {
-    const GROUP_NAV_MODEL = mongoose.model("portfolioGroup");
+    const GROUP_NAV_MODEL = mongoose.model("navPerformence");
 
-    if (!securityId) {
-      throw new customError("Security Id Required", 400);
+    if (!groupid || !userId) {
+      throw new customError("Missing Payload", 400);
     }
-
-    const securityDetail = get_SingleAssetMetaDataName(securityId);
-
-    if (!securityDetail) {
-      throw new customError("Data Not Available", 404);
-    }
-
-    const { _id } = securityDetail;
 
     const query = {
-      assetId: _id,
+      userId,
+      portfolioGroupId: groupid,
     };
 
     if (startDate) {
@@ -187,9 +184,9 @@ module.exports.read_GroupPriceRange = async (securityId, startDate = null) => {
       };
     }
 
-    const prices = await PRICE_MODEL.find(query)
+    const prices = await GROUP_NAV_MODEL.find(query)
       .sort({ date: 1 })
-      .select("date close")
+      .select("date nav")
       .lean();
 
     if (prices.length === 0) {
@@ -204,12 +201,12 @@ module.exports.read_GroupPriceRange = async (securityId, startDate = null) => {
     let high = -Infinity;
     let low = Infinity;
 
-    const series = prices.map(({ date, close }) => {
-      if (high < close) high = close;
-      if (low > close) low = close;
+    const series = prices.map(({ date, nav }) => {
+      if (high < nav) high = nav;
+      if (low > nav) low = nav;
       return {
         time: date.toISOString().split("T")[0],
-        value: Number(close),
+        value: Number(nav),
       };
     });
 

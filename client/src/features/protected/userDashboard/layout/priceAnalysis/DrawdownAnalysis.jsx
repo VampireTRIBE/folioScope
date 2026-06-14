@@ -1,3 +1,4 @@
+import { useContext } from "react";
 import { useParams } from "react-router-dom";
 
 // ! styles
@@ -7,11 +8,17 @@ import drawdownAnalysisStyle from "./drawdownanalysis.module.css";
 import DrawdownAnalysisCard from "../../../../../components/layout/public/analysis/DrawdownAnalysisCard";
 
 // ! tanStack Query Hook
-import { useSecurityDrawdown } from "../../../../public/securityDashboard/hooks/RTK Query/useSecurityQuery";
+import { useGroupDrawdown } from "../../hooks/ReactQuery/useQuery";
+
+// ! context
+import { AuthenticationContext } from "../../../../../context/authenticationContext";
 
 const DrawdownAnalysis = () => {
-  const { securityID } = useParams();
-  const { data: drawdownData } = useSecurityDrawdown(securityID);
+  const { gp_id, level } = useParams();
+  const { accessToken, userData } = useContext(AuthenticationContext);
+  const groupId = `${userData?.groups?.[`level${level}`]?.[gp_id]?._id}`;
+
+  const { data: drawdownData } = useGroupDrawdown(groupId, accessToken);
 
   const drawdownDetails = [];
   const drawdownDataKeys = drawdownData ? Object.keys(drawdownData) : [];

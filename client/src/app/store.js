@@ -6,7 +6,7 @@ import securitychartRangeFilterState from "../features/public/securityDashboard/
 
 import groupchartRangeFilterState from "../features/protected/userDashboard/redux/groupPriceChartState";
 
-import signupErrorState from "../features/public/signup/redux/signupFormState";
+import signupErrorState from "../features/public/Authentication/signup/redux/signupFormState";
 
 const store = configureStore({
   reducer: {

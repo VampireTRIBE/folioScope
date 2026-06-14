@@ -2,7 +2,6 @@ import React from "react";
 import ImgButton from "../../../UI/buttons/ImgButton";
 
 import pricebadgeStyle from "./pricebadge.module.css";
-import cardContentType1Style from "../cardContent/cardcontentType1.module.css";
 
 const PriceBadge = ({
   price,

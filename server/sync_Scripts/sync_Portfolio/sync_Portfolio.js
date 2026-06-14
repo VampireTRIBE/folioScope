@@ -44,7 +44,7 @@ module.exports.sync_Portfolio = async (userID = null) => {
   try {
     let userIds = [userID];
     if (!userID) {
-      userIds = await get_AllUserIDs(session);
+      userIds = await get_AllUserIDs();
       if (userIds.length === 0) {
         return { success: false };
       }

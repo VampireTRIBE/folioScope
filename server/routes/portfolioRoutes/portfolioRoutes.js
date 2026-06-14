@@ -32,7 +32,7 @@ const { verifyAccessToken } = require("../../middlewares/authentication");
 // ! Portfolio Group POST Routes
 router
   .route("/:pg_id")
-  .get(verifyAccessToken, get_GroupMetadata)
+  .get(verifyAccessToken, validateID("pg_id"), get_GroupMetadata)
   .post(verifyAccessToken, validateID("pg_id"), addGroup)
   .patch(verifyAccessToken, validateID("pg_id"), updateGroup)
   .delete(verifyAccessToken, validateID("pg_id"), deleteGroup);

@@ -26,7 +26,7 @@ import { todaysMarketToggleActions } from "../../../redux/todaysMarketsState";
 import { AuthenticationContext } from "../../../../../../context/authenticationContext";
 
 const TodaysMarkets = () => {
-  const { user } = useContext(AuthenticationContext);
+  const { accessToken } = useContext(AuthenticationContext);
 
   const activeStockCategory = useSelector(selectActiveFilterByGroup("Stocks"));
   const activeEtfCategory = useSelector(selectActiveFilterByGroup("Etfs"));
@@ -37,7 +37,7 @@ const TodaysMarkets = () => {
   return (
     <section className={TodaysMarketStyle.section2}>
       <div className={TodaysMarketStyle.containerMarketData}>
-        {!user && <PortfolioAdd />}
+        {!accessToken && <PortfolioAdd />}
         <div className={TodaysMarketStyle.cardcontainer}>
           <Head activeCategory={activeStockCategory} />
           <Content activeCategory={activeStockCategory} />
@@ -51,7 +51,7 @@ const TodaysMarkets = () => {
           <Content activeCategory={activeMfCategory} />
         </div>
       </div>
-      {!user && (
+      {!accessToken && (
         <aside className={TodaysMarketStyle.adsContainer}>
           <h3>Connect with us</h3>
           <LoginAds />

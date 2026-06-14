@@ -19,9 +19,10 @@ import { AuthenticationContext } from "../../../../../context/authenticationCont
 import { useGROUPMETADATA } from "../../hooks/ReactQuery/useQuery";
 
 const PortfolioSnapshot = () => {
-  const { gp_id } = useParams();
-  const { user } = useContext(AuthenticationContext);
-  const { data: GroupMeatadataData } = useGROUPMETADATA(user, gp_id);
+  const { gp_id, level } = useParams();
+  const { accessToken, userData } = useContext(AuthenticationContext);
+  const groupId = `${userData?.groups?.[`level${level}`]?.[gp_id]?._id}`;
+  const { data: GroupMeatadataData } = useGROUPMETADATA(accessToken, groupId);
 
   return (
     <div className={portfolioSnapshotStyles.container}>

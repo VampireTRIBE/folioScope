@@ -24,18 +24,18 @@ const MobileHeader = () => {
   const profileToggle = useSelector(selectToggleByKey("profileToggle"));
   const menuToggle = useSelector(selectToggleByKey("menuToggle"));
 
-  // user state
-  const { user, setUser } = useContext(AuthenticationContext);
+  // accessToken state
+  const { accessToken, setAccessToken } = useContext(AuthenticationContext);
 
   // header Actions based on roles and login or not
   const { profileBtn, profileSidebarItems } = useHeaderActions();
   const { userprofileBtn, userprofileSidebarItems, userMneuSidebarItems } =
     useHeaderUserActions();
 
-  const navbarButtons = user ? userprofileBtn : profileBtn;
-  const profileSidebar = user ? userprofileSidebarItems : profileSidebarItems;
+  const navbarButtons = accessToken ? userprofileBtn : profileBtn;
+  const profileSidebar = accessToken ? userprofileSidebarItems : profileSidebarItems;
 
-  const menuOptions = user ? userMneuSidebarItems : null;
+  const menuOptions = accessToken ? userMneuSidebarItems : null;
 
   const view = true;
   return (

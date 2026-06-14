@@ -158,6 +158,7 @@ module.exports.get_DailyClosePricesByAsset = async (
   asset = null,
   startDate = null,
   nav = false,
+  userId = null,
   session = null,
   endDate = null,
 ) => {
@@ -185,28 +186,42 @@ module.exports.get_DailyClosePricesByAsset = async (
 
   const assetId = nav ? "portfolioGroupId" : "assetId";
 
+  let query1 = {
+    [assetId]: asset,
+    date: { $lt: startDate },
+  };
+  let query2 = {
+    [assetId]: asset,
+    date: { $gte: startDate, $lte: endDate },
+  };
+
+  if (nav) {
+    query1.userId = userId;
+    query2.userId = userId;
+  }
+
   const [seedData, rangeData] = await Promise.all([
-    reqested_Model
-      .findOne({
-        [assetId]: asset,
-        date: { $lt: startDate },
-      })
-      .sort({ date: -1 })
-      .session(session)
-      .lean(),
-    reqested_Model
-      .find({
-        [assetId]: asset,
-        date: { $gte: startDate, $lte: endDate },
-      })
-      .sort({ date: 1 })
-      .session(session)
-      .lean(),
+    reqested_Model.findOne(query1).sort({ date: -1 }).session(session).lean(),
+    reqested_Model.find(query2).sort({ date: 1 }).session(session).lean(),
   ]);
   let result = {};
 
-  if (seedData && seedData.close) {
+  if (!nav && seedData && seedData.close) {
     result[startDate.toISOString()] = seedData.close;
+  }
+
+  if (nav && seedData && seedData.nav) {
+    result[startDate.toISOString()] = {
+      nav: seedData.nav,
+      units: seedData.units,
+    };
+  }
+
+  let current = null;
+  if (seedData) {
+    current = new Date(startDate);
+  } else {
+    current = new Date(rangeData[0].date);
   }
 
   for (const data of rangeData) {
@@ -214,8 +229,6 @@ module.exports.get_DailyClosePricesByAsset = async (
       ? (result[data.date.toISOString()] = { nav: data.nav, units: data.units })
       : (result[data.date.toISOString()] = data.close);
   }
-
-  let current = new Date(startDate);
 
   while (current <= endDate) {
     const dateKey = current.toISOString();

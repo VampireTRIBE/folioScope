@@ -2,8 +2,9 @@ const AssetPriceHistoryModel = require("../../../../models/AssetsData_Models/Met
 const {
   callAppsScript,
 } = require("../../../../services/appsScript/appsScriptService");
+const log = require("../../../../utils/shared/console_Loggers/consoleLoggers");
 const customError = require("../../../../utils/shared/error/customError");
-const log = require("../../../../utils/shared/console_loggers/consoleLoggers");
+
 const {
   validate_AssetPriceHistory,
 } = require("../../../../utils/validations/contentValidator/validate_AssetPriceHistory");

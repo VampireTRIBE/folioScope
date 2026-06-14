@@ -11,7 +11,7 @@ export const AuthenticationContext = createContext(null);
 const ROTATE_TIME = 8 * 60 * 1000;
 
 export const AuthenticationProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [accessToken, setAccessToken] = useState(null);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -40,7 +40,7 @@ export const AuthenticationProvider = ({ children }) => {
     try {
       const res = await rotateToken();
       const accessToken = res?.accessToken || null;
-      setUser(accessToken);
+      setAccessToken(accessToken);
       if (!accessToken) {
         setUserData(null);
         clearTimer();
@@ -49,7 +49,7 @@ export const AuthenticationProvider = ({ children }) => {
 
       schedule();
     } catch (err) {
-      setUser(null);
+      setAccessToken(null);
       setUserData(null);
       clearTimer();
     } finally {
@@ -62,7 +62,7 @@ export const AuthenticationProvider = ({ children }) => {
       try {
         const res = await rotateToken();
         const accessToken = res?.accessToken || null;
-        setUser(accessToken);
+        setAccessToken(accessToken);
         if (!accessToken) {
           setUserData(null);
           return;
@@ -72,7 +72,7 @@ export const AuthenticationProvider = ({ children }) => {
         setUserData(userDetails?.user || null);
         schedule();
       } catch (err) {
-        setUser(null);
+        setAccessToken(null);
         setUserData(null);
         clearTimer();
       } finally {
@@ -92,8 +92,8 @@ export const AuthenticationProvider = ({ children }) => {
   return (
     <AuthenticationContext.Provider
       value={{
-        user,
-        setUser,
+        accessToken,
+        setAccessToken,
         userData,
         setUserData,
       }}

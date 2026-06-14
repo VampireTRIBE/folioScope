@@ -113,7 +113,11 @@ export const useHeaderUserActions = () => {
       },
       {
         id: "menu-dashboard",
-        onClick: goToUserDashboard,
+        onClick: () =>
+          goToUserDashboard(
+            1,
+            `${userData?.groups?.level1?.["NET WORTH"]?.name}`,
+          ),
         children: "Dashboard",
         variant: "sideBarbtn",
         order: 1,

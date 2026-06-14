@@ -1,3 +1,4 @@
+import { useContext } from "react";
 import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 
@@ -16,20 +17,31 @@ import { selectActiveGroupChartFilter } from "../../redux/groupPriceChartSelecto
 import { useGroupChartActions } from "../../redux/dispatchActions";
 
 // ! tanStack Query Hooks
+import { useNavGroupChartRange } from "../../hooks/ReactQuery/useQuery";
+
+// ! context
+import { AuthenticationContext } from "../../../../../context/authenticationContext";
 
 const PriceChart = () => {
-  const { securityID } = useParams();
+  const { gp_id, level } = useParams();
+  const { accessToken, userData } = useContext(AuthenticationContext);
+  const groupId = `${userData?.groups?.[`level${level}`]?.[gp_id]?._id}`;
   const { FILTER_CHART_RANGE } = useGroupChartActions();
   const active = useSelector(selectActiveGroupChartFilter);
 
-  const chartRangeData = null;
+  const { data: groupNavchartRangeData } = useNavGroupChartRange(
+    groupId,
+    accessToken,
+    active,
+  );
+
   const highLowReturn = {
-    high: chartRangeData?.high ?? null,
-    low: chartRangeData?.low ?? null,
-    price: { today: chartRangeData?.periodReturn ?? null },
+    high: groupNavchartRangeData?.high ?? null,
+    low: groupNavchartRangeData?.low ?? null,
+    price: { today: groupNavchartRangeData?.periodReturn ?? null },
   };
 
-  const seriesData = chartRangeData?.series ?? [];
+  const seriesData = groupNavchartRangeData?.series ?? [];
 
   const buttonArray = [
     {

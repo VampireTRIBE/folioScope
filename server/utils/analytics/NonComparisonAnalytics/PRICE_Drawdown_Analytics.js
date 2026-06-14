@@ -14,24 +14,42 @@ module.exports.priceDrawdownAnalysis = async ({
   assetId = null,
   startDate = null,
   nav = false,
+  userID = null,
   session = null,
 }) => {
   if (!assetId || !startDate) {
     throw new customError("Missing Request Parameters", 400);
   }
-  const securityDetail = get_SingleAssetMetaDataName(assetId);
-  if (!securityDetail) {
-    throw new customError("Data Not Available", 404);
+
+  let pastPrices = null;
+
+  if (!nav) {
+    const securityDetail = get_SingleAssetMetaDataName(assetId);
+    if (!securityDetail) {
+      throw new customError("Data Not Available", 404);
+    }
+    const { _id } = securityDetail;
+    pastPrices = await get_DailyClosePricesByAsset(
+      _id,
+      new Date(startDate),
+      nav,
+      session,
+    );
+  } else {
+    const prices = await get_DailyClosePricesByAsset(
+      assetId,
+      new Date(startDate),
+      nav,
+      userID,
+      session,
+    );
+
+    const formatPrices = {};
+    for (const [key, value] of Object.entries(prices)) {
+      formatPrices[key] = value.nav;
+    }
+    pastPrices = formatPrices;
   }
-
-  const { _id } = securityDetail;
-  const pastPrices = await get_DailyClosePricesByAsset(
-    _id,
-    new Date(startDate),
-    nav,
-    session,
-  );
-
   let priceDrawdownAnalysis = {};
 
   const dateSeries = Object.keys(pastPrices);

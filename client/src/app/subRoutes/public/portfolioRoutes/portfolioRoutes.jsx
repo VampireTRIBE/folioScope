@@ -2,11 +2,11 @@ import UserDashboardOutlet from "../../../../features/protected/userDashboard/ou
 
 export const portfolioRoutes = [
   {
-    index: true,
+    path: "profile",
     element: <UserDashboardOutlet />,
   },
   {
-    path: "profile",
+    path: ":level/:gp_id",
     element: <UserDashboardOutlet />,
   },
 ];

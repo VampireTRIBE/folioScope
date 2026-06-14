@@ -23,9 +23,10 @@ import { useGROUPMETADATA } from "../../hooks/ReactQuery/useQuery";
 import { useStaticDataSecurityContent } from "../../../../public/securityDashboard/hooks/custom Hooks/useStaticData/useStaticData";
 
 const PortfolioContent = () => {
-  const { gp_id } = useParams();
-  const { user } = useContext(AuthenticationContext);
-  const { data: GroupMeatadataData } = useGROUPMETADATA(user, gp_id);
+  const { gp_id, level } = useParams();
+  const { accessToken, userData } = useContext(AuthenticationContext);
+  const groupId = `${userData?.groups?.[`level${level}`]?.[gp_id]?._id}`;
+  const { data: GroupMeatadataData } = useGROUPMETADATA(accessToken, groupId);
   const { dummyOverview } = useStaticDataSecurityContent();
 
   const classifications = dummyOverview;

@@ -1,4 +1,4 @@
 export const USERROUTES = {
-  USERDASHBOARD: "/dashboard",
   USERPROFILE: "/dashboard/profile",
+  USERDASHBOARD: (level, groupId) => `/dashboard/${level}/${groupId}`,
 };

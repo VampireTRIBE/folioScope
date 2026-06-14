@@ -16,32 +16,13 @@ module.exports.get_GroupMetadata = async (req, res) => {
     const userID = req.userId;
     const sessionDocID = req.sessionDocId;
     const sessionDoc = req.sessionDoc;
-    let { pg_id = "null" } = req.params;
+    const { pg_id } = req.params;
 
-    const userfilterObj = {
-      _id: userID,
-    };
+    const protfolioGroupFilterObj = { _id: pg_id, userId: userID };
 
-    let protfolioGroupFilterObj = null;
-
-    if ("null" === pg_id) {
-      protfolioGroupFilterObj = {
-        level: 1,
-        userId: userID,
-      };
-    } else {
-      protfolioGroupFilterObj = {
-        _id: pg_id,
-        userId: userID,
-      };
-    }
-
-    const [user, portfolioGroup] = await Promise.all([
-      find_validate_user({ filterObj: userfilterObj }),
-      find_validate_portfolioGroup({
-        filterObj: protfolioGroupFilterObj,
-      }),
-    ]);
+    const portfolioGroup = await find_validate_portfolioGroup({
+      filterObj: protfolioGroupFilterObj,
+    });
 
     const respData = {
       _id: portfolioGroup._id,

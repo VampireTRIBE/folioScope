@@ -51,9 +51,12 @@ export const useNavigationActions = () => {
     [navigate],
   );
 
-  const goToUserDashboard = useCallback(() => {
-    navigate(ROUTES.USERDASHBOARD, { replace: true });
-  }, [navigate]);
+  const goToUserDashboard = useCallback(
+    (level, groupId) => {
+      navigate(ROUTES.USERDASHBOARD(level ,groupId), { replace: true });
+    },
+    [navigate],
+  );
 
   const goToUserProfile = useCallback(() => {
     navigate(ROUTES.USERPROFILE);

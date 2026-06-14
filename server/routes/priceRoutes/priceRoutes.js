@@ -19,7 +19,7 @@ const {
 // ! routes
 
 // ! Public Data Fetch Routes
-router.route("/:securityId").get(priceRange);
+router.route("/security/:securityId").get(priceRange);
 
 router
   .route("/group/:groupId")
