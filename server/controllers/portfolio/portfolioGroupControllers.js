@@ -10,6 +10,10 @@ const {
 const {
   find_validate_portfolioGroup,
 } = require("../../utils/mongodb/aggregations/readModels/read_PortfolioGroup_Models/read_PortfolioGroup_Metadata");
+const {
+  read_NetWorthRange1D,
+} = require("../../utils/mongodb/aggregations/readModels/readpriceRange/priceRange");
+const customError = require("../../utils/shared/error/customError");
 
 module.exports.get_GroupMetadata = async (req, res) => {
   try {
@@ -23,6 +27,8 @@ module.exports.get_GroupMetadata = async (req, res) => {
     const portfolioGroup = await find_validate_portfolioGroup({
       filterObj: protfolioGroupFilterObj,
     });
+
+    const netWorth = await read_NetWorthRange1D(pg_id, userID);
 
     const respData = {
       _id: portfolioGroup._id,
@@ -47,6 +53,7 @@ module.exports.get_GroupMetadata = async (req, res) => {
           Number(portfolioGroup.groupSnapshot.investmentValue)
         ).toFixed(2),
       },
+      networth: netWorth,
       currentyear: {
         realizedgain: portfolioGroup.groupSnapshot.financialYear.realizedGain,
         dividend: portfolioGroup.groupSnapshot.financialYear.dividend,
@@ -77,7 +84,7 @@ module.exports.get_GroupMetadata = async (req, res) => {
   }
 };
 
-module.exports.addGroup = async (req, res) => {
+module.exports.addGroup = async (req, res, next) => {
   try {
     const userID = req.userId;
     const sessionDocID = req.sessionDocId;
@@ -85,12 +92,12 @@ module.exports.addGroup = async (req, res) => {
     const { pg_id } = req.params;
 
     if (!req.body || !req.body.name || !req.body.description) {
-      return res.status(400).json({ error: "Invalid payload" });
+      throw new customError("Invalid payload", 400);
     }
 
     const { name, description } = req.body;
     if (!name.trim()) {
-      return res.status(400).json({ error: "Name is required" });
+      throw new customError("Name is required", 400);
     }
 
     const [parent, financialAsset] = await Promise.all([
@@ -102,22 +109,21 @@ module.exports.addGroup = async (req, res) => {
     ]);
 
     if (financialAsset) {
-      return res
-        .status(400)
-        .json({ error: "Group with asset cannot become parent" });
+      throw new customError("Group with asset cannot become parent", 400);
     }
 
     if (!parent) {
-      return res.status(404).json({ error: "Invalid Group ID" });
+      throw new customError("Invalid Group ID", 400);
     }
 
     if (parent.userId.toString() !== userID.toString()) {
-      return res.status(403).json({ error: "Unauthorized" });
+      throw new customError("Unauthorized", 403);
     }
 
     if (parent.level >= 4) {
-      return res.status(400).json({ error: "Max depth reached" });
+      throw new customError("Max depth reached", 400);
     }
+
     const doc = new PORTFOLIOGROUP_MODEL({
       name: name.trim(),
       description,
@@ -132,9 +138,9 @@ module.exports.addGroup = async (req, res) => {
     });
   } catch (error) {
     if (error.code === 11000) {
-      return res.status(400).json({ error: "Duplicate group name" });
+      throw new customError("Duplicate group name", 400);
     }
-    return res.status(500).json({ error: error.message });
+    next(error);
   }
 };
 

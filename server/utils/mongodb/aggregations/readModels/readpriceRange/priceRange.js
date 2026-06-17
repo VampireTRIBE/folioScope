@@ -161,6 +161,44 @@ module.exports.read_GroupPriceRange1D = async (groupid, userId) => {
   }
 };
 
+module.exports.read_NetWorthRange1D = async (groupid, userId) => {
+  try {
+    const GROUP_NAV_MODEL = mongoose.model("navPerformence");
+    if (!groupid || !userId) {
+      throw new customError("Group or User Id Required", 400);
+    }
+
+    const prices = await GROUP_NAV_MODEL.find({
+      portfolioGroupId: groupid,
+      userId,
+    })
+      .sort({ date: -1 })
+      .limit(2)
+      .select("date value")
+      .lean();
+
+    if (prices.length <= 1) {
+      return {
+        currentPrice: (prices[0]?.value).toFixed(2) ?? 0.0,
+        todayChange: 0.0,
+      };
+    }
+
+    const todayChange = Number(
+      ((prices[0]?.value - prices[1]?.value) / prices[1].value) * 100,
+    );
+
+    return {
+      currentPrice: (prices[0]?.value).toFixed(2) ?? 0.0,
+      todayChange: todayChange ? todayChange.toFixed(2) : 0.0,
+    };
+  } catch (error) {
+    throw error instanceof customError
+      ? error
+      : new customError(error.message || "Database Error", 503);
+  }
+};
+
 module.exports.read_GroupPriceRange = async (
   groupid,
   userId,

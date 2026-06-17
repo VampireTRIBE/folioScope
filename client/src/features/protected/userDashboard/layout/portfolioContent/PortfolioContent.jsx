@@ -9,6 +9,7 @@ import OverView from "../../../../../components/layout/public/Overview/OverView"
 import DrawdownAnalysis from "../priceAnalysis/DrawdownAnalysis";
 import ComparisonAnalysis from "../priceAnalysis/ComparisonAnalysis";
 import PortfolioSnapshot from "../portfolioSnapshot/PortfolioSnapshot";
+import ButtonContainers from "../portfolioActions/ButtonContainers";
 
 // ! Styles
 import portfolioContentStyles from "./portfoliocontent.module.css";
@@ -38,23 +39,7 @@ const PortfolioContent = () => {
 
   return (
     <div className={portfolioContentStyles.container}>
-      <div className={portfolioContentStyles.cardContainer}>
-        {classifications
-          .filter((el) => {
-            const [k] = Object.keys(el);
-            return !!el?.[k];
-          })
-          .map((el, indx) => {
-            const [k] = Object.keys(el);
-            return (
-              <CardType3
-                key={el?.[k]?.id ?? indx}
-                title={k}
-                description={el?.[k]?.name}
-              />
-            );
-          })}
-      </div>
+      <ButtonContainers />
 
       <PortfolioSnapshot />
 

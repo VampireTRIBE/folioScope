@@ -33,14 +33,17 @@ const PortfolioSnapshot = () => {
       <SnapshotHead
         snapshotHead={{
           text: GroupMeatadataData?.data?.groupName,
-          price: null, // need to wire
+          price: {
+            price:GroupMeatadataData?.data?.networth?.currentPrice,
+            today:GroupMeatadataData?.data?.networth?.todayChange,
+          }
         }}
       />
       <CurrentStatus
         currentStatus={GroupMeatadataData?.data?.currentInvestment}
       />
       <CurrentYearPerformence
-        currentYear={GroupMeatadataData?.data?.currentyear}
+        currentyear={GroupMeatadataData?.data?.currentyear}
       />
       <LifetimePerformence lifetime={GroupMeatadataData?.data?.lifetime} />
     </div>

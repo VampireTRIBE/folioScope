@@ -35,7 +35,7 @@ const MobileHeader = () => {
   const navbarButtons = accessToken ? userprofileBtn : profileBtn;
   const profileSidebar = accessToken ? userprofileSidebarItems : profileSidebarItems;
 
-  const menuOptions = accessToken ? userMneuSidebarItems : null;
+  const menuOptions = accessToken ? userMneuSidebarItems : [];
 
   const view = true;
   return (
