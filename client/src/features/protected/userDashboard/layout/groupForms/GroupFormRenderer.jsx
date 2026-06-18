@@ -12,7 +12,7 @@ import styles from "./groupformrenderer.module.css";
 import AddGroupForm from "./addGroupForm/AddGroupForm";
 import UpdateGroupForm from "./updateGroupForm/UpdateGroupForm.jsx";
 import DeleteGroupForm from "./deleteGroupForm/DeleteGroupForm.jsx";
-import TradeForm from "./tradeGroupForm/DeleteGroupForm.jsx";
+import TradeForm from "./tradeGroupForm/TradeGroupForm.jsx";
 
 const formComponents = {
   addGroup: AddGroupForm,

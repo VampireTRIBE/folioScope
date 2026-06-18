@@ -1,0 +1,109 @@
+.form {
+  width: 100%;
+}
+
+.fieldset {
+  padding: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  border: 0;
+  border-radius: var(--radius-md);
+}
+
+.legend {
+  width: 100%;
+  padding: 0 0 var(--space-2);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.closeButton {
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  color: var(--text-primary);
+  border: var(--border-width-sm) solid var(--border-default);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  font-size: var(--text-base);
+  font-weight: var(--fw-bold);
+  cursor: pointer;
+}
+
+.closeButton:hover {
+  background-color: var(--color-danger-bg);
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.inputGroup {
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-between;
+  gap: var(--space-1);
+}
+
+.label {
+  width: 50%;
+  font-size: var(--text-base);
+  font-weight: var(--fw-semibold);
+}
+
+.input,
+.textarea {
+  flex: 1;
+  min-width: 12rem;
+  padding: var(--space-2);
+  border: var(--border-width-sm) solid transparent;
+  border-radius: var(--radius-md);
+  background-color: var(--border-default);
+  outline: none;
+  font-family: inherit;
+  font-size: var(--text-base);
+  transition: border var(--transition-fast);
+}
+
+.textarea {
+  resize: none;
+}
+
+.input:focus,
+.textarea:focus {
+  border-color: var(--border-dark);
+}
+
+.buttonContainer {
+  padding: var(--space-3) 0 0;
+  border-top: var(--border-width-sm) solid var(--border-dark);
+  display: flex;
+  gap: var(--space-2);
+}
+
+.resetButton,
+.submitButton {
+  flex: 1;
+  padding: var(--space-2) var(--space-3);
+  color: var(--text-primary);
+  border: var(--border-width-md) solid var(--border-dark);
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  font-size: var(--text-base);
+  font-weight: var(--fw-medium);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.resetButton:hover,
+.submitButton:hover {
+  background-color: var(--color-primary-light-alpha);
+}
+
+@media screen and (min-width: 580px) {
+  .label {
+    width: 35%;
+  }
+}
