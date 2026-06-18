@@ -1,0 +1,13 @@
+import { BASE_URL } from "../../../../../../../constants/axiosInstance";
+
+export const POST_ADDGROUPFORM = async ({ accessToken, groupId, data }) => {
+  if (!accessToken || !groupId) {
+    throw new Error("Group context is missing");
+  }
+  const response = await BASE_URL.post(`/portfolio/${groupId}`, data, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+  return response.data;
+};

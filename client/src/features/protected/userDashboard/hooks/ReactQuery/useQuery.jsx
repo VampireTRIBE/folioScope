@@ -42,7 +42,7 @@ export const useGroupDrawdown = (groupId, accessToken) => {
   return useQuery({
     queryKey: ["GroupDrawdown", groupId],
     queryFn: () => FETCH_GROUPDRAWDOWN(groupId, accessToken),
-    enabled: !!groupId,
+    enabled: !!groupId && !!accessToken,
     staleTime: 30000,
   });
 };
