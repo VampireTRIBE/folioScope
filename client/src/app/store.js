@@ -8,6 +8,8 @@ import groupchartRangeFilterState from "../features/protected/userDashboard/redu
 
 import signupErrorState from "../features/public/Authentication/signup/redux/signupFormState";
 
+import groupFormState from "../features/protected/userDashboard/redux/groupFormState";
+
 const store = configureStore({
   reducer: {
     publicheaderToggle,
@@ -15,6 +17,7 @@ const store = configureStore({
     securitychartRangeFilterState,
     groupchartRangeFilterState,
     signupErrorState,
+    groupFormState,
   },
 });
 

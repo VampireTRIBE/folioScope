@@ -4,61 +4,76 @@ import TextImgButton from "../../../../../components/UI/buttons/TextImgButton";
 // ! Styles
 import ButtonContainersStyles from "./buttoncontainers.module.css";
 
-const ButtonContainers = () => {
-  const handleClick = (buttonName) => {
-    console.log(`${buttonName} clicked`);
-  };
+// ! Dispatch Actions
+import { useGroupFormActions } from "../../redux/dispatchActions";
+import GroupFormRenderer from "../groupForms/GroupFormRenderer";
 
-  const dummyButtons = [
-    {
-      name: "Add Group",
-      varient: "textImgButton",
-      imgAttibutes: {
-        variantButton: "textImgButtonVarient",
-        variantImg: "img",
-        src: "/assets/icons/addGroup.png",
-        alt: "add group",
-        title: "Add New Group",
-      },
-      onClick: () => handleClick("Add Group"),
+const buttons = [
+  {
+    key: "addGroup",
+    name: "Add Group",
+    varient: "textImgButton",
+    imgAttibutes: {
+      variantButton: "textImgButtonVarient",
+      variantImg: "img",
+      src: "/assets/icons/addGroup.png",
+      alt: "add group",
+      title: "Add New Group",
     },
-    {
-      name: "Update Group",
-      varient: "textImgButton",
-      imgAttibutes: {
-        variantButton: "textImgButtonVarient",
-        variantImg: "img",
-        src: "/assets/icons/updateGroup.png",
-        alt: "Update Group",
-        title: "Update Group",
-      },
-      onClick: () => handleClick("Update Group"),
+  },
+  {
+    key: "updateGroup",
+    name: "Update Group",
+    varient: "textImgButton",
+    imgAttibutes: {
+      variantButton: "textImgButtonVarient",
+      variantImg: "img",
+      src: "/assets/icons/updateGroup.png",
+      alt: "Update Group",
+      title: "Update Group",
     },
-    {
-      name: "Delete Group",
-      varient: "textImgButton",
-      imgAttibutes: {
-        variantButton: "textImgButtonVarient",
-        variantImg: "img",
-        src: "/assets/icons/deleteGroup.png",
-        alt: "Delete Group",
-        title: "Delete Group",
-      },
-      onClick: () => handleClick("Delete Group"),
+  },
+  {
+    key: "deleteGroup",
+    name: "Delete Group",
+    varient: "textImgButton",
+    imgAttibutes: {
+      variantButton: "textImgButtonVarient",
+      variantImg: "img",
+      src: "/assets/icons/deleteGroup.png",
+      alt: "Delete Group",
+      title: "Delete Group",
     },
-  ];
+  },
+  {
+    key: "trade",
+    name: "Trade",
+    varient: "textImgButton",
+    imgAttibutes: {
+      variantButton: "textImgButtonVarient",
+      variantImg: "img",
+      src: "/assets/icons/trade.png",
+      alt: "Trade",
+      title: "Trade",
+    },
+  },
+];
+
+const ButtonContainers = () => {
+  const { ACTIVE_GROUP_FORM } = useGroupFormActions();
 
   return (
     <div className={ButtonContainersStyles.container}>
-      {dummyButtons.map((button, index) => (
+      {buttons.map((button) => (
         <TextImgButton
-          key={index}
+          key={button.key}
           name={button.name}
           varient={button.varient}
           imgAttibutes={button.imgAttibutes}
-          onClick={button.onClick}
+          onClick={() => ACTIVE_GROUP_FORM(button.key)}
         />
       ))}
+      <GroupFormRenderer />
     </div>
   );
 };
