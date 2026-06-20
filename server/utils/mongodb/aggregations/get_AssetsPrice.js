@@ -220,8 +220,10 @@ module.exports.get_DailyClosePricesByAsset = async (
   let current = null;
   if (seedData) {
     current = new Date(startDate);
-  } else {
+  } else if (rangeData.length > 0) {
     current = new Date(rangeData[0].date);
+  } else {
+    return result;
   }
 
   for (const data of rangeData) {

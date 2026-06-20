@@ -69,7 +69,7 @@ app.listen(PORT, (err) => {
 })();
 
 // ! Only for Testing purpouse In Devlopment
-app.use("/test", testRoutes);
+// app.use("/test", testRoutes);
 
 // ! Diffrent Routes
 
@@ -93,6 +93,9 @@ app.use("/portfolio", portfolioRoute);
 
 // ! error handling middleware
 app.use((err, req, res, next) => {
+  console.log()
+  console.log("error --- ",err)
+  console.log()
   const { statusCode = 500, message = "Some Error" } = err;
   console.log(`Status Code : ${statusCode}\nMessage : ${message}`);
   res.status(statusCode).json({ success: false, statusCode, message: message });

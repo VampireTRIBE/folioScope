@@ -4,6 +4,7 @@ const initialState = {
   addGroup: false,
   updateGroup: false,
   deleteGroup: false,
+  groupTransaction: false,
   trade: false,
 };
 

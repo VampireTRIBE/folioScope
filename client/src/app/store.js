@@ -9,6 +9,7 @@ import groupchartRangeFilterState from "../features/protected/userDashboard/redu
 import signupErrorState from "../features/public/Authentication/signup/redux/signupFormState";
 
 import groupFormState from "../features/protected/userDashboard/redux/groupFormState";
+import groupTransactionState from "../features/protected/userDashboard/redux/groupTransactionState";
 
 const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ const store = configureStore({
     groupchartRangeFilterState,
     signupErrorState,
     groupFormState,
+    groupTransactionState,
   },
 });
 

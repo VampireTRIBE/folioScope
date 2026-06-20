@@ -1,4 +1,4 @@
-import { BASE_URL } from "../../../../../../../constants/axiosInstance";
+import { BASE_URL } from "../../../../constants/axiosInstance";
 
 export const PATCH_UPDATEGROUPFORM = async ({ accessToken, groupId, data }) => {
   if (!accessToken || !groupId) {

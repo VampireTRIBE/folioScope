@@ -8,59 +8,76 @@ import ButtonContainersStyles from "./buttoncontainers.module.css";
 import { useGroupFormActions } from "../../redux/dispatchActions";
 import GroupFormRenderer from "../groupForms/GroupFormRenderer";
 
-const buttons = [
-  {
-    key: "addGroup",
-    name: "Add Group",
-    varient: "textImgButton",
-    imgAttibutes: {
-      variantButton: "textImgButtonVarient",
-      variantImg: "img",
-      src: "/assets/icons/addGroup.png",
-      alt: "add group",
-      title: "Add New Group",
-    },
-  },
-  {
-    key: "updateGroup",
-    name: "Update Group",
-    varient: "textImgButton",
-    imgAttibutes: {
-      variantButton: "textImgButtonVarient",
-      variantImg: "img",
-      src: "/assets/icons/updateGroup.png",
-      alt: "Update Group",
-      title: "Update Group",
-    },
-  },
-  {
-    key: "deleteGroup",
-    name: "Delete Group",
-    varient: "textImgButton",
-    imgAttibutes: {
-      variantButton: "textImgButtonVarient",
-      variantImg: "img",
-      src: "/assets/icons/deleteGroup.png",
-      alt: "Delete Group",
-      title: "Delete Group",
-    },
-  },
-  {
-    key: "trade",
-    name: "Trade",
-    varient: "textImgButton",
-    imgAttibutes: {
-      variantButton: "textImgButtonVarient",
-      variantImg: "img",
-      src: "/assets/icons/trade.png",
-      alt: "Trade",
-      title: "Trade",
-    },
-  },
-];
-
-const ButtonContainers = () => {
+const ButtonContainers = ({ isLeaf = false }) => {
   const { ACTIVE_GROUP_FORM } = useGroupFormActions();
+
+  const buttons = [
+    {
+      key: "addGroup",
+      name: "Add Group",
+      varient: "textImgButton",
+      imgAttibutes: {
+        variantButton: "textImgButtonVarient",
+        variantImg: "img",
+        src: "/assets/icons/addGroup.png",
+        alt: "add group",
+        title: "Add New Group",
+      },
+    },
+    {
+      key: "updateGroup",
+      name: "Update Group",
+      varient: "textImgButton",
+      imgAttibutes: {
+        variantButton: "textImgButtonVarient",
+        variantImg: "img",
+        src: "/assets/icons/updateGroup.png",
+        alt: "Update Group",
+        title: "Update Group",
+      },
+    },
+    {
+      key: "deleteGroup",
+      name: "Delete Group",
+      varient: "textImgButton",
+      imgAttibutes: {
+        variantButton: "textImgButtonVarient",
+        variantImg: "img",
+        src: "/assets/icons/deleteGroup.png",
+        alt: "Delete Group",
+        title: "Delete Group",
+      },
+    },
+  ];
+
+  if (isLeaf) {
+    buttons.push(
+      {
+        key: "groupTransaction",
+        name: "Group Transaction",
+        varient: "textImgButton",
+        imgAttibutes: {
+          variantButton: "textImgButtonVarient",
+          variantImg: "img",
+          src: "/assets/icons/trade.png",
+          alt: "Group Transaction",
+          title: "Group Transaction",
+        },
+      },
+      {
+        key: "trade",
+        name: "Trade",
+        varient: "textImgButton",
+        imgAttibutes: {
+          variantButton: "textImgButtonVarient",
+          variantImg: "img",
+          src: "/assets/icons/trade.png",
+          alt: "Trade",
+          title: "Trade",
+        },
+      },
+    );
+  }
 
   return (
     <div className={ButtonContainersStyles.container}>

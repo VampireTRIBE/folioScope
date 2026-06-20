@@ -20,17 +20,13 @@ import { AuthenticationContext } from "../../../../../context/authenticationCont
 // ! tanStack Query Hooks
 import { useGROUPMETADATA } from "../../hooks/ReactQuery/useQuery";
 
-// ! custom Hooks
-import { useStaticDataSecurityContent } from "../../../../public/securityDashboard/hooks/custom Hooks/useStaticData/useStaticData";
-
 const PortfolioContent = () => {
   const { gp_id, level } = useParams();
   const { accessToken, userData } = useContext(AuthenticationContext);
-  const groupId = `${userData?.groups?.[`level${level}`]?.[gp_id]?._id}`;
+  const selectedGroup = userData?.groups?.[`level${level}`]?.[gp_id];
+  const groupId = selectedGroup?._id;
+  const isLeaf = selectedGroup?.isLeaf === true;
   const { data: GroupMeatadataData } = useGROUPMETADATA(accessToken, groupId);
-  const { dummyOverview } = useStaticDataSecurityContent();
-
-  const classifications = dummyOverview;
 
   const overview = {
     title: GroupMeatadataData?.data?.groupName,
@@ -39,7 +35,7 @@ const PortfolioContent = () => {
 
   return (
     <div className={portfolioContentStyles.container}>
-      <ButtonContainers />
+      <ButtonContainers isLeaf={isLeaf} />
 
       <PortfolioSnapshot />
 

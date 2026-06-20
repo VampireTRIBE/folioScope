@@ -8,7 +8,7 @@ module.exports.read_PriceRange1D = async (securityId) => {
   try {
     const PRICE_MODEL = mongoose.model("AssetPriceHistory");
     if (!securityId) {
-      throw new customErrortomError("Security Id Required", 400);
+      throw new customError("Security Id Required", 400);
     }
 
     const securityDetail = get_SingleAssetMetaDataName(securityId);
@@ -25,7 +25,7 @@ module.exports.read_PriceRange1D = async (securityId) => {
 
     if (prices.length <= 1) {
       return {
-        currentPrice: (prices[0]?.close).toFixed(2) ?? 0.0,
+        currentPrice: prices[0]?.close?.toFixed(2) ?? 0.0,
         todayChange: 0.0,
       };
     }
@@ -35,7 +35,7 @@ module.exports.read_PriceRange1D = async (securityId) => {
     );
 
     return {
-      currentPrice: (prices[0]?.close).toFixed(2) ?? 0.0,
+      currentPrice: prices[0]?.close?.toFixed(2) ?? 0.0,
       todayChange: todayChange ? todayChange.toFixed(2) : 0.0,
     };
   } catch (error) {
@@ -141,7 +141,7 @@ module.exports.read_GroupPriceRange1D = async (groupid, userId) => {
 
     if (prices.length <= 1) {
       return {
-        currentPrice: (prices[0]?.nav).toFixed(2) ?? 0.0,
+        currentPrice: prices[0]?.nav?.toFixed(2) ?? 0.0,
         todayChange: 0.0,
       };
     }
@@ -151,7 +151,7 @@ module.exports.read_GroupPriceRange1D = async (groupid, userId) => {
     );
 
     return {
-      currentPrice: (prices[0]?.nav).toFixed(2) ?? 0.0,
+      currentPrice: prices[0]?.nav?.toFixed(2) ?? 0.0,
       todayChange: todayChange ? todayChange.toFixed(2) : 0.0,
     };
   } catch (error) {
@@ -179,7 +179,7 @@ module.exports.read_NetWorthRange1D = async (groupid, userId) => {
 
     if (prices.length <= 1) {
       return {
-        currentPrice: (prices[0]?.value).toFixed(2) ?? 0.0,
+        currentPrice: prices[0]?.value?.toFixed(2) ?? 0.0,
         todayChange: 0.0,
       };
     }
@@ -189,7 +189,7 @@ module.exports.read_NetWorthRange1D = async (groupid, userId) => {
     );
 
     return {
-      currentPrice: (prices[0]?.value).toFixed(2) ?? 0.0,
+      currentPrice: prices[0]?.value?.toFixed(2) ?? 0.0,
       todayChange: todayChange ? todayChange.toFixed(2) : 0.0,
     };
   } catch (error) {

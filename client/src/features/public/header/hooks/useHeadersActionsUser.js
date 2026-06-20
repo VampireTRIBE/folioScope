@@ -4,9 +4,11 @@ import { useDispatch } from "react-redux";
 import { useNavigationActions } from "../../../hooks/customHooks/useNavigationActions";
 import { publicheaderToggleActions } from "../redux/headerToggleState";
 import { AuthenticationContext } from "../../../../context/authenticationContext";
+import { useLogoutActions } from "./customHooks/useMutationHooks";
 
 export const useHeaderUserActions = () => {
   const { userData } = useContext(AuthenticationContext);
+  const { LogoutRequest } = useLogoutActions();
   const dispatch = useDispatch();
 
   const { goToUserDashboard, goToUserProfile, gotoHome } =
@@ -109,6 +111,13 @@ export const useHeaderUserActions = () => {
         id: "logout-user",
         onClick: goToUserProfile,
         children: "Logout",
+        variant: "sideBarbtn",
+        order: 4,
+      },
+      {
+        id: "logout-user-all-devices",
+        onClick: goToUserProfile,
+        children: "Logout All",
         variant: "sideBarbtn",
         order: 4,
       },

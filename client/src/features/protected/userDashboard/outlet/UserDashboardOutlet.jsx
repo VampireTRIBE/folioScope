@@ -24,7 +24,9 @@ const UserDashboardOutlet = () => {
   const { gp_id, level } = useParams();
   const { accessToken, userData } = useContext(AuthenticationContext);
   const { goToLogin } = useNavigationActions();
-  const groupId = `${userData?.groups?.[`level${level}`]?.[gp_id]?._id}`;
+  const selectedGroup = userData?.groups?.[`level${level}`]?.[gp_id];
+  const groupId = selectedGroup?._id;
+  const isLeaf = selectedGroup?.isLeaf === true;
 
   const {
     data: GroupMeatadataData,
@@ -42,7 +44,7 @@ const UserDashboardOutlet = () => {
 
   const content = {
     name: GroupMeatadataData?.data?.groupName || "Name",
-    category: `Level ${GroupMeatadataData?.data?.level || "-"}`,
+    category: `Level ${GroupMeatadataData?.data?.level || "-"} ${isLeaf ? "{ LEAF} " : ""}`,
     price: {
       currentPrice: nav1DData?.currentPrice,
       todayChangePercent: nav1DData?.todayChange,

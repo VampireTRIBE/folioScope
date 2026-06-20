@@ -12,12 +12,14 @@ import styles from "./groupformrenderer.module.css";
 import AddGroupForm from "./addGroupForm/AddGroupForm";
 import UpdateGroupForm from "./updateGroupForm/UpdateGroupForm.jsx";
 import DeleteGroupForm from "./deleteGroupForm/DeleteGroupForm.jsx";
+import GroupTransactionForm from "./groupTransactionGorm/GroupTransactionForm.jsx";
 import TradeForm from "./tradeGroupForm/TradeGroupForm.jsx";
 
 const formComponents = {
   addGroup: AddGroupForm,
   updateGroup: UpdateGroupForm,
   deleteGroup: DeleteGroupForm,
+  groupTransaction: GroupTransactionForm,
   trade: TradeForm,
 };
 

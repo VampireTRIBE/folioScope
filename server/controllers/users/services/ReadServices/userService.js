@@ -3,6 +3,9 @@ const USER_MODEL = require("../../../../models/Users_Models/user");
 
 // ! Utils
 const {
+  get_AllLeafNodes,
+} = require("../../../../utils/mongodb/aggregations/get_LeafNodes");
+const {
   find_validate_user,
 } = require("../../../../utils/mongodb/aggregations/readModels/read_Auth_Models/validate_User");
 const {
@@ -32,19 +35,29 @@ module.exports.Read_UserDetails_Service = async (req, res, next) => {
     const filterObjLevel3 = { userId: userID, level: 3 };
     const filterObjLevel4 = { userId: userID, level: 4 };
 
+    const LeafGroupIDs = await get_AllLeafNodes(userID);
+    let LeafGroupIDsOBJ = {};
+    for (const el of LeafGroupIDs) {
+      LeafGroupIDsOBJ[el] = "TRUE";
+    }
+
     const [level1_Groups, level2_Groups, level3_Groups, level4_Groups] =
       await Promise.all([
         find_AllPortfolioGroups_BY_Level({
           filterObj: filterObjLevel1,
+          LeafGroupIDsOBJ,
         }),
         find_AllPortfolioGroups_BY_Level({
           filterObj: filterObjLevel2,
+          LeafGroupIDsOBJ,
         }),
         find_AllPortfolioGroups_BY_Level({
           filterObj: filterObjLevel3,
+          LeafGroupIDsOBJ,
         }),
         find_AllPortfolioGroups_BY_Level({
           filterObj: filterObjLevel4,
+          LeafGroupIDsOBJ,
         }),
       ]);
 

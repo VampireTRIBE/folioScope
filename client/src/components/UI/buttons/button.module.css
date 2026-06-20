@@ -145,13 +145,14 @@
 .chartFilter {
   padding: var(--space-2);
   flex: 1;
-  background-color: inherit;
   color: inherit;
   font-size: var(--text-base);
   font-weight: var(--fw-bold);
   outline: none;
   border: none;
   cursor: pointer;
+  border-right: var(--border-width-sm) solid var(--border-dark);
+  border-left: var(--border-width-sm) solid var(--border-dark);
   transition:
     background-color var(--transition-fast),
     color var(--transition-fast);

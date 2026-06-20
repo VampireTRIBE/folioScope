@@ -1,9 +1,9 @@
 import { useContext, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useQueryClient } from "@tanstack/react-query";
 
 // ! Styles
-import styles from "../groupActionForm.module.css";
+import groupUpdateStyles from "./groupUpdateForm.module.css";
 
 // ! Context
 import { AuthenticationContext } from "../../../../../../context/authenticationContext";
@@ -16,28 +16,38 @@ import { FETCH_USERDETAILS } from "../../../../../apis/FETCH_APIs";
 
 // ! tanStack Query hooks
 import { useGROUPMETADATA } from "../../../hooks/ReactQuery/useQuery";
-import { useUpdateGroupFormMutation } from "./hooks/RTK Query/useFormMutation";
+import { useUpdateGroupFormMutation } from "../../../hooks/ReactQuery/useFormMutation";
 
 // ! Custom Hooks
-import { useFormDataActions } from "./hooks/customHooks/useFormData";
+import { useFormDataActions } from "../../../hooks/customHooks/useFormData";
 
 const UpdateGroupForm = () => {
   const { gp_id, level } = useParams();
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const queryClient = useQueryClient();
+
   const { accessToken, userData, setUserData } =
     useContext(AuthenticationContext);
+
   const { ACTIVE_GROUP_FORM_RESET } = useGroupFormActions();
+
   const groupId = userData?.groups?.[`level${level}`]?.[gp_id]?._id;
+
   const {
     data: GroupMeatadataData,
     isPending: isPendingGroupMetadata,
   } = useGROUPMETADATA(accessToken, groupId);
+
   const {
     mutateAsync: updateGroupFormMutationFn,
     isPending: isPendingUpdateGroupForm,
     isSuccess: isSuccessUpdateGroupForm,
     error: errorUpdateGroupForm,
   } = useUpdateGroupFormMutation();
+
   const { submitFormUpdateGroupData } = useFormDataActions();
 
   useEffect(() => {
@@ -49,7 +59,28 @@ const UpdateGroupForm = () => {
       if (accessToken) {
         try {
           const updatedUserDetails = await FETCH_USERDETAILS(accessToken);
-          setUserData(updatedUserDetails?.user || null);
+          const updatedUser = updatedUserDetails?.user || null;
+
+          setUserData(updatedUser);
+
+          const updatedLevelGroups =
+            updatedUser?.groups?.[`level${level}`] || {};
+
+          const newGroupKey = Object.keys(updatedLevelGroups).find(
+            (key) =>
+              String(updatedLevelGroups[key]?._id) === String(groupId),
+          );
+
+          if (newGroupKey && newGroupKey !== gp_id) {
+            const oldPathPart = encodeURIComponent(gp_id);
+            const newPathPart = encodeURIComponent(newGroupKey);
+
+            const nextPath = location.pathname.includes(oldPathPart)
+              ? location.pathname.replace(oldPathPart, newPathPart)
+              : location.pathname.replace(gp_id, newGroupKey);
+
+            navigate(nextPath, { replace: true });
+          }
         } catch {
           setUserData(userData);
         }
@@ -62,7 +93,12 @@ const UpdateGroupForm = () => {
   }, [
     ACTIVE_GROUP_FORM_RESET,
     accessToken,
+    gp_id,
+    groupId,
     isSuccessUpdateGroupForm,
+    level,
+    location.pathname,
+    navigate,
     queryClient,
     setUserData,
     userData,
@@ -77,7 +113,7 @@ const UpdateGroupForm = () => {
   return (
     <form
       key={GroupMeatadataData?.data?._id || groupId || "updateGroupForm"}
-      className={styles.form}
+      className={groupUpdateStyles.form}
       onSubmit={(e) =>
         submitFormUpdateGroupData(
           e,
@@ -87,12 +123,12 @@ const UpdateGroupForm = () => {
         )
       }>
       <fieldset
-        className={styles.fieldset}
+        className={groupUpdateStyles.fieldset}
         disabled={isPendingUpdateGroupForm || isPendingGroupMetadata}>
-        <legend className={styles.legend}>
+        <legend className={groupUpdateStyles.legend}>
           <h3>Update Group</h3>
           <button
-            className={styles.closeButton}
+            className={groupUpdateStyles.closeButton}
             type="button"
             aria-label="Close update group form"
             title="Close"
@@ -102,16 +138,16 @@ const UpdateGroupForm = () => {
         </legend>
 
         {errorUpdateGroupForm && (
-          <div className={styles.error}>{errorMessage}</div>
+          <div className={groupUpdateStyles.error}>{errorMessage}</div>
         )}
 
-        <div className={styles.inputGroup}>
-          <label htmlFor="updateGroupName" className={styles.label}>
+        <div className={groupUpdateStyles.inputGroup}>
+          <label htmlFor="updateGroupName" className={groupUpdateStyles.label}>
             Name :
           </label>
 
           <input
-            className={styles.input}
+            className={groupUpdateStyles.input}
             type="text"
             placeholder="Group name"
             id="updateGroupName"
@@ -121,13 +157,15 @@ const UpdateGroupForm = () => {
           />
         </div>
 
-        <div className={styles.inputGroup}>
-          <label htmlFor="updateGroupDescription" className={styles.label}>
+        <div className={groupUpdateStyles.inputGroup}>
+          <label
+            htmlFor="updateGroupDescription"
+            className={groupUpdateStyles.label}>
             Description :
           </label>
 
           <textarea
-            className={styles.textarea}
+            className={groupUpdateStyles.textarea}
             placeholder="Group description"
             id="updateGroupDescription"
             name="description"
@@ -137,12 +175,12 @@ const UpdateGroupForm = () => {
           />
         </div>
 
-        <div className={styles.buttonContainer}>
-          <button className={styles.resetButton} type="reset">
+        <div className={groupUpdateStyles.buttonContainer}>
+          <button className={groupUpdateStyles.resetButton} type="reset">
             Reset
           </button>
 
-          <button className={styles.submitButton} type="submit">
+          <button className={groupUpdateStyles.submitButton} type="submit">
             {isPendingUpdateGroupForm ? "Submiting...." : "Update Group"}
           </button>
         </div>
@@ -151,4 +189,4 @@ const UpdateGroupForm = () => {
   );
 };
 
-export default UpdateGroupForm
+export default UpdateGroupForm;

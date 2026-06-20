@@ -9,3 +9,8 @@ export const selectActiveGroupForm = (state) =>
 
 export const selectIsAnyGroupFormOpen = (state) =>
   Object.values(selectGroupFormState(state)).some(Boolean);
+
+export const selectActiveGroupTransactionType = (state) => {
+  const group = state.groupTransactionState;
+  return Object.keys(group).find((k) => group[k]);
+};

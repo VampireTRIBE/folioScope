@@ -24,6 +24,7 @@ const { cookieObj } = require("../../../../utils/authentication/cookieObj");
 const {
   find_AllPortfolioGroups_BY_Level,
 } = require("../../../../utils/mongodb/aggregations/readModels/read_PortfolioGroup_Models/read_PortfolioGroupIDsBylevel");
+const { get_AllLeafNodes } = require("../../../../utils/mongodb/aggregations/get_LeafNodes");
 
 module.exports.emailVerification_Service = async (req, res, next) => {
   try {
@@ -157,19 +158,29 @@ module.exports.emailVerify_Service = async (req, res, next) => {
     const filterObjLevel3 = { userId: user._id, level: 3 };
     const filterObjLevel4 = { userId: user._id, level: 4 };
 
+    const LeafGroupIDs = await get_AllLeafNodes(userID);
+    let LeafGroupIDsOBJ = {};
+    for (const el of LeafGroupIDs) {
+      LeafGroupIDsOBJ[el] = "TRUE";
+    }
+
     const [level1_Groups, level2_Groups, level3_Groups, level4_Groups] =
       await Promise.all([
         find_AllPortfolioGroups_BY_Level({
           filterObj: filterObjLevel1,
+          LeafGroupIDsOBJ,
         }),
         find_AllPortfolioGroups_BY_Level({
           filterObj: filterObjLevel2,
+          LeafGroupIDsOBJ,
         }),
         find_AllPortfolioGroups_BY_Level({
           filterObj: filterObjLevel3,
+          LeafGroupIDsOBJ,
         }),
         find_AllPortfolioGroups_BY_Level({
           filterObj: filterObjLevel4,
+          LeafGroupIDsOBJ,
         }),
       ]);
 
