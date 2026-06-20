@@ -12,8 +12,8 @@ import styles from "./groupformrenderer.module.css";
 import AddGroupForm from "./addGroupForm/AddGroupForm";
 import UpdateGroupForm from "./updateGroupForm/UpdateGroupForm.jsx";
 import DeleteGroupForm from "./deleteGroupForm/DeleteGroupForm.jsx";
-import GroupTransactionForm from "./groupTransactionGorm/GroupTransactionForm.jsx";
-import TradeForm from "./tradeGroupForm/TradeGroupForm.jsx";
+import GroupTransactionForm from "./groupTransactionForm/GroupTransactionForm.jsx";
+import TradeForm from "./tradeForm/TradeForm.jsx";
 
 const formComponents = {
   addGroup: AddGroupForm,

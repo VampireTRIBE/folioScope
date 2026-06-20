@@ -14,3 +14,8 @@ export const selectActiveGroupTransactionType = (state) => {
   const group = state.groupTransactionState;
   return Object.keys(group).find((k) => group[k]);
 };
+
+export const selectActiveTradeTransactionType = (state) => {
+  const group = state.tradeTransactionState;
+  return Object.keys(group).find((k) => group[k]);
+};

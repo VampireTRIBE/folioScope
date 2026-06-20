@@ -62,6 +62,15 @@ const userSchema = new Schema(
       type: Number,
       default: 1,
     },
+    passwordResetVerified: {
+      type: Boolean,
+      default: false,
+    },
+
+    passwordResetVerifiedAt: {
+      type: Date,
+      default: null,
+    },
   },
   { timestamps: true },
 );

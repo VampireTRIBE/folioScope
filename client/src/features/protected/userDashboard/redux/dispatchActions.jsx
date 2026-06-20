@@ -5,6 +5,7 @@ import { useDispatch } from "react-redux";
 import { groupchartRangeFilterStateActions } from "./groupPriceChartState";
 import { groupFormStateActions } from "./groupFormState";
 import { groupTransactionStateActions } from "./groupTransactionState";
+import { tradeTransactionStateActions } from "./tradeTransactionState";
 
 export const useGroupChartActions = () => {
   const dispatch = useDispatch();
@@ -58,10 +59,29 @@ export const useGroupFormActions = () => {
     );
   }, [dispatch]);
 
+  const FILTER_ACTIVE_TRADETRANSACTION_TYPE = useCallback(
+    (key) => {
+      dispatch(
+        tradeTransactionStateActions.TRADE_FROM_TRANSACTION_FILTER({
+          key,
+        }),
+      );
+    },
+    [dispatch],
+  );
+
+  const FILTER_ACTIVE_TRADETRANSACTION_TYPE_RESET = useCallback(() => {
+    dispatch(
+      tradeTransactionStateActions.TRADE_FORM_TRANSACTION_FILTER_RESET(),
+    );
+  }, [dispatch]);
+
   return {
     ACTIVE_GROUP_FORM,
     ACTIVE_GROUP_FORM_RESET,
     FILTER_ACTIVE_GROUPTRANSACTION_TYPE,
     FILTER_ACTIVE_GROUPTRANSACTION_TYPE_RESET,
+    FILTER_ACTIVE_TRADETRANSACTION_TYPE,
+    FILTER_ACTIVE_TRADETRANSACTION_TYPE_RESET,
   };
 };

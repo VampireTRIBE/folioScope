@@ -4,3 +4,8 @@ export const FETCH_SECURITIESLIST = async () => {
   const response = await BASE_URL.get("/allsecuritieslist");
   return response.data.data;
 };
+
+export const FETCH_TRADABLESECURITIESLIST = async () => {
+  const response = await BASE_URL.get("/tradablesecuritieslist");
+  return response.data.data;
+};

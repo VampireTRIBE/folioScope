@@ -10,6 +10,7 @@ import signupErrorState from "../features/public/Authentication/signup/redux/sig
 
 import groupFormState from "../features/protected/userDashboard/redux/groupFormState";
 import groupTransactionState from "../features/protected/userDashboard/redux/groupTransactionState";
+import tradeTransactionState from "../features/protected/userDashboard/redux/tradeTransactionState";
 
 const store = configureStore({
   reducer: {
@@ -20,6 +21,7 @@ const store = configureStore({
     signupErrorState,
     groupFormState,
     groupTransactionState,
+    tradeTransactionState,
   },
 });
 
