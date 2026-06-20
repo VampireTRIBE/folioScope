@@ -4,6 +4,7 @@ import { useMutation } from "@tanstack/react-query";
 import {
   POST_ADDGROUPFORM,
   POST_GROUPTRANSACTION,
+  POST_GROUPXIRR,
   POST_TRADETRANSACTION,
 } from "../../APIs/POST_APIs";
 import { PATCH_UPDATEGROUPFORM } from "../../APIs/PATCH_APIs";
@@ -29,5 +30,12 @@ export const useGroupTransactionFormMutation = () => {
 export const useTradeTransactionFormMutation = () => {
   return useMutation({
     mutationFn: POST_TRADETRANSACTION,
+  });
+};
+
+export const useGroupXirrMutation = (groupId) => {
+  return useMutation({
+    mutationKey: ["GroupXirr", groupId],
+    mutationFn: POST_GROUPXIRR,
   });
 };

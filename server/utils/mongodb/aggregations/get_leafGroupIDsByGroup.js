@@ -17,14 +17,16 @@ module.exports.get_leafGroupIDsByGroup = async (
     path: rootId,
   };
 
-  if (session !== null) {
-    filter.session = session;
-  }
-
-  const nodes = await PortfolioGroup.find(filter, {
+  const query = PortfolioGroup.find(filter, {
     _id: 1,
     parentId: 1,
-  }).lean();
+  });
+
+  if (session !== null) {
+    query.session(session);
+  }
+
+  const nodes = await query.lean();
 
   if (!nodes.length) return [];
 

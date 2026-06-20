@@ -5,6 +5,7 @@ const router = express.Router({ mergeParams: true });
 const {
   priceSecurityDrawdownAnalytic,
   priceGroupDrawdownAnalytic,
+  xirrAnalytic,
 } = require("../../controllers/analytic/PriceAnalytic/priceAnalyticController");
 const { verifyAccessToken } = require("../../middlewares/authentication");
 
@@ -19,5 +20,7 @@ router
 router
   .route("/drawdown/group/:groupId")
   .get(verifyAccessToken, priceGroupDrawdownAnalytic);
+  
+router.route("/xirr/group/:groupId").post(verifyAccessToken, xirrAnalytic);
 
 module.exports = router;

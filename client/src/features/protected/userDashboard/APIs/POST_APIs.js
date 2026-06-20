@@ -48,3 +48,19 @@ export const POST_TRADETRANSACTION = async ({
   );
   return response.data;
 };
+
+export const POST_GROUPXIRR = async ({ accessToken, groupId }) => {
+  if (!accessToken || !groupId) {
+    throw new Error("Group context is missing");
+  }
+  const response = await BASE_URL.post(
+    `/analytic/xirr/group/${groupId}`,
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  );
+  return response.data;
+};

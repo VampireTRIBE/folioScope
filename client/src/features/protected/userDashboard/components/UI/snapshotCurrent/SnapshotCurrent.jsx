@@ -1,12 +1,53 @@
 // ! UI Components
-import { useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
 import PriceBadge from "../../../../../../components/layout/public/priceBadge/PriceBadge";
+
+// ! Context
+import { AuthenticationContext } from "../../../../../../context/authenticationContext";
 
 // ! Styles
 import snapshotCurrentStyles from "./snapshotcurrent.module.css";
 
+// ! tanStack Query hooks
+import { useGroupXirrMutation } from "../../../hooks/ReactQuery/useFormMutation";
+
 const CurrentStatus = ({ currentStatus = null }) => {
-  const [xirr, setXirr] = useState(false);
+  const { gp_id, level } = useParams();
+  const { accessToken, userData } = useContext(AuthenticationContext);
+  const groupId = userData?.groups?.[`level${level}`]?.[gp_id]?._id;
+  const currentGroupIdRef = useRef(groupId);
+  const [xirr, setXirr] = useState(null);
+  const {
+    mutateAsync: groupXirrMutationFn,
+    isPending: isPendinggroupXirr,
+    error: errorgroupXirr,
+    reset: resetGroupXirrMutation,
+  } = useGroupXirrMutation(groupId);
+
+  useEffect(() => {
+    currentGroupIdRef.current = groupId;
+    setXirr(null);
+    resetGroupXirrMutation();
+  }, [groupId, resetGroupXirrMutation]);
+
+  const errorMessage =
+    errorgroupXirr?.response?.data?.message ||
+    errorgroupXirr?.response?.data?.error ||
+    errorgroupXirr?.message ||
+    "XIRR calculation failed";
+
+  const handleXirrButton = async () => {
+    const requestedGroupId = groupId;
+    const response = await groupXirrMutationFn({
+      accessToken,
+      groupId: requestedGroupId,
+    });
+
+    if (requestedGroupId === currentGroupIdRef.current) {
+      setXirr(response?.data ?? null);
+    }
+  };
 
   const currentValue = {
     price: currentStatus?.currentvalue || 0.0,
@@ -41,18 +82,23 @@ const CurrentStatus = ({ currentStatus = null }) => {
       </div>
       <div className={snapshotCurrentStyles.subContainerPnl}>
         <div>XIRR : </div>
-        {xirr ? (
+        {xirr !== null ? (
           <div>
-            <PriceBadge currency={true} priceValue={false} />
+            <PriceBadge price={{ today: xirr }} priceValue={false} />
           </div>
         ) : (
           <button
             className={snapshotCurrentStyles.xirrButton}
-            onClick={() => setXirr(true)}>
-            View
+            type="button"
+            disabled={isPendinggroupXirr || !groupId || !accessToken}
+            onClick={handleXirrButton}>
+            {isPendinggroupXirr ? "---" : "View"}
           </button>
         )}
       </div>
+      {errorgroupXirr && (
+        <div className={snapshotCurrentStyles.error}>{errorMessage}</div>
+      )}
     </div>
   );
 };

@@ -133,8 +133,8 @@ module.exports.addGroup = async (req, res, next) => {
     doc.$locals.parent = parent;
     await doc.save();
     return res.status(201).json({
-      success: "Group created",
-      data: doc,
+      success: true,
+      message: "Group Add created",
     });
   } catch (error) {
     if (error.code === 11000) {

@@ -31,3 +31,17 @@
   background-color: var(--color-success);
   cursor: pointer;
 }
+
+.xirrButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.error {
+  width: 100%;
+  padding: var(--space-1) var(--space-2);
+  color: var(--color-danger);
+  background-color: var(--color-danger-bg);
+  border-left: var(--border-width-lg) solid var(--color-danger);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}

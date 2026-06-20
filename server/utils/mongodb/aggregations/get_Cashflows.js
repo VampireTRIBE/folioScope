@@ -19,11 +19,7 @@ module.exports.build_GroupCashflows = async (
     type: { $ne: "tax" },
   };
 
-  if (session !== null) {
-    matchStage.session = session;
-  }
-
-  const result = await GroupStatement.aggregate([
+  const query = GroupStatement.aggregate([
     { $match: matchStage },
     {
       $project: {
@@ -63,6 +59,12 @@ module.exports.build_GroupCashflows = async (
       },
     },
   ]);
+
+  if (session !== null) {
+    query.session(session);
+  }
+  
+  const result = await query;
 
   return result;
 };
