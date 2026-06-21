@@ -1,10 +1,17 @@
 import { useSelector } from "react-redux";
 import { useContext, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
 
-// ! APIs
-import { FETCH_TRADABLESECURITIESLIST } from "../../../../../public/header/api/FETCH_APIs";
+// ! Hooks
+import { usePublicSecurities } from "../../../../../../hooks/RTK Query Hooks/sessionStorage";
+
+// ! Utils
+import {
+  getSecuritiesByCategory,
+  getSecurityId,
+  getSecurityLabel,
+  TRADABLE_SECURITIES_KEY,
+} from "../../../../../../utils/sessionStorage/securityListTransforms";
 
 // ! Styles
 import tradeStyles from "./tradeform.module.css";
@@ -30,21 +37,9 @@ import { useFormDataActions } from "../../../hooks/customHooks/useFormData";
 // ! Custom Client Navigation Hooks
 import { useNavigationActions } from "../../../../../hooks/customHooks/useNavigationActions";
 
-const getSecurityLabel = (item) => {
-  if (typeof item === "string") return item;
-  return item?.symbol || item?.name || item?.label || "";
-};
-
-const getSecurityId = (item) => {
-  if (typeof item === "string") return item;
-  return item?._id || item?.id || item?.value || item?.securityId || "";
-};
-
 const TradeForm = () => {
   const { gp_id, level } = useParams();
-  const { accessToken, userData, setUserData } = useContext(
-    AuthenticationContext,
-  );
+  const { accessToken, userData } = useContext(AuthenticationContext);
   const { goToUserDashboard } = useNavigationActions();
 
   const {
@@ -71,22 +66,11 @@ const TradeForm = () => {
   const [selectedSymbolId, setSelectedSymbolId] = useState("");
   const [showSymbolPreview, setShowSymbolPreview] = useState(false);
 
-  const { data: securitiesList, isPending: isPendingSecuritiesList } = useQuery(
-    {
-      queryKey: ["TradableSecuritieslist"],
-      queryFn: FETCH_TRADABLESECURITIESLIST,
-      staleTime: 600000,
-    },
-  );
+  const { data: securitiesList, isPending: isPendingSecuritiesList } =
+    usePublicSecurities();
 
   const safeSecuritiesList = useMemo(() => {
-    if (Array.isArray(securitiesList)) return securitiesList;
-    if (!securitiesList || typeof securitiesList !== "object") return [];
-
-    return Object.entries(securitiesList).map(([symbol, id]) => ({
-      symbol,
-      id,
-    }));
+    return getSecuritiesByCategory(securitiesList, TRADABLE_SECURITIES_KEY);
   }, [securitiesList]);
 
   const filteredSecuritiesList = useMemo(() => {
@@ -131,7 +115,6 @@ const TradeForm = () => {
     {
       id: "dividend",
       text: "DIVIDEND",
-      varient: "chartFilter",
       varient:
         activeTradeTransactionType === "dividend"
           ? "chartFilterActive"
@@ -151,7 +134,15 @@ const TradeForm = () => {
     };
 
     syncAfterSuccess();
-  }, [ACTIVE_GROUP_FORM_RESET, isSuccesstradeTransactionForm, gp_id, level]);
+  }, [
+    ACTIVE_GROUP_FORM_RESET,
+    FILTER_ACTIVE_GROUPTRANSACTION_TYPE_RESET,
+    FILTER_ACTIVE_TRADETRANSACTION_TYPE_RESET,
+    goToUserDashboard,
+    isSuccesstradeTransactionForm,
+    gp_id,
+    level,
+  ]);
 
   return (
     <form

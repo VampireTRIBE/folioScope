@@ -1,7 +1,10 @@
 import { useQuery } from "@tanstack/react-query";
 
 // ! APIs
-import { FETCH_GROUPMETADATA } from "../../APIs/FETCH_APIs";
+import {
+  FETCH_GROUPMETADATA,
+  FETCH_XIRRCOMPARISION,
+} from "../../APIs/FETCH_APIs";
 import {
   FETCH_GROUPDRAWDOWN,
   FETCH_RANGENAVGROUP,
@@ -44,5 +47,14 @@ export const useGroupDrawdown = (groupId, accessToken) => {
     queryFn: () => FETCH_GROUPDRAWDOWN(groupId, accessToken),
     enabled: !!groupId && !!accessToken,
     staleTime: 30000,
+  });
+};
+
+export const useXirrComparision = (groupId, indexId, accessToken) => {
+  return useQuery({
+    queryKey: ["XirrComparision", groupId, indexId],
+    queryFn: () => FETCH_XIRRCOMPARISION(accessToken, groupId, indexId),
+    enabled: !!groupId && !!accessToken && !!indexId,
+    staleTime: 24 * 60 * 60 * 1000,
   });
 };

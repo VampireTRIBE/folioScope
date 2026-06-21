@@ -1,11 +1,23 @@
 const mongoose = require("mongoose");
+
+// ! MODELS
 const PORTFOLIOGROUP_MODEL = require("../../../models/Portfolio_Models/PortfolioGroup_Models/portfolioGroup");
+
+// ! Analytic Utils
 const {
   priceDrawdownAnalysis,
 } = require("../../../utils/analytics/NonComparisonAnalytics/PRICE_Drawdown_Analytics");
 const {
   XIRR_Group,
 } = require("../../../utils/analytics/NonComparisonAnalytics/XIRR_Calculation");
+const {
+  default_XirrComparison,
+} = require("../../../utils/analytics/ComparisonAnalytics/default_XirrComparison");
+const {
+  default_NavComparison,
+} = require("../../../utils/analytics/ComparisonAnalytics/default_NavComparison");
+
+// ! Other Utils
 const customError = require("../../../utils/shared/error/customError");
 
 module.exports.priceSecurityDrawdownAnalytic = async (req, res, next) => {
@@ -51,7 +63,6 @@ module.exports.priceGroupDrawdownAnalytic = async (req, res, next) => {
       data: priceDrawdown?.[key] ?? null,
     });
   } catch (error) {
-    console.log(error);
     next(error);
   }
 };
@@ -88,6 +99,7 @@ module.exports.xirrAnalytic = async (req, res, next) => {
           xirr: groupXirr,
           lastcomputed: new Date(),
         });
+        portfolioGroup.$locals.parent = "xirr";
         await portfolioGroup.save({ session });
       }
       xirr = portfolioGroup.groupSnapshot.groupXirr.xirr;
@@ -102,5 +114,53 @@ module.exports.xirrAnalytic = async (req, res, next) => {
     next(error);
   } finally {
     session.endSession();
+  }
+};
+
+module.exports.xirrComparison = async (req, res, next) => {
+  try {
+    const userID = req.userId;
+    const { groupId } = req.params;
+    const { indexId } = req.params;
+    if (!groupId || !indexId)
+      throw new customError("Missing Request Credentials", 400);
+
+    const XirrComparision = await default_XirrComparison(
+      groupId,
+      userID,
+      indexId,
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Xirr Comparision Analysis",
+      data: XirrComparision,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports.navComparison = async (req, res, next) => {
+  try {
+    const userID = req.userId;
+    const { groupId } = req.params;
+    const { indexId } = req.params;
+    if (!groupId || !indexId)
+      throw new customError("Missing Request Credentials", 400);
+
+    const XirrComparision = await default_NavComparison(
+      indexId,
+      groupId,
+      userID,
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Xirr Comparision Analysis",
+      data: XirrComparision,
+    });
+  } catch (error) {
+    next(error);
   }
 };

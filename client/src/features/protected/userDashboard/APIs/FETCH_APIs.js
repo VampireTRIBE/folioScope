@@ -8,3 +8,15 @@ export const FETCH_GROUPMETADATA = async (accessToken, gp_id = "null") => {
   });
   return response.data;
 };
+
+export const FETCH_XIRRCOMPARISION = async (accessToken, gp_id, indexId) => {
+  const response = await BASE_URL.get(
+    `/analytic/comparision/xirr/${gp_id}/${indexId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  );
+  return response.data;
+};

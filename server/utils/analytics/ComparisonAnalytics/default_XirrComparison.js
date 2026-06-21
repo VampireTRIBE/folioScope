@@ -16,6 +16,7 @@ const {
 const {
   normalizeToIST330PM,
 } = require("../../../utils/transformData/normalizeDates");
+const customError = require("../../shared/error/customError");
 
 module.exports.default_XirrComparison = async (
   groupId = null,
@@ -24,7 +25,7 @@ module.exports.default_XirrComparison = async (
   session = null,
 ) => {
   if (!groupId || !userId || !indexId) {
-    throw new Error("Missing Parameters");
+    throw new customError("Missing Parameters", 400);
   }
   try {
     const [groupLeafIDs, currentValue] = await Promise.all([
@@ -68,6 +69,7 @@ module.exports.default_XirrComparison = async (
       new Date(groupCashflows[0].date),
       false,
       null,
+      null,
       new Date(today),
     );
 
@@ -89,15 +91,17 @@ module.exports.default_XirrComparison = async (
     const indexXirr = Number(computeIRR(indexCashflows)).toFixed(2);
 
     return {
-      xirrBasedAnalysis: {
-        xirr: {
-          groupXirr,
-          indexXirr,
-          alpha: groupXirr - indexXirr,
+      xirrAnalysis: {
+        _ids: {
+          groupId,
+          indexId,
         },
+        groupXirr,
+        indexXirr,
+        alpha: groupXirr - indexXirr,
       },
     };
   } catch (error) {
-    throw new Error("Error IN computation");
+    throw new customError("Error in Computation", 422);
   }
 };

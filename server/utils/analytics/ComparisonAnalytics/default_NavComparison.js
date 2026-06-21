@@ -11,15 +11,28 @@ const {
 module.exports.default_NavComparison = async ({
   indexId = null,
   groupId = null,
+  userId = null,
   startDate = null,
   session = null,
 }) => {
-  if (!indexId || !groupId || !startDate) {
+  if (!userId || !indexId || !groupId || !startDate) {
     throw new Error("Missing Request Parameters");
   }
   const [indexPastPrices, navPastPrices] = await Promise.all([
-    get_DailyClosePricesByAsset(indexId, new Date(startDate), false, session),
-    get_DailyClosePricesByAsset(groupId, new Date(startDate), true, session),
+    get_DailyClosePricesByAsset(
+      indexId,
+      new Date(startDate),
+      false,
+      null,
+      session,
+    ),
+    get_DailyClosePricesByAsset(
+      groupId,
+      new Date(startDate),
+      true,
+      userId,
+      session,
+    ),
   ]);
 
   let navBasedAnalytics = {

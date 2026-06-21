@@ -93,4 +93,44 @@ portfolioGroupSchema.pre(/^find/, function () {
   this.where({ isDeleted: false });
 });
 
+// -------- STRUCTURE ENFORCEMENT --------
+portfolioGroupSchema.pre("validate", async function (next) {
+  try {
+    if (this.$locals.parent !== "xirr") {
+      if (this.parentId && !this.$locals.parent) {
+        return next(new Error("Parent must be provided from controller"));
+      }
+
+      // ROOT
+      if (!this.parentId) {
+        this.level = 1;
+        this.path = [];
+        return next();
+      }
+
+      // Parent must be passed via $locals (Option B)
+      const parent = this.$locals.parent;
+
+      if (!parent) {
+        return next(new Error("Parent must be provided"));
+      }
+
+      if (parent.userId.toString() !== this.userId.toString()) {
+        return next(new Error("Parent belongs to different user"));
+      }
+
+      this.level = parent.level + 1;
+
+      if (this.level > 4) {
+        return next(new Error("Max depth exceeded"));
+      }
+
+      this.path = [...parent.path, parent._id];
+    }
+    return next();
+  } catch (err) {
+    return next(err);
+  }
+});
+
 module.exports = mongoose.model("portfolioGroup", portfolioGroupSchema);

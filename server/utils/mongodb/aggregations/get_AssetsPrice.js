@@ -5,6 +5,7 @@ const {
   normalizeToIST5PM,
   normalizeToISTEndOfDay,
 } = require("../../transformData/normalizeDates");
+const customError = require("../../shared/error/customError");
 
 module.exports.get_LatestTargetCloses = async (
   targetDate = null,
@@ -167,10 +168,10 @@ module.exports.get_DailyClosePricesByAsset = async (
   const reqested_Model = nav ? NAV_Model : AssetPriceHistory_Model;
 
   if (!startDate) {
-    throw new Error("Start Date Requiered");
+    throw new customError("Start Date Requiered", 400);
   }
   if (!asset) {
-    throw new Error("Financial Asset Requiered");
+    throw new customError("Financial Asset Requiered", 400);
   }
   startDate = nav
     ? normalizeToIST5PM(startDate)

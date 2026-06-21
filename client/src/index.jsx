@@ -6,6 +6,7 @@ import { Provider } from "react-redux";
 import { router } from "./app/router";
 import store from "./app/store";
 import { AuthenticationProvider } from "./context/authenticationContext";
+import AppInitializerWithSessionStorage from "./CustomProviders/AppInitializerWithSessionStorage";
 
 const queryClient = new QueryClient();
 
@@ -13,6 +14,7 @@ createRoot(document.getElementById("root")).render(
   <Provider store={store}>
     <QueryClientProvider client={queryClient}>
       <AuthenticationProvider>
+        <AppInitializerWithSessionStorage />
         <RouterProvider router={router} />
         <ReactQueryDevtools initialIsOpen={false} />
       </AuthenticationProvider>

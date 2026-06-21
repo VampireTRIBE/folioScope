@@ -122,7 +122,7 @@ module.exports.login_Service = async (req, res, next) => {
     const filterObjLevel3 = { userId: user._id, level: 3 };
     const filterObjLevel4 = { userId: user._id, level: 4 };
 
-    const LeafGroupIDs = await get_AllLeafNodes(userID);
+    const LeafGroupIDs = await get_AllLeafNodes(user._id);
     let LeafGroupIDsOBJ = {};
     for (const el of LeafGroupIDs) {
       LeafGroupIDsOBJ[el] = "TRUE";
