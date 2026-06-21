@@ -7,7 +7,7 @@ const XirrCard = ({ xirrComparisionStats }) => {
       <div className={xirrCardStyles.cardSubtitleContainer}>
         <h4 className={xirrCardStyles.cardSubtitle}>Vs</h4>
         <span className={xirrCardStyles.cardSubtitleIndex}>
-          {xirrComparisionStats.indexName}
+          {xirrComparisionStats?.indexName || "N/A"}
         </span>
       </div>
       <div className={xirrCardStyles.zoneContainer}>

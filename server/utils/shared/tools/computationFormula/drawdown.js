@@ -166,8 +166,6 @@ module.exports.comparisonDrawdownFunction = (
   return drawdownOBJ;
 };
 
-
-
 module.exports.singleDrawdownFunction = (
   currentDate = null,
   startDate = null,

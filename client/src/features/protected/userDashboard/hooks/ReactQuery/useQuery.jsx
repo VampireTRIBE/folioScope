@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 // ! APIs
 import {
   FETCH_GROUPMETADATA,
+  FETCH_NAVCOMPARISION,
   FETCH_XIRRCOMPARISION,
 } from "../../APIs/FETCH_APIs";
 import {
@@ -54,6 +55,15 @@ export const useXirrComparision = (groupId, indexId, accessToken) => {
   return useQuery({
     queryKey: ["XirrComparision", groupId, indexId],
     queryFn: () => FETCH_XIRRCOMPARISION(accessToken, groupId, indexId),
+    enabled: !!groupId && !!accessToken && !!indexId,
+    staleTime: 24 * 60 * 60 * 1000,
+  });
+};
+
+export const useNavComparision = (groupId, indexId, accessToken) => {
+  return useQuery({
+    queryKey: ["NavComparision", groupId, indexId],
+    queryFn: () => FETCH_NAVCOMPARISION(accessToken, groupId, indexId),
     enabled: !!groupId && !!accessToken && !!indexId,
     staleTime: 24 * 60 * 60 * 1000,
   });

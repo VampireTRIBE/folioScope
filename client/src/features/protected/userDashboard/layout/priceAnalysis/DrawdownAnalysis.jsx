@@ -63,7 +63,10 @@ const DrawdownAnalysis = () => {
   return (
     <div id="analysis" className={drawdownAnalysisStyle.container}>
       <h3 className={drawdownAnalysisStyle.title}>Price Analysis</h3>
-      <DrawdownAnalysisCard drawdownDetails={drawdownDetails} />
+      <DrawdownAnalysisCard
+        drawdownDetails={drawdownDetails}
+        disclaimer={true}
+      />
     </div>
   );
 };

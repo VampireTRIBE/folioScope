@@ -149,11 +149,12 @@ module.exports.navComparison = async (req, res, next) => {
     if (!groupId || !indexId)
       throw new customError("Missing Request Credentials", 400);
 
-    const XirrComparision = await default_NavComparison(
+    const XirrComparision = await default_NavComparison({
       indexId,
       groupId,
-      userID,
-    );
+      userId: userID,
+      startDate: new Date("2024-06-26T06:45:00.000+00:00"),
+    });
 
     res.status(200).json({
       success: true,

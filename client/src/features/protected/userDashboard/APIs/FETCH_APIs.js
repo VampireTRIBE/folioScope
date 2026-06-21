@@ -20,3 +20,15 @@ export const FETCH_XIRRCOMPARISION = async (accessToken, gp_id, indexId) => {
   );
   return response.data;
 };
+
+export const FETCH_NAVCOMPARISION = async (accessToken, gp_id, indexId) => {
+  const response = await BASE_URL.get(
+    `/analytic/comparision/nav/${gp_id}/${indexId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  );
+  return response.data;
+};

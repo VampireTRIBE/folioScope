@@ -2,7 +2,7 @@ const {
   get_DailyClosePricesByAsset,
 } = require("../../../utils/mongodb/aggregations/get_AssetsPrice");
 const {
-  drawdownFunction,
+  comparisonDrawdownFunction,
 } = require("../../../utils/shared/tools/computationFormula/drawdown");
 const {
   normalizeToIST330PM,
@@ -85,7 +85,7 @@ module.exports.default_NavComparison = async ({
     let groupReturn =
       ((normalizeNavsSeries[x].group - groupBase) / groupBase) * 100;
 
-    const drawdown = drawdownFunction(x, y, normalizeNavsSeries);
+    const drawdown = comparisonDrawdownFunction(x, y, normalizeNavsSeries);
 
     // initialize properly
     navBasedAnalytics.standalone[groupId] ??= {};
@@ -127,9 +127,6 @@ module.exports.default_NavComparison = async ({
     };
   };
 
-  if (v1 && v2) {
-    valueCalculation(v1, v2, "1Day");
-  }
   if (v3) {
     valueCalculation(v1, v3, "3Months");
   }
