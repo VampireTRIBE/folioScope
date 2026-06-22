@@ -1,44 +1,72 @@
 .container {
   width: 100%;
-  padding: var(--space-2);
-  border: 1px solid var(--border-dark);
+  height: 100%;
+  min-width: 0;
+  padding: var(--space-3);
+  border: var(--border-width-sm) solid var(--border-default);
   border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-sm);
   background-color: var(--bg-card);
   font-size: var(--text-xs);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  transition:
+    transform var(--transition-fast),
+    box-shadow var(--transition-fast),
+    border-color var(--transition-fast);
+}
+
+.container:hover {
+  border-color: var(--border-dark);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
 }
 
 .head {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  padding-bottom: var(--space-1);
-  border-bottom: 1px dotted var(--border-dark);
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding-bottom: var(--space-2);
+  border-bottom: var(--border-width-sm) solid var(--border-light);
+}
+
+.headSub {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
 }
 
 .assetName {
+  color: var(--text-primary);
+  font-size: var(--text-sm);
   font-weight: var(--fw-bold);
+  line-height: var(--lh-tight);
+  overflow-wrap: anywhere;
 }
 
 .oneDayPrice,
 .rightContent {
   font-size: var(--text-sm);
+  text-align: right;
 }
 
 .content,
 .contentValue,
 .valueWrapper,
 .ltpContainer {
-  padding: var(--space-1) 0;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: var(--space-2);
 }
 
 .leftContent {
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  flex-flow: row wrap;
+  justify-content: flex-start;
   align-items: center;
   gap: var(--space-1);
 }
@@ -54,29 +82,61 @@
 .leftContent > .avg span {
   font-weight: var(--fw-regular);
   font-size: var(--text-sm);
+  color: var(--text-secondary);
 }
 
 .contentValue {
   flex-direction: column;
+  gap: var(--space-1);
 }
 
 .valueWrapper {
   width: 100%;
+  color: var(--text-secondary);
 }
 
 .ltpContainer {
   gap: var(--space-1);
   font-size: var(--text-xs);
-  opacity: 0.8;
+  color: var(--text-secondary);
 }
 
 .expenseRatio {
   width: 100%;
   display: flex;
+  flex-flow: row wrap;
+  align-items: center;
   gap: var(--space-2);
+  margin-top: var(--space-1);
+  padding-top: var(--space-2);
+  border-top: var(--border-width-sm) solid var(--border-light);
+  color: var(--text-secondary);
 }
 
 .alert {
   flex: 1;
   text-align: center;
+  min-width: 4rem;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-full);
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning);
+  font-weight: var(--fw-semibold);
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: var(--space-2);
+  }
+
+  .head,
+  .content,
+  .valueWrapper {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .oneDayPrice {
+    text-align: left;
+  }
 }
