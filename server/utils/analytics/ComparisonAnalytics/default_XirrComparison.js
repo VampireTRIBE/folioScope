@@ -98,7 +98,7 @@ module.exports.default_XirrComparison = async (
         },
         groupXirr,
         indexXirr,
-        alpha: groupXirr - indexXirr,
+        alpha: Number(groupXirr - indexXirr).toFixed(2),
       },
     };
   } catch (error) {

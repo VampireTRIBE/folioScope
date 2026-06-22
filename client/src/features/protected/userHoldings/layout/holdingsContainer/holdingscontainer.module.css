@@ -1,0 +1,25 @@
+.container {
+  margin-top: var(--space-4);
+  background-color: inherit;
+  padding: var(--space-2);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  scroll-margin-top: calc(var(--header-height) + 2.5rem);
+}
+
+.title {
+  margin-bottom: var(--space-1);
+  padding-bottom: var(--space-1);
+  font-size: var(--text-xl);
+  font-weight: var(--fw-bold);
+  letter-spacing: 1px;
+  border-bottom: var(--border-width-sm) solid var(--border-dark);
+}
+
+.content {
+  display: flex;
+  flex-flow: row wrap;
+  gap: var(--space-3);
+  justify-content: center;
+
+}

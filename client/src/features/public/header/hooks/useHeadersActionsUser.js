@@ -11,7 +11,7 @@ export const useHeaderUserActions = () => {
   const { LogoutRequest } = useLogoutActions();
   const dispatch = useDispatch();
 
-  const { goToUserDashboard, goToUserProfile, gotoHome } =
+  const { goToUserDashboard, goToUserProfile, gotoHome, goToUserHoldings } =
     useNavigationActions();
 
   const level1Array = useMemo(
@@ -150,7 +150,7 @@ export const useHeaderUserActions = () => {
       {
         id: "menu-holdings",
         group: false,
-        onClick: () => console.log("Holdings"),
+        onClick: goToUserHoldings,
         children: "Holdings",
         variant: "sideBarbtn",
         order: 3,

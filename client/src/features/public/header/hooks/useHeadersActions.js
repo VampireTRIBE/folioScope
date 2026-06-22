@@ -11,7 +11,7 @@ export const useHeaderActions = () => {
   const { goToLogin, goToSignup } = useNavigationActions();
 
   // =========================
-  // TOGGLE ACTION
+  // ! TOGGLE ACTION
   // =========================
 
   const toggle = useCallback(

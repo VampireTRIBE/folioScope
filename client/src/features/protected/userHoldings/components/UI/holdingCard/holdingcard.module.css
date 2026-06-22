@@ -1,0 +1,82 @@
+.container {
+  width: 100%;
+  padding: var(--space-2);
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  background-color: var(--bg-card);
+  font-size: var(--text-xs);
+}
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: var(--space-1);
+  border-bottom: 1px dotted var(--border-dark);
+}
+
+.assetName {
+  font-weight: var(--fw-bold);
+}
+
+.oneDayPrice,
+.rightContent {
+  font-size: var(--text-sm);
+}
+
+.content,
+.contentValue,
+.valueWrapper,
+.ltpContainer {
+  padding: var(--space-1) 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.leftContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.leftContent > .qty,
+.leftContent > .avg,
+.current,
+.invested,
+.ltp {
+  font-weight: var(--fw-bold);
+}
+.leftContent > .qty span,
+.leftContent > .avg span {
+  font-weight: var(--fw-regular);
+  font-size: var(--text-sm);
+}
+
+.contentValue {
+  flex-direction: column;
+}
+
+.valueWrapper {
+  width: 100%;
+}
+
+.ltpContainer {
+  gap: var(--space-1);
+  font-size: var(--text-xs);
+  opacity: 0.8;
+}
+
+.expenseRatio {
+  width: 100%;
+  display: flex;
+  gap: var(--space-2);
+}
+
+.alert {
+  flex: 1;
+  text-align: center;
+}

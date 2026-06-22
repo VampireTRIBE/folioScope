@@ -53,13 +53,17 @@ export const useNavigationActions = () => {
 
   const goToUserDashboard = useCallback(
     (level, groupId) => {
-      navigate(ROUTES.USERDASHBOARD(level ,groupId), { replace: true });
+      navigate(ROUTES.USERDASHBOARD(level, groupId), { replace: true });
     },
     [navigate],
   );
 
   const goToUserProfile = useCallback(() => {
     navigate(ROUTES.USERPROFILE);
+  }, [navigate]);
+
+  const goToUserHoldings = useCallback(() => {
+    navigate(ROUTES.USERHOLDINGS);
   }, [navigate]);
 
   return {
@@ -73,5 +77,6 @@ export const useNavigationActions = () => {
     goToSendVerificationMail,
     goToUserDashboard,
     goToUserProfile,
+    goToUserHoldings,
   };
 };

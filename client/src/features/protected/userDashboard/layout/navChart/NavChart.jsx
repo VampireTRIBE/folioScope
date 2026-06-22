@@ -1,5 +1,5 @@
 // ! components
-import PriceChartCurveDoubleSeries from "../../../../../components/layout/public/priceChartCurve/priceChartCurveDoubleSeries";
+import PriceChartCurveDoubleSeries from "../../../../../components/layout/public/priceChartCurve/PriceChartCurveDoubleSeries";
 
 // ! styles
 import navChartStyle from "./navchart.module.css";

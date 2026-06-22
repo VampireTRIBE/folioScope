@@ -1,0 +1,40 @@
+.container {
+  margin-top: var(--space-3);
+  width: 100%;
+  padding: var(--space-2);
+  border: 1px solid var(--border-dark);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  background-color: var(--bg-card);
+
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.item {
+  flex: 1 1 180px;
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+  border: 1px dotted var(--border-dark);
+
+  display: flex;
+  flex-flow: column;
+  gap: var(--space-1);
+}
+
+.label {
+  font-size: var(--text-xs);
+  font-weight: var(--fw-bold);
+  opacity: 0.75;
+}
+
+.value {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  gap: var(--space-1);
+  font-size: var(--text-sm);
+  font-weight: var(--fw-bold);
+}
