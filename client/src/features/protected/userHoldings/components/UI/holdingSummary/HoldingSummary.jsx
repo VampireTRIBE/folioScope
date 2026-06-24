@@ -9,6 +9,10 @@ const HoldingSummary = ({
   currentValue = 0,
   todaysGain = 0,
   todaysGainPercentage = "0.00%",
+  groupXirr = {
+    xirr: "0.00%",
+    lastcomputed: null,
+  },
 }) => {
   const invested = Number(totalInvested || 0);
   const current = Number(currentValue || 0);
@@ -20,6 +24,12 @@ const HoldingSummary = ({
     invested > 0
       ? `${((totalProfitLoss / invested) * 100).toFixed(2)}%`
       : "0.00%";
+  const groupXirrLastComputed = groupXirr?.lastcomputed
+    ? new Date(groupXirr.lastcomputed).toLocaleString("en-IN", {
+        dateStyle: "medium",
+        timeStyle: "short",
+      })
+    : "Not computed";
 
   return (
     <div className={holdingSummaryStyles.container}>
@@ -74,6 +84,23 @@ const HoldingSummary = ({
             currency={true}
             percentage={true}
           />
+        </div>
+      </div>
+
+      <div className={holdingSummaryStyles.item}>
+        <div className={holdingSummaryStyles.label}>Group XIRR</div>
+
+        <div className={holdingSummaryStyles.value}>
+          <PriceBadge
+            price={{
+              today: groupXirr?.xirr || "0.00%",
+            }}
+            priceValue={false}
+            percentage={true}
+          />
+        </div>
+        <div className={holdingSummaryStyles.meta}>
+          Last computed: {groupXirrLastComputed}
         </div>
       </div>
     </div>

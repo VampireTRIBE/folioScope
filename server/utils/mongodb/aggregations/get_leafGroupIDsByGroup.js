@@ -14,7 +14,7 @@ module.exports.get_leafGroupIDsByGroup = async (
   const filter = {
     isDeleted: false,
     userId: userObjectId,
-    path: rootId,
+    $or: [{ _id: rootId }, { path: rootId }],
   };
 
   const query = PortfolioGroup.find(filter, {

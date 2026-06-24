@@ -2,10 +2,10 @@
 import costStructureStyles from "./coststructure.module.css";
 
 const CostStructure = ({
-  title = "Cost Structure",
-  totalExpenseRatio = "0.40%",
-  progress = 35,
-  annualCost = 2938,
+  title = "Bucket Cost",
+  totalExpenseRatio = "0.00%",
+  progress = 0,
+  annualCost = 0,
 }) => {
   const safeProgress = Math.min(Math.max(Number(progress), 0), 100);
 
@@ -34,7 +34,7 @@ const CostStructure = ({
           <div className={costStructureStyles.costLabel}>Est. Annual Cost</div>
 
           <div className={costStructureStyles.costValue}>
-            ₹{Number(annualCost).toLocaleString("en-IN")}
+            ₹{Number(annualCost).toFixed(2).toLocaleString("en-IN")}
           </div>
         </div>
       </div>

@@ -7,6 +7,7 @@ const {
   deleteGroup,
   updateGroup,
   get_GroupMetadata,
+  fetch_UserHoldings,
 } = require("../../controllers/portfolio/portfolioGroupControllers");
 const {
   groupstatementTransaction,
@@ -28,6 +29,10 @@ const {
 const { verifyAccessToken } = require("../../middlewares/authentication");
 
 // ! routes
+
+// ! Fetch User Holdings Routes
+
+router.route("/holdings").post(verifyAccessToken, fetch_UserHoldings);
 
 // ! Portfolio Group POST Routes
 router

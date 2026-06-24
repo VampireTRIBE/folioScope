@@ -25,6 +25,13 @@
   align-items: stretch;
 }
 
+.noHolding{
+  min-height: 10rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 @media (max-width: 640px) {
   .container {
     margin-top: var(--space-3);
