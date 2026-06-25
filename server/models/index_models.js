@@ -20,6 +20,7 @@ const NAVSYSTEM_MODEL = require("./Portfolio_Models/PortfolioMetrics_Models/navS
 const FIFOLEDGERSTATEMENT_MODEL = require("./Portfolio_Models/ledger_Models/fifoLedgerStatement");
 const GROUPSTATEMENT_MODEL = require("./Portfolio_Models/ledger_Models/groupStatement");
 const LEDGERSTATEMENT_MODEL = require("./Portfolio_Models/ledger_Models/ledgerStatement");
+const PORTFOLIOREBALANCER_MODEL = require("./Portfolio_Models/PortfolioMetrics_Models/portfolioRebalancer");
 
 const log = require("../utils/shared/console_Loggers/consoleLoggers");
 

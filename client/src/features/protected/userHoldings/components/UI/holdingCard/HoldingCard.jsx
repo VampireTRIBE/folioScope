@@ -21,6 +21,7 @@ const HoldingCard = ({ holding = {} }) => {
 
     invested = 0,
     current = 0,
+    expenseRatioValue = "n/a",
   } = holding;
 
   return (
@@ -95,7 +96,11 @@ const HoldingCard = ({ holding = {} }) => {
         </div>
         <div className={holdingCardStyles.expenseRatio}>
           <div>Expense Ratio : </div>
-          <span>0.25</span>
+          <span>
+            {"n/a" !== expenseRatioValue
+              ? `${expenseRatioValue}%`
+              : expenseRatioValue}
+          </span>
           <div className={holdingCardStyles.alert}>Alert</div>
         </div>
       </div>

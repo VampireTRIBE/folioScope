@@ -1,6 +1,5 @@
 // ! Page Outlets
 
-
 // ! User Dashboard Page
 import UserDashboardOutlet from "../../../../features/protected/userDashboard/outlet/UserDashboardOutlet";
 
@@ -10,6 +9,9 @@ import UserHoldingsOutlet from "../../../../features/protected/userHoldings/outl
 // ! User Profile Outlet
 import UserProfileOutlet from "../../../../features/protected/userProfile/outlet/UserProfileOutlet";
 
+// ! User Portfolio Rebalncer Outlet
+import UserPortfolioRebalencerOutlet from "../../../../features/protected/userPortfolioRebalancers/outlet/UserPortfolioRebalancerOutlet";
+
 export const portfolioRoutes = [
   {
     path: "profile",
@@ -18,6 +20,10 @@ export const portfolioRoutes = [
   {
     path: "holdings",
     element: <UserHoldingsOutlet />,
+  },
+  {
+    path: "rebalencer",
+    element: <UserPortfolioRebalencerOutlet />,
   },
   {
     path: ":level/:gp_id",

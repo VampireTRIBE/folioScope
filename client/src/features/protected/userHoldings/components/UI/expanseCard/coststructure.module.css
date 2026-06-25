@@ -52,10 +52,16 @@
   overflow: hidden;
 }
 
-.progressFill {
+.progressFillGreen {
   height: 100%;
   border-radius: var(--radius-full);
   background: var(--gradient-accent);
+}
+
+.progressFillRed {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: var(--color-danger);
 }
 
 .costBox {

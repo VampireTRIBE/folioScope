@@ -104,59 +104,12 @@ module.exports.fetch_UserHoldings = async (req, res, next) => {
       filterObj: financialAssetFilterObj,
     });
 
-    // const netWorth = await read_NetWorthRange1D(pg_id, userID);
-
-    // const respData = {
-    //   _id: portfolioGroup._id,
-    //   groupName: portfolioGroup.name,
-    //   description: portfolioGroup.description,
-    //   level: portfolioGroup.level,
-    //   consolidatedSnapshot: {
-    //     netcurrentvalue: portfolioGroup.consolidatedCurrentValue,
-    //     consolidatedcash: portfolioGroup.consolidatedCash,
-    //     consolidatedtax: portfolioGroup.consolidatedTax,
-    //   },
-    //   currentInvestment: {
-    //     investmentvalue: portfolioGroup.groupSnapshot.investmentValue,
-    //     currentvalue: portfolioGroup.groupSnapshot.currentValue,
-    //     pl: (
-    //       Number(portfolioGroup.groupSnapshot.currentValue) -
-    //       Number(portfolioGroup.groupSnapshot.investmentValue)
-    //     ).toFixed(2),
-    //     "pl%": (
-    //       (Number(portfolioGroup.groupSnapshot.currentValue) -
-    //         Number(portfolioGroup.groupSnapshot.investmentValue)) /
-    //       Number(portfolioGroup.groupSnapshot.investmentValue)
-    //     ).toFixed(2),
-    //   },
-    //   networth: netWorth,
-    //   currentyear: {
-    //     realizedgain: portfolioGroup.groupSnapshot.financialYear.realizedGain,
-    //     dividend: portfolioGroup.groupSnapshot.financialYear.dividend,
-    //     unrealizedgain:
-    //       portfolioGroup.groupSnapshot.financialYear.unrealizedGain,
-    //     totalgain: portfolioGroup.groupSnapshot.financialYear.totalGain,
-    //   },
-    //   lifetime: {
-    //     realized: portfolioGroup.groupSnapshot.lifetime.realizedGain,
-    //     dividend: portfolioGroup.groupSnapshot.lifetime.dividend,
-    //     totalgain: (
-    //       Number(portfolioGroup.groupSnapshot.lifetime.realizedGain) +
-    //       Number(portfolioGroup.groupSnapshot.lifetime.dividend)
-    //     ).toFixed(2),
-    //   },
-    // };
-
     return res.status(200).json({
       success: true,
       message: "Metadata Fetched",
       data: userHoldingData,
     });
   } catch (error) {
-    // if (error.code === 11000) {
-    //   return res.status(400).json({ error: "Duplicate group name" });
-    // }
-    // return res.status(500).json({ error: error.message });
     next(error);
   }
 };

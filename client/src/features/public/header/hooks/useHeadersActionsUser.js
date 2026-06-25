@@ -11,8 +11,13 @@ export const useHeaderUserActions = () => {
   const { LogoutRequest } = useLogoutActions();
   const dispatch = useDispatch();
 
-  const { goToUserDashboard, goToUserProfile, gotoHome, goToUserHoldings } =
-    useNavigationActions();
+  const {
+    goToUserDashboard,
+    goToUserProfile,
+    gotoHome,
+    goToUserHoldings,
+    goToUserPortfolioRebalencer,
+  } = useNavigationActions();
 
   const level1Array = useMemo(
     () => Object.values(userData?.groups?.level1 || {}),
@@ -152,6 +157,14 @@ export const useHeaderUserActions = () => {
         group: false,
         onClick: goToUserHoldings,
         children: "Holdings",
+        variant: "sideBarbtn",
+        order: 2,
+      },
+      {
+        id: "menu-rebalancer",
+        group: false,
+        onClick: goToUserPortfolioRebalencer,
+        children: "Rebalencer",
         variant: "sideBarbtn",
         order: 3,
       },

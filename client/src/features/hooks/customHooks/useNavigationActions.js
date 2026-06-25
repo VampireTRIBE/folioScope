@@ -66,6 +66,10 @@ export const useNavigationActions = () => {
     navigate(ROUTES.USERHOLDINGS);
   }, [navigate]);
 
+  const goToUserPortfolioRebalencer = useCallback(() => {
+    navigate(ROUTES.USERPORTFOLIOREBALENCER);
+  }, [navigate]);
+
   return {
     goToLogin,
     goToForgotPassword,
@@ -78,5 +82,6 @@ export const useNavigationActions = () => {
     goToUserDashboard,
     goToUserProfile,
     goToUserHoldings,
+    goToUserPortfolioRebalencer,
   };
 };

@@ -50,6 +50,10 @@ const AssetMetaDataSchema = new Schema(
       required: true,
       trim: true,
     },
+    expenseRatio: {
+      type: String,
+      trim: true,
+    },
 
     assetClass: {
       type: Schema.Types.ObjectId,

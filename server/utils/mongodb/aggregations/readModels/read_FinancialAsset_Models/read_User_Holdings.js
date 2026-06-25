@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 // ! Utils
 const { get_leafGroupIDsByGroup } = require("../../get_leafGroupIDsByGroup");
 const customError = require("../../../../shared/error/customError");
-   
+
 const toObjectId = (id, fieldName) => {
   if (!mongoose.Types.ObjectId.isValid(id)) {
     throw new customError(`Invalid ${fieldName}`, 400);
@@ -14,6 +14,12 @@ const toObjectId = (id, fieldName) => {
 
 const roundMoney = (value) => Number(Number(value || 0).toFixed(2));
 const formatPercent = (value) => `${Number(value || 0).toFixed(2)}%`;
+const parsePercent = (value) => {
+  if (value == null) return 0;
+
+  const numericValue = Number(value.toString().replace("%", "").trim());
+  return Number.isFinite(numericValue) ? numericValue : 0;
+};
 const formatDate = (value) => {
   if (!value) return null;
 
@@ -90,13 +96,58 @@ const read_LtpByAssetMetadataIds = async ({
   }, {});
 };
 
+const readExpenseRatioByAssetMetadataIds = async ({
+  assetMetadataIds = [],
+  session = null,
+}) => {
+  const ASSETMETADATA_MODEL = mongoose.model("AssetMetaData");
+  const assetObjectIds = [
+    ...new Set(
+      assetMetadataIds
+        .filter((assetId) => mongoose.Types.ObjectId.isValid(assetId))
+        .map((assetId) => assetId.toString()),
+    ),
+  ].map((assetId) => new mongoose.Types.ObjectId(assetId));
+
+  if (!assetObjectIds.length) return {};
+
+  const query = ASSETMETADATA_MODEL.find({
+    _id: { $in: assetObjectIds },
+  })
+    .select("expenseRatio")
+    .lean();
+
+  if (session !== null) {
+    query.session(session);
+  }
+
+  const assetMetadataRows = await query;
+
+  return assetMetadataRows.reduce((result, assetMetadata) => {
+    result[assetMetadata._id.toString()] = parsePercent(
+      assetMetadata.expenseRatio,
+    );
+    return result;
+  }, {});
+};
+
 const addLtpToFinancialAssets = async ({ financialAssets, session = null }) => {
-  const ltpByAssetId = await read_LtpByAssetMetadataIds({
-    assetMetadataIds: financialAssets.map((asset) => asset.assetMetadataId),
-    session,
-  });
+  const assetMetadataIds = financialAssets.map(
+    (asset) => asset.assetMetadataId,
+  );
+  const [ltpByAssetId, expenseRatioByAssetId] = await Promise.all([
+    read_LtpByAssetMetadataIds({
+      assetMetadataIds,
+      session,
+    }),
+    readExpenseRatioByAssetMetadataIds({
+      assetMetadataIds,
+      session,
+    }),
+  ]);
 
   return financialAssets.map((asset) => {
+    const assetMetadataKey = asset.assetMetadataId?.toString();
     const priceData = ltpByAssetId[asset.assetMetadataId?.toString()] || {
       price: 0,
       today: "0.00%",
@@ -128,6 +179,7 @@ const addLtpToFinancialAssets = async ({ financialAssets, session = null }) => {
       profitLossPercentage: formatPercent(profitLossPercentage),
       invested,
       current,
+      expenseRatioValue: expenseRatioByAssetId[assetMetadataKey] || 0,
     };
   });
 };
@@ -169,6 +221,30 @@ const buildHoldingsStats = ({ financialAssets, portfolioGroupDoc }) => {
       xirr: formatPercent(groupXirr.xirr),
       lastcomputed: formatDate(groupXirr.lastcomputed),
     },
+  };
+};
+
+const buildBucketCost = ({ financialAssets }) => {
+  const currentValue = roundMoney(
+    financialAssets.reduce(
+      (total, asset) => total + Number(asset.current || 0),
+      0,
+    ),
+  );
+  const anualCost = roundMoney(
+    financialAssets.reduce((total, asset) => {
+      const assetCurrentValue = Number(asset.current || 0);
+      const expenseRatio = Number(asset.expenseRatioValue || 0);
+      return total + (assetCurrentValue * expenseRatio) / 100;
+    }, 0),
+  );
+
+  const totalExpenseRatio =
+    currentValue > 0 ? (anualCost / currentValue) * 100 : 0;
+
+  return {
+    totalExpenseRatio: formatPercent(totalExpenseRatio),
+    anualCost,
   };
 };
 
@@ -249,15 +325,16 @@ module.exports.read_User_Holdings = async ({ filterObj = null }) => {
         })
       : [];
 
+    // const userHoldings = financialAssets.map(
+    //   ({ expenseRatioValue, ...financialAsset }) => financialAsset,
+    // );
+
     const respObj = {
       totalStats: buildHoldingsStats({
         financialAssets,
         portfolioGroupDoc,
       }),
-      buketCost: {
-        totalExpenseRatio: "0.00%",
-        anualCost: 0,
-      },
+      buketCost: buildBucketCost({ financialAssets }),
       userHoldings: financialAssets,
     };
 

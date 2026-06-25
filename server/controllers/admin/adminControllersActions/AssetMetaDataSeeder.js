@@ -40,6 +40,7 @@ module.exports.AssetMetadata_Seeder = async () => {
         record,
         "name",
       );
+      console.log(message);
 
       if (!result) {
         summary.skippedRecords++;

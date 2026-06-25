@@ -59,14 +59,14 @@ app.listen(PORT, (err) => {
 
 // ! Update Live Price
 
-(async function () {
-  await sync_CurrentPrices();
-})();
+// (async function () {
+//   await sync_CurrentPrices();
+// })();
 
 // ! Update for all users
-(async function () {
-  await sync_AllUsersPortfolio();
-})();
+// (async function () {
+//   await sync_AllUsersPortfolio();
+// })();
 
 // ! Only for Testing purpouse In Devlopment
 // app.use("/test", testRoutes);
@@ -93,9 +93,9 @@ app.use("/portfolio", portfolioRoute);
 
 // ! error handling middleware
 app.use((err, req, res, next) => {
-  console.log()
-  console.log("error --- ",err)
-  console.log()
+  console.log();
+  console.log("error --- ", err);
+  console.log();
   const { statusCode = 500, message = "Some Error" } = err;
   console.log(`Status Code : ${statusCode}\nMessage : ${message}`);
   res.status(statusCode).json({ success: false, statusCode, message: message });

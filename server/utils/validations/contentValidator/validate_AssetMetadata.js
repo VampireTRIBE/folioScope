@@ -7,8 +7,13 @@ const {
   get_AMCClassificationStructureName,
 } = require("../../../init_Scripts/init_Cache/AssetsData_Models_Cache/init_cacheFiles/assetClassificationCache");
 
-module.exports.validate_AssetMetadata = async (data = null, dataType = "id", validateOnly = false) => {
+module.exports.validate_AssetMetadata = async (
+  data = null,
+  dataType = "id",
+  validateOnly = false,
+) => {
   const isId = dataType === "id";
+  console.log(data)
 
   const baseFields = [
     "name",
@@ -147,6 +152,7 @@ module.exports.validate_AssetMetadata = async (data = null, dataType = "id", val
   // -------------------- AMC VALIDATION --------------------
 
   let amcObj = null;
+  let expenseRatio = null;
 
   if (requiredFields.includes("assetAMC")) {
     if (!("assetAMC" in data) || data.assetAMC == null) {
@@ -166,6 +172,15 @@ module.exports.validate_AssetMetadata = async (data = null, dataType = "id", val
         statusCode: 422,
       };
     }
+    if (!("expenseRatio" in data) || data.expenseRatio == null) {
+      return {
+        result: false,
+        message: "Missing Expense Ratio Field",
+        statusCode: 422,
+      };
+    }
+    expenseRatio = data.expenseRatio;
+    console.log(data.expenseRatio);
   }
 
   // -------------------- FORBIDDEN FIELDS --------------------
@@ -212,7 +227,12 @@ module.exports.validate_AssetMetadata = async (data = null, dataType = "id", val
   // AMC
   if (requiredFields.includes("assetAMC")) {
     doc.assetAMC = isId ? data.assetAMC : amcObj._id;
+    doc.expenseRatio = expenseRatio;
   }
+
+  console.log();
+  console.log(doc);
+  console.log();
 
   return validateOnly === false
     ? {

@@ -4,10 +4,12 @@ import costStructureStyles from "./coststructure.module.css";
 const CostStructure = ({
   title = "Bucket Cost",
   totalExpenseRatio = "0.00%",
-  progress = 0,
   annualCost = 0,
 }) => {
-  const safeProgress = Math.min(Math.max(Number(progress), 0), 100);
+  const safeProgress = Math.min(
+    Math.max(Number(totalExpenseRatio.split("%")[0]) * 100, 0),
+    100,
+  );
 
   return (
     <div className={costStructureStyles.container}>
@@ -16,7 +18,9 @@ const CostStructure = ({
       <div className={costStructureStyles.content}>
         <div>
           <div className={costStructureStyles.statRow}>
-            <span className={costStructureStyles.label}>Total Expense Ratio</span>
+            <span className={costStructureStyles.label}>
+              Total Expense Ratio
+            </span>
             <span className={costStructureStyles.value}>
               {totalExpenseRatio}
             </span>
@@ -24,7 +28,11 @@ const CostStructure = ({
 
           <div className={costStructureStyles.progressTrack}>
             <div
-              className={costStructureStyles.progressFill}
+              className={
+                costStructureStyles[
+                  safeProgress < 50 ? "progressFillGreen" : "progressFillRed"
+                ]
+              }
               style={{ width: `${safeProgress}%` }}
             />
           </div>
