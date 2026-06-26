@@ -4,6 +4,9 @@
   margin-top: var(--header-height);
   padding: clamp(var(--space-3), 3vw, var(--space-6)) var(--container-padding);
   background-color: var(--bg-section);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
 }
 
 .layout {

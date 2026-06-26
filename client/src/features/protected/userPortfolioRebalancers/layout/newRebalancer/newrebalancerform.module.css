@@ -1,0 +1,305 @@
+.form {
+  width: 100%;
+}
+
+.fieldset {
+  width: 100%;
+  padding: clamp(var(--space-3), 2vw, var(--space-5));
+  border: var(--border-width-sm) solid var(--border-default);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-card);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.legend {
+  width: 100%;
+  padding: 0 0 var(--space-3);
+  display: flex;
+  flex-flow: row wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.legend h3 {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: var(--text-xl);
+  font-weight: var(--fw-bold);
+}
+
+.legend p {
+  margin: var(--space-1) 0 0;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+}
+
+.weightBadge {
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width-sm) solid var(--border-default);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-hover);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: var(--fw-medium);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.weightBadge strong {
+  color: var(--text-primary);
+  font-weight: var(--fw-bold);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.sectionHeader {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.sectionTitle {
+  margin: 0;
+  color: var(--text-primary);
+  font-size: var(--text-base);
+  font-weight: var(--fw-bold);
+}
+
+.inputGrid,
+.allocationGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: var(--space-3);
+}
+
+.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.inputGroup {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.label {
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  font-weight: var(--fw-semibold);
+}
+
+.input,
+.textarea {
+  width: 100%;
+  min-width: 0;
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width-sm) solid var(--border-default);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: var(--text-base);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.textarea {
+  resize: vertical;
+}
+
+.input:focus,
+.textarea:focus {
+  border-color: var(--border-dark);
+}
+
+.suggestionContainer {
+  position: relative;
+  min-width: 0;
+}
+
+.suggestionPreview {
+  position: absolute;
+  top: calc(100% + var(--space-1));
+  left: 0;
+  width: 100%;
+  max-height: calc(var(--header-height) * 5);
+  border: var(--border-width-sm) solid var(--border-default);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-card);
+  box-shadow: var(--shadow-md);
+  overflow-y: auto;
+  z-index: var(--z-dropdown);
+}
+
+.suggestionItem {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  border: 0;
+  border-bottom: var(--border-width-sm) solid var(--border-light);
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  font: inherit;
+  font-size: var(--text-sm);
+  text-align: left;
+}
+
+.suggestionItem:hover,
+.suggestionItem:focus {
+  background-color: var(--color-primary-light-alpha);
+}
+
+.suggestionMeta {
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  white-space: nowrap;
+}
+
+.allocations {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.allocationRow {
+  min-width: 0;
+  padding: var(--space-3);
+  border: var(--border-width-sm) solid var(--border-light);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-hover);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.rowHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+}
+
+.secondaryButton,
+.removeButton,
+.resetButton,
+.submitButton {
+  padding: var(--space-2) var(--space-3);
+  border: var(--border-width-sm) solid var(--border-dark);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-card);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: var(--fw-medium);
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--transition-fast),
+    border-color var(--transition-fast),
+    color var(--transition-fast);
+}
+
+.secondaryButton:hover,
+.resetButton:hover,
+.submitButton:hover {
+  background-color: var(--color-primary-light-alpha);
+}
+
+.removeButton {
+  color: var(--color-danger);
+  border-color: var(--color-danger);
+}
+
+.removeButton:hover {
+  background-color: var(--color-danger-bg);
+}
+
+.removeButton:disabled {
+  color: var(--text-muted);
+  border-color: var(--border-default);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.buttonContainer {
+  padding-top: var(--space-3);
+  border-top: var(--border-width-sm) solid var(--border-default);
+  display: flex;
+  flex-flow: row wrap;
+  gap: var(--space-2);
+}
+
+.resetButton,
+.submitButton {
+  flex: 1;
+  min-width: 10rem;
+  font-size: var(--text-base);
+}
+
+.submitButton {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--text-inverse);
+}
+
+.submitButton:hover {
+  background-color: var(--color-primary-dark);
+  border-color: var(--color-primary-dark);
+}
+
+.error,
+.success {
+  padding: var(--space-2) var(--space-3);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-size: var(--text-sm);
+  font-weight: var(--fw-medium);
+}
+
+.error {
+  color: var(--color-danger);
+  background-color: var(--color-danger-bg);
+  border-left: var(--border-width-lg) solid var(--color-danger);
+}
+
+.success {
+  color: var(--color-success);
+  background-color: var(--color-success-bg);
+  border-left: var(--border-width-lg) solid var(--color-success);
+}
+
+@media (max-width: 640px) {
+  .fieldset {
+    padding: var(--space-3);
+  }
+
+  .inputGrid,
+  .allocationGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .weightBadge,
+  .secondaryButton,
+  .resetButton,
+  .submitButton {
+    width: 100%;
+    justify-content: center;
+  }
+}

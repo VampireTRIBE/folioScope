@@ -25,7 +25,6 @@ const {
 
 // ! Register Models
 const { registerModels } = require("./models/index_models");
-
 const app = express();
 
 corAuth(app);

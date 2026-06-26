@@ -1,11 +1,10 @@
 import { useMutation } from "@tanstack/react-query";
 
 // ! APIs
+import { POST_NEWREBALANCER } from "../../APIs/POST_APIs";
 
-// import { FETCH_USERSHOLDINGS } from "../../APIs/FETCH_APIs";
-
-// export const useFilterHoldingsFormMutation = () => {
-//   return useMutation({
-//     mutationFn: FETCH_USERSHOLDINGS,
-//   });
-// };
+export const useNewRebalancerFormMutation = () => {
+  return useMutation({
+    mutationFn: POST_NEWREBALANCER,
+  });
+};

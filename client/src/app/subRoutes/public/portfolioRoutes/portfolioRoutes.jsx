@@ -26,6 +26,10 @@ export const portfolioRoutes = [
     element: <UserPortfolioRebalencerOutlet />,
   },
   {
+    path: "rebalencer/create",
+    element: <UserPortfolioRebalencerOutlet />,
+  },
+  {
     path: ":level/:gp_id",
     element: <UserDashboardOutlet />,
   },

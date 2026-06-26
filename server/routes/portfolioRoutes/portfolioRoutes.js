@@ -8,6 +8,7 @@ const {
   updateGroup,
   get_GroupMetadata,
   fetch_UserHoldings,
+  createRebalancer,
 } = require("../../controllers/portfolio/portfolioGroupControllers");
 const {
   groupstatementTransaction,
@@ -35,6 +36,7 @@ const { verifyAccessToken } = require("../../middlewares/authentication");
 router.route("/holdings").post(verifyAccessToken, fetch_UserHoldings);
 
 // ! Portfolio Group POST Routes
+router.route("/rebalancer").post(verifyAccessToken, createRebalancer);
 router
   .route("/:pg_id")
   .get(verifyAccessToken, validateID("pg_id"), get_GroupMetadata)

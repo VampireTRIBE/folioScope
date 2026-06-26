@@ -2,39 +2,6 @@ const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
 // ===============================
-// Sub Schema: Portfolio Group Target
-// ===============================
-const portfolioGroupTargetSchema = new Schema(
-  {
-    groupId: {
-      type: Schema.Types.ObjectId,
-      ref: "portfolioGroup",
-      required: true,
-    },
-
-    groupName: {
-      type: String,
-      trim: true,
-    },
-
-    targetWeight: {
-      type: Number,
-      required: true,
-      min: [0, "Target weight cannot be negative"],
-      max: [100, "Target weight cannot be greater than 100"],
-    },
-
-    band: {
-      type: Number,
-      required: true,
-      min: [0, "Band cannot be negative"],
-      max: [100, "Band cannot be greater than 100"],
-    },
-  },
-  { _id: false },
-);
-
-// ===============================
 // Sub Schema: Asset Target
 // ===============================
 const assetTargetSchema = new Schema(
@@ -102,21 +69,16 @@ const portfolioRebalancerSchema = new Schema(
       index: true,
     },
 
-    name: {
+    rebalancerName: {
       type: String,
       required: true,
       trim: true,
     },
 
-    description: {
+    rebalancerDescription: {
       type: String,
       trim: true,
       default: "",
-    },
-
-    portfolioGroups: {
-      type: [portfolioGroupTargetSchema],
-      default: [],
     },
 
     assets: {

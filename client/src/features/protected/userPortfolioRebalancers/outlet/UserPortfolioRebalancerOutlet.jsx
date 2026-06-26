@@ -1,4 +1,4 @@
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useContext, useEffect } from "react";
 
 // ! Syles
 import userPortfolioBalancerOutletStyles from "./userportfolioreblanceroutlet.module.css";
@@ -9,14 +9,11 @@ import { AuthenticationContext } from "../../../../context/authenticationContext
 // ! Custom Hooks
 import { useNavigationActions } from "../../../hooks/customHooks/useNavigationActions";
 
-// ! Tanstck Query
-
 // ! Layout Components
-import FilterHoldings from "../layout/filterHoldings/FilterHoldings";
-import { useFormDataActions } from "../hooks/customHooks/useFormData";
+import NewRebalancerForm from "../layout/newRebalancer/NewRebalancerForm";
 
 const UserPortfolioRebalencerOutlet = () => {
-  const { accessToken, userData } = useContext(AuthenticationContext);
+  const { accessToken } = useContext(AuthenticationContext);
   const { goToLogin } = useNavigationActions();
 
   useEffect(() => {
@@ -27,9 +24,7 @@ const UserPortfolioRebalencerOutlet = () => {
 
   return (
     <main className={userPortfolioBalancerOutletStyles.outlet}>
-      <div className={userPortfolioBalancerOutletStyles.filterLayout}>
-        Reblancers List
-      </div>
+      <NewRebalancerForm />
     </main>
   );
 };

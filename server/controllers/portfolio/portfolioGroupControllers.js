@@ -114,6 +114,24 @@ module.exports.fetch_UserHoldings = async (req, res, next) => {
   }
 };
 
+module.exports.createRebalancer = async (req, res, next) => {
+  try {
+    const userID = req.userId;
+    const sessionDocID = req.sessionDocId;
+    const sessionDoc = req.sessionDoc;
+
+    return res.status(201).json({
+      success: true,
+      message: "Rebalancer Created",
+    });
+  } catch (error) {
+    if (error.code === 11000) {
+      throw new customError("Duplicate group name", 400);
+    }
+    next(error);
+  }
+};
+
 module.exports.addGroup = async (req, res, next) => {
   try {
     const userID = req.userId;
@@ -164,7 +182,7 @@ module.exports.addGroup = async (req, res, next) => {
     await doc.save();
     return res.status(201).json({
       success: true,
-      message: "Group Add created",
+      message: "Group Created",
     });
   } catch (error) {
     if (error.code === 11000) {
