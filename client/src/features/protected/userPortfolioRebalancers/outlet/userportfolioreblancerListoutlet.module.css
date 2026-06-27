@@ -9,10 +9,7 @@
   gap: var(--space-4);
 }
 
-.pageHeader,
-.hero,
-.sectionHeader,
-.ruleHeader {
+.header {
   display: flex;
   flex-flow: row wrap;
   align-items: flex-start;
@@ -20,20 +17,7 @@
   gap: var(--space-3);
 }
 
-.hero,
-.section,
-.stateBox,
-.errorBox {
-  min-width: 0;
-  padding: var(--space-4);
-  border: var(--border-width-sm) solid var(--border-default);
-  border-radius: var(--radius-md);
-  background-color: var(--bg-card);
-  box-shadow: var(--shadow-sm);
-}
-
 .title,
-.sectionHeader h4,
 .cardTitle {
   margin: 0;
   color: var(--text-primary);
@@ -44,78 +28,55 @@
   font-size: var(--text-xl);
 }
 
-.subtitle {
+.subtitle,
+.cardDescription {
   margin: var(--space-1) 0 0;
   color: var(--text-secondary);
   font-size: var(--text-sm);
 }
 
-.summaryGrid,
-.cardGrid {
+.grid {
   display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
   gap: var(--space-3);
 }
 
-.summaryGrid {
-  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
-}
-
-.summaryItem,
-.card {
+.card,
+.emptyBox,
+.stateBox,
+.errorBox {
   min-width: 0;
-  padding: var(--space-3);
-  border: var(--border-width-sm) solid var(--border-light);
+  padding: var(--space-4);
+  border: var(--border-width-sm) solid var(--border-default);
   border-radius: var(--radius-md);
   background-color: var(--bg-card);
-}
-
-.summaryItem {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.summaryItem span,
-.detailGrid span,
-.deploymentRow span {
-  color: var(--text-secondary);
-  font-size: var(--text-xs);
-}
-
-.summaryItem strong,
-.detailGrid strong,
-.deploymentRow strong {
-  color: var(--text-primary);
-  overflow-wrap: anywhere;
-}
-
-.section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-}
-
-.cardGrid {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr));
+  box-shadow: var(--shadow-sm);
 }
 
 .card {
   display: flex;
   flex-direction: column;
+  gap: var(--space-3);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
   gap: var(--space-3);
 }
 
 .cardTitle {
-  font-size: var(--text-base);
+  font-size: var(--text-lg);
 }
 
-.detailGrid {
+.statsGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-2);
 }
 
-.detailGrid div {
+.statsGrid div {
   min-width: 0;
   padding: var(--space-2);
   border-radius: var(--radius-sm);
@@ -125,34 +86,38 @@
   gap: var(--space-1);
 }
 
-.deploymentList {
+.statsGrid span {
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+}
+
+.statsGrid strong {
+  color: var(--text-primary);
+  font-size: var(--text-sm);
+  overflow-wrap: anywhere;
+}
+
+.assetPreview {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
+  flex-flow: row wrap;
+  gap: var(--space-1);
 }
 
-.deploymentRow {
-  min-width: 0;
-  padding: var(--space-2);
-  border-radius: var(--radius-sm);
-  background-color: var(--bg-hover);
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) repeat(2, minmax(0, 0.8fr));
-  gap: var(--space-2);
-}
-
-.statusBadge,
-.ruleBadge {
+.assetPreview span,
+.statusBadge {
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-sm);
   font-size: var(--text-xs);
   font-weight: var(--fw-semibold);
-  white-space: nowrap;
 }
 
-.ruleBadge {
+.assetPreview span {
   background-color: var(--bg-hover);
   color: var(--text-secondary);
+}
+
+.statusBadge {
+  white-space: nowrap;
 }
 
 .active {
@@ -166,8 +131,9 @@
 }
 
 .primaryButton,
-.textButton {
+.secondaryButton {
   padding: var(--space-2) var(--space-3);
+  border: var(--border-width-sm) solid var(--color-primary);
   border-radius: var(--radius-md);
   font: inherit;
   font-size: var(--text-sm);
@@ -176,15 +142,30 @@
 }
 
 .primaryButton {
-  border: var(--border-width-sm) solid var(--color-primary);
   background-color: var(--color-primary);
   color: var(--text-inverse);
 }
 
-.textButton {
-  border: var(--border-width-sm) solid var(--border-default);
+.secondaryButton {
   background-color: var(--bg-card);
+  color: var(--color-primary);
+}
+
+.emptyBox {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.emptyBox h4 {
+  margin: 0;
   color: var(--text-primary);
+}
+
+.emptyBox p {
+  margin: 0;
+  color: var(--text-secondary);
 }
 
 .stateBox {
@@ -203,12 +184,7 @@
   }
 
   .primaryButton,
-  .textButton {
+  .secondaryButton {
     width: 100%;
-  }
-
-  .deploymentRow,
-  .detailGrid {
-    grid-template-columns: 1fr;
   }
 }

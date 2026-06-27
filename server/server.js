@@ -25,6 +25,7 @@ const {
 
 // ! Register Models
 const { registerModels } = require("./models/index_models");
+
 const app = express();
 
 corAuth(app);
@@ -68,7 +69,7 @@ app.listen(PORT, (err) => {
 })();
 
 // ! Only for Testing purpouse In Devlopment
-// app.use("/test", testRoutes);
+app.use("/test", testRoutes);
 
 // ! Diffrent Routes
 

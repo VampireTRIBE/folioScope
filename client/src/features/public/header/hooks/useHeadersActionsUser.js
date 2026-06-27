@@ -16,7 +16,7 @@ export const useHeaderUserActions = () => {
     goToUserProfile,
     gotoHome,
     goToUserHoldings,
-    goToUserPortfolioRebalencer,
+    goToUserPortfolioRebalencerList,
   } = useNavigationActions();
 
   const level1Array = useMemo(
@@ -161,10 +161,10 @@ export const useHeaderUserActions = () => {
         order: 2,
       },
       {
-        id: "menu-rebalancer",
+        id: "menu-rebalancerList",
         group: false,
-        onClick: goToUserPortfolioRebalencer,
-        children: "Rebalencer",
+        onClick: goToUserPortfolioRebalencerList,
+        children: "Rebalencer List",
         variant: "sideBarbtn",
         order: 3,
       },

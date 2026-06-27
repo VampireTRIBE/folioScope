@@ -1,13 +1,35 @@
 import { BASE_URL } from "../../../../constants/axiosInstance";
 
-// export const FETCH_USERSHOLDINGS = async ({ accessToken, data }) => {
-//   if (!accessToken || !data?.groupId) {
-//     throw new Error("Holdings group context is missing");
-//   }
-//   const response = await BASE_URL.post(`/portfolio/holdings`, data, {
-//     headers: {
-//       Authorization: `Bearer ${accessToken}`,
-//     },
-//   });
-//   return response.data;
-// };
+const getAuthConfig = (accessToken) => {
+  if (!accessToken) {
+    throw new Error("User session is missing");
+  }
+
+  return {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  };
+};
+
+export const FETCH_REBALANCERLIST = async (accessToken) => {
+  const response = await BASE_URL.get(
+    "/portfolio/rebalancer/list",
+    getAuthConfig(accessToken),
+  );
+
+  return response.data;
+};
+
+export const FETCH_REBALANCER = async (accessToken, rebalancerId) => {
+  if (!rebalancerId) {
+    throw new Error("Rebalancer id is missing");
+  }
+
+  const response = await BASE_URL.get(
+    `/portfolio/rebalancer/${rebalancerId}`,
+    getAuthConfig(accessToken),
+  );
+
+  return response.data;
+};

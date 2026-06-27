@@ -66,9 +66,20 @@ export const useNavigationActions = () => {
     navigate(ROUTES.USERHOLDINGS);
   }, [navigate]);
 
-  const goToUserPortfolioRebalencer = useCallback(() => {
-    navigate(ROUTES.USERPORTFOLIOREBALENCER);
+  const goToUserPortfolioRebalencerList = useCallback(() => {
+    navigate(ROUTES.USERPORTFOLIOREBALENCERLIST);
   }, [navigate]);
+
+  const goToUserPortfolioRebalencerNew = useCallback(() => {
+    navigate(ROUTES.USERPORTFOLIOREBALENCERNEW);
+  }, [navigate]);
+
+  const goToUserPortfolioRebalencer = useCallback(
+    (rebalancerId) => {
+      navigate(ROUTES.USERPORTFOLIOREBALENCER(rebalancerId));
+    },
+    [navigate],
+  );
 
   return {
     goToLogin,
@@ -82,6 +93,8 @@ export const useNavigationActions = () => {
     goToUserDashboard,
     goToUserProfile,
     goToUserHoldings,
+    goToUserPortfolioRebalencerList,
+    goToUserPortfolioRebalencerNew,
     goToUserPortfolioRebalencer,
   };
 };

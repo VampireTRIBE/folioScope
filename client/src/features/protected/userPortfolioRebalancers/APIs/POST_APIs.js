@@ -5,7 +5,7 @@ export const POST_NEWREBALANCER = async ({ accessToken, data }) => {
     throw new Error("User session is missing");
   }
 
-  const response = await BASE_URL.post("/portfolio/rebalancer", data, {
+  const response = await BASE_URL.post("/portfolio/rebalancer/new", data, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },

@@ -11,6 +11,8 @@ import UserProfileOutlet from "../../../../features/protected/userProfile/outlet
 
 // ! User Portfolio Rebalncer Outlet
 import UserPortfolioRebalencerOutlet from "../../../../features/protected/userPortfolioRebalancers/outlet/UserPortfolioRebalancerOutlet";
+import UserPortfolioRebalencerNewOutlet from "../../../../features/protected/userPortfolioRebalancers/outlet/UserPortfolioRebalancerNewOutlet";
+import UserPortfolioRebalencerListOutlet from "../../../../features/protected/userPortfolioRebalancers/outlet/UserPortfolioRebalancerListOutlet";
 
 export const portfolioRoutes = [
   {
@@ -22,11 +24,15 @@ export const portfolioRoutes = [
     element: <UserHoldingsOutlet />,
   },
   {
-    path: "rebalencer",
-    element: <UserPortfolioRebalencerOutlet />,
+    path: "rebalencer/list",
+    element: <UserPortfolioRebalencerListOutlet />,
   },
   {
-    path: "rebalencer/create",
+    path: "rebalencer/new",
+    element: <UserPortfolioRebalencerNewOutlet />,
+  },
+  {
+    path: "rebalencer/:rebalancerId",
     element: <UserPortfolioRebalencerOutlet />,
   },
   {

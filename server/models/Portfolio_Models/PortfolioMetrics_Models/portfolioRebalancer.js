@@ -20,6 +20,7 @@ const assetTargetSchema = new Schema(
     groupId: {
       type: Schema.Types.ObjectId,
       ref: "portfolioGroup",
+      required: true,
     },
 
     groupName: {
@@ -45,6 +46,77 @@ const assetTargetSchema = new Schema(
       type: Number,
       default: 1,
       min: [0, "Multiplier cannot be negative"],
+    },
+  },
+  { _id: false },
+);
+
+// ===============================
+// Sub Schema: Market Fall Rule
+// ===============================
+const marketFallAssetRuleSchema = new Schema(
+  {
+    assetId: {
+      type: Schema.Types.ObjectId,
+      ref: "asset",
+      required: true,
+    },
+
+    assetName: {
+      type: String,
+      trim: true,
+    },
+
+    multiplier: {
+      type: Number,
+      default: 1,
+      min: [0, "Multiplier cannot be negative"],
+    },
+
+    min: {
+      type: Number,
+      default: 0.15,
+      min: [0.15, "Minimum score cannot be negative"],
+    },
+  },
+  { _id: false },
+);
+
+const marketFallRuleSchema = new Schema(
+  {
+    fallPercentage: {
+      type: Number,
+      required: true,
+      min: [0, "Market fall percentage cannot be negative"],
+      max: [100, "Market fall percentage cannot be greater than 100"],
+    },
+
+    deployPercentage: {
+      type: Number,
+      required: true,
+      min: [0, "Deploy percentage cannot be negative"],
+      max: [100, "Deploy percentage cannot be greater than 100"],
+    },
+
+    isTriggered: {
+      type: Boolean,
+      default: false,
+    },
+
+    shotNumber: {
+      type: Number,
+      max: 3,
+      default: 0,
+    },
+
+    assets: {
+      type: [marketFallAssetRuleSchema],
+      default: [],
+    },
+
+    lastDeployed: {
+      type: Date,
+      default: null,
     },
   },
   { _id: false },
@@ -86,6 +158,11 @@ const portfolioRebalancerSchema = new Schema(
       default: [],
     },
 
+    marketFallRules: {
+      type: [marketFallRuleSchema],
+      default: [],
+    },
+
     isActive: {
       type: Boolean,
       default: true,
@@ -105,7 +182,8 @@ const roundTwo = (value) => {
 // Validation: Total Weights
 // ===============================
 portfolioRebalancerSchema.pre("validate", function (next) {
-  const totalGroupWeight = this.portfolioGroups.reduce((sum, group) => {
+  const portfolioGroups = this.portfolioGroups || [];
+  const totalGroupWeight = portfolioGroups.reduce((sum, group) => {
     return sum + Number(group.targetWeight || 0);
   }, 0);
 
@@ -113,7 +191,7 @@ portfolioRebalancerSchema.pre("validate", function (next) {
     return sum + Number(asset.targetWeight || 0);
   }, 0);
 
-  if (this.portfolioGroups.length > 0 && roundTwo(totalGroupWeight) !== 100) {
+  if (portfolioGroups.length > 0 && roundTwo(totalGroupWeight) !== 100) {
     return next(
       new Error(
         `Total portfolio group target weight must be exactly 100. Current total is ${roundTwo(
@@ -137,25 +215,9 @@ portfolioRebalancerSchema.pre("validate", function (next) {
 });
 
 // ===============================
-// Validation: Duplicate Groups
-// ===============================
-portfolioRebalancerSchema.pre("validate", function (next) {
-  const groupIds = this.portfolioGroups.map((group) =>
-    group.groupId?.toString(),
-  );
-
-  const uniqueGroupIds = new Set(groupIds);
-
-  if (groupIds.length !== uniqueGroupIds.size) {
-    return next(new Error("Duplicate portfolio groups are not allowed"));
-  }
-  next();
-});
-
-// ===============================
 // Unique Index
 // One user cannot create duplicate rebalancer
-// for the same portfolio group with the same name
+// for the same portfolio group
 // ===============================
 portfolioRebalancerSchema.index(
   {

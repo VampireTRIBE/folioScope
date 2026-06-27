@@ -2,6 +2,10 @@
 
 const PORTFOLIOGROUP_MODEL = require("../../models/Portfolio_Models/PortfolioGroup_Models/portfolioGroup");
 const FINANCIALASSET_MODEL = require("../../models/Portfolio_Models/PortfolioMetrics_Models/financialAsset");
+const PORTFOLIOREBALANCER_MODEL = require("../../models/Portfolio_Models/PortfolioMetrics_Models/portfolioRebalancer");
+const {
+  get_leafGroupIDsByGroup,
+} = require("../../utils/mongodb/aggregations/get_leafGroupIDsByGroup");
 
 // ! utils
 const {
@@ -16,6 +20,9 @@ const {
 const {
   read_NetWorthRange1D,
 } = require("../../utils/mongodb/aggregations/readModels/readpriceRange/priceRange");
+const {
+  validate_NewRebalancer_ReqData,
+} = require("../../utils/mongodb/aggregations/writeModels/write_Rebalancer_Model/validate_NewRebalancer");
 const customError = require("../../utils/shared/error/customError");
 
 module.exports.get_GroupMetadata = async (req, res) => {
@@ -117,17 +124,68 @@ module.exports.fetch_UserHoldings = async (req, res, next) => {
 module.exports.createRebalancer = async (req, res, next) => {
   try {
     const userID = req.userId;
-    const sessionDocID = req.sessionDocId;
-    const sessionDoc = req.sessionDoc;
+    req.body.userId = userID;
+
+    const validated_Data = await validate_NewRebalancer_ReqData(req.body);
+    const createdRebalancer =
+      await PORTFOLIOREBALANCER_MODEL.create(validated_Data);
 
     return res.status(201).json({
       success: true,
       message: "Rebalancer Created",
+      data: createdRebalancer,
     });
   } catch (error) {
     if (error.code === 11000) {
-      throw new customError("Duplicate group name", 400);
+      return next(new customError("Duplicate rebalancer", 400));
     }
+    next(error);
+  }
+};
+
+module.exports.fetchRebalancerList = async (req, res, next) => {
+  try {
+    const userID = req.userId;
+
+    const rebalancers = await PORTFOLIOREBALANCER_MODEL.find({
+      userId: userID,
+    })
+      .select(
+        "rebalancerName rebalancerDescription portfolioGroupId assets marketFallRules isActive createdAt updatedAt",
+      )
+      .sort({ createdAt: -1 })
+      .lean();
+
+    return res.status(200).json({
+      success: true,
+      message: "Rebalancers Fetched",
+      data: rebalancers,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+module.exports.fetchRebalancerById = async (req, res, next) => {
+  try {
+    const userID = req.userId;
+    const { rebalancerId } = req.params;
+
+    const rebalancer = await PORTFOLIOREBALANCER_MODEL.findOne({
+      _id: rebalancerId,
+      userId: userID,
+    }).lean();
+
+    if (!rebalancer) {
+      throw new customError("Rebalancer not found", 404);
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Rebalancer Fetched",
+      data: rebalancer,
+    });
+  } catch (error) {
     next(error);
   }
 };

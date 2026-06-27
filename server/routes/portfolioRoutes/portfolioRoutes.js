@@ -9,6 +9,8 @@ const {
   get_GroupMetadata,
   fetch_UserHoldings,
   createRebalancer,
+  fetchRebalancerList,
+  fetchRebalancerById,
 } = require("../../controllers/portfolio/portfolioGroupControllers");
 const {
   groupstatementTransaction,
@@ -24,6 +26,7 @@ const {
 const {
   validate_GroupStatementData,
   validate_tradeData,
+  validate_CreatePortfolioRebalancerData,
 } = require("../../utils/validations/middlewares/joi_validation/validate_Data/portfolioData");
 
 // ! Auth Middlewares
@@ -35,8 +38,21 @@ const { verifyAccessToken } = require("../../middlewares/authentication");
 
 router.route("/holdings").post(verifyAccessToken, fetch_UserHoldings);
 
+// ! Portfolio Group Rebalncer Routes
+
+router
+  .route("/rebalancer/new")
+  .post(
+    verifyAccessToken,
+    validate_CreatePortfolioRebalancerData,
+    createRebalancer,
+  );
+router.route("/rebalancer/list").get(verifyAccessToken, fetchRebalancerList);
+router
+  .route("/rebalancer/:rebalancerId")
+  .get(verifyAccessToken, validateID("rebalancerId"), fetchRebalancerById);
+
 // ! Portfolio Group POST Routes
-router.route("/rebalancer").post(verifyAccessToken, createRebalancer);
 router
   .route("/:pg_id")
   .get(verifyAccessToken, validateID("pg_id"), get_GroupMetadata)
