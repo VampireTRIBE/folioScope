@@ -69,7 +69,7 @@ app.listen(PORT, (err) => {
 })();
 
 // ! Only for Testing purpouse In Devlopment
-app.use("/test", testRoutes);
+// app.use("/test", testRoutes);
 
 // ! Diffrent Routes
 
