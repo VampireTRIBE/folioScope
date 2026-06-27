@@ -144,6 +144,7 @@ module.exports.validate_NewRebalancer_ReqData = async (data) => {
     return {
       userId: data.userId,
       portfolioGroupId: data.portfolioGroupId,
+      sipAmount: Number(data.sipAmount),
       rebalancerName: data.rebalancerName,
       rebalancerDescription: data.rebalancerDescription || "",
       assets: cleanAssets,

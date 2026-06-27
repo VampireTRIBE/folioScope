@@ -1,34 +1,5 @@
 import styles from "./rebalancerCategoryCards.module.css";
 
-const categoryData = [
-  {
-    categoryLevel: "STABLE_ASSETS",
-    weight: 20,
-    band: 4,
-    upperLimit: 24,
-    lowerLimit: 16,
-    currentValue: 189868,
-    currentWeight: 21.47,
-    displayValue: 189868,
-    drift: 1.47,
-    status: "EXTREME OVER WEIGHT",
-    driftAmount: 12983,
-  },
-  {
-    categoryLevel: "UNSTABLE_ASSETS",
-    weight: 80,
-    band: 4,
-    upperLimit: 84,
-    lowerLimit: 76,
-    currentValue: 694559.2,
-    currentWeight: 78.53,
-    displayValue: 694559,
-    drift: -1.47,
-    status: "INSIDE",
-    driftAmount: -12983,
-  },
-];
-
 const isEmpty = (value) => {
   return value === null || value === undefined || value === "";
 };
@@ -37,12 +8,7 @@ const parseNumber = (value) => {
   if (isEmpty(value)) return 0;
 
   const number = Number(
-    value
-      .toString()
-      .replace("%", "")
-      .replace("₹", "")
-      .replaceAll(",", "")
-      .trim(),
+    value.toString().replace("%", "").replaceAll(",", "").trim(),
   );
 
   return Number.isFinite(number) ? number : 0;
@@ -57,17 +23,9 @@ const formatINR = (value) => {
   });
 };
 
-const formatNumber = (value) => {
-  if (isEmpty(value)) return "-";
-
-  return parseNumber(value).toLocaleString("en-IN", {
-    maximumFractionDigits: 0,
-  });
-};
-
 const formatCurrency = (value) => {
   if (isEmpty(value)) return "-";
-  return `₹${formatINR(value)}`;
+  return `Rs.${formatINR(value)}`;
 };
 
 const formatSignedCurrency = (value) => {
@@ -76,23 +34,12 @@ const formatSignedCurrency = (value) => {
   const number = parseNumber(value);
   const sign = number < 0 ? "-" : "";
 
-  return `${sign}₹${formatNumber(Math.abs(number))}`;
+  return `${sign}Rs.${formatINR(Math.abs(number))}`;
 };
 
 const formatPercent = (value) => {
   if (isEmpty(value)) return "-";
   return `${parseNumber(value).toFixed(2)}%`;
-};
-
-const getComputedStatus = (item) => {
-  const currentWeight = parseNumber(item.currentWeight);
-  const lowerLimit = parseNumber(item.lowerLimit);
-  const upperLimit = parseNumber(item.upperLimit);
-
-  if (currentWeight < lowerLimit) return "EXTREME UNDER WEIGHT";
-  if (currentWeight > upperLimit) return "EXTREME OVER WEIGHT";
-
-  return "INSIDE";
 };
 
 const getSignClass = (value) => {
@@ -116,8 +63,8 @@ const getStatusClass = (status = "") => {
   return styles.outside;
 };
 
-const getCategoryClass = (categoryLevel = "") => {
-  const normalizedCategory = categoryLevel.trim().toUpperCase();
+const getCategoryClass = (groupName = "") => {
+  const normalizedCategory = groupName.trim().toUpperCase();
 
   if (normalizedCategory === "STABLE_ASSETS") return styles.stableCategory;
   if (normalizedCategory === "UNSTABLE_ASSETS") return styles.unstableCategory;
@@ -148,70 +95,68 @@ const InfoItem = ({ label, value, valueClass = "" }) => {
   );
 };
 
-const RebalancerCategoryCards = ({ data = categoryData }) => {
+const RebalancerCategoryCards = ({ data = [] }) => {
   return (
     <section className={styles.container}>
       <div className={styles.header}>
         <div>
-          <h4 className={styles.title}>Category Level Rebalancer</h4>
+          <h4 className={styles.title}>groupLevelData</h4>
           <p className={styles.subtitle}>
-            Weight, band limits, current allocation and drift status
+            Backend group level meta, position and metrics
           </p>
         </div>
       </div>
 
       <div className={styles.cardsContainer}>
-        {data.map((item) => {
-          const computedStatus = getComputedStatus(item);
+        {data.map((item, index) => {
+          const meta = item?.meta || {};
+          const position = item?.position || {};
+          const metrics = item?.metrics || {};
 
           return (
-            <article className={styles.card} key={item.categoryLevel}>
+            <article className={styles.card} key={`${meta.groupName}-${index}`}>
               <div className={styles.cardTop}>
                 <div className={styles.categoryBlock}>
-                  <h4 className={styles.categoryTitle}>
-                    {item.categoryLevel}
-                  </h4>
+                  <h4 className={styles.categoryTitle}>{meta.groupName}</h4>
 
                   <span
                     className={`${styles.categoryBadge} ${getCategoryClass(
-                      item.categoryLevel,
-                    )}`}
-                  >
-                    {item.categoryLevel.replaceAll("_", " ")}
+                      meta.groupName,
+                    )}`}>
+                    {meta.groupName || "Group"}
                   </span>
                 </div>
 
                 <span
                   className={`${styles.statusBadge} ${getStatusClass(
-                    computedStatus,
-                  )}`}
-                >
-                  {computedStatus}
+                    metrics.status,
+                  )}`}>
+                  {metrics.status}
                 </span>
               </div>
 
               <div className={styles.weightProgressSection}>
                 <div className={styles.weightProgressHeader}>
                   <span>Current Weight</span>
-                  <strong>{formatPercent(item.currentWeight)}</strong>
+                  <strong>{formatPercent(metrics.currentWeight)}</strong>
                 </div>
 
                 <div className={styles.progressMeta}>
-                  <span>Lower {formatPercent(item.lowerLimit)}</span>
-                  <span>Target {formatPercent(item.weight)}</span>
-                  <span>Upper {formatPercent(item.upperLimit)}</span>
+                  <span>Lower {formatPercent(meta.lowerLimit)}</span>
+                  <span>Target {formatPercent(meta.targetWeight)}</span>
+                  <span>Upper {formatPercent(meta.upperLimit)}</span>
                 </div>
 
                 <div className={styles.progressTrack}>
                   <div
                     className={`${styles.progressFill} ${getStatusClass(
-                      computedStatus,
+                      metrics.status,
                     )}`}
                     style={{
                       width: getProgressWidth({
-                        currentWeight: item.currentWeight,
-                        lowerLimit: item.lowerLimit,
-                        upperLimit: item.upperLimit,
+                        currentWeight: metrics.currentWeight,
+                        lowerLimit: meta.lowerLimit,
+                        upperLimit: meta.upperLimit,
                       }),
                     }}
                   />
@@ -220,25 +165,30 @@ const RebalancerCategoryCards = ({ data = categoryData }) => {
 
               <div className={styles.mainStats}>
                 <InfoItem
-                  label="CRR Value"
-                  value={formatCurrency(item.currentValue)}
+                  label="Current Value"
+                  value={formatCurrency(position.currentValue)}
                 />
 
                 <InfoItem
-                  label="CRR Weight"
-                  value={formatPercent(item.currentWeight)}
+                  label="Invested Value"
+                  value={formatCurrency(position.investedValue)}
                 />
 
                 <InfoItem
-                  label="Drift"
-                  value={formatPercent(item.drift)}
-                  valueClass={getSignClass(item.drift)}
+                  label="Profit / Loss"
+                  value={formatSignedCurrency(position.price?.price)}
+                  valueClass={getSignClass(position.price?.price)}
                 />
 
                 <InfoItem
-                  label="Drift Amount"
-                  value={formatSignedCurrency(item.driftAmount)}
-                  valueClass={getSignClass(item.driftAmount)}
+                  label="Profit / Loss %"
+                  value={formatPercent(position.price?.today)}
+                  valueClass={getSignClass(position.price?.today)}
+                />
+
+                <InfoItem
+                  label="Current Weight"
+                  value={formatPercent(metrics.currentWeight)}
                 />
               </div>
 
@@ -247,25 +197,34 @@ const RebalancerCategoryCards = ({ data = categoryData }) => {
               <div className={styles.detailsSection}>
                 <InfoItem
                   label="Target Weight"
-                  value={formatPercent(item.weight)}
+                  value={formatPercent(meta.targetWeight)}
                 />
 
-                <InfoItem label="Band" value={formatPercent(item.band)} />
+                <InfoItem label="Band" value={formatPercent(meta.band)} />
 
                 <InfoItem
                   label="Upper Limit"
-                  value={formatPercent(item.upperLimit)}
+                  value={formatPercent(meta.upperLimit)}
                 />
 
                 <InfoItem
                   label="Lower Limit"
-                  value={formatPercent(item.lowerLimit)}
+                  value={formatPercent(meta.lowerLimit)}
                 />
 
                 <InfoItem
-                  label="Display Value"
-                  value={`₹${formatNumber(item.displayValue)}`}
+                  label="Drift"
+                  value={formatPercent(metrics.driftPercentage)}
+                  valueClass={getSignClass(metrics.driftPercentage)}
                 />
+
+                <InfoItem
+                  label="Drift Amount"
+                  value={formatSignedCurrency(metrics.driftAmount)}
+                  valueClass={getSignClass(metrics.driftAmount)}
+                />
+
+                <InfoItem label="Status" value={metrics.status || "-"} />
               </div>
             </article>
           );

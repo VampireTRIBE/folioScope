@@ -332,6 +332,11 @@ const NewRebalancerForm = () => {
       return;
     }
 
+    if (!values.sipAmount || toNumber(values.sipAmount) < 1000) {
+      setError("SIP amount must be at least 1000.");
+      return;
+    }
+
     if (Math.abs(totalWeight - 100) > 0.01) {
       setError("Total target weight must be exactly 100%.");
       return;
@@ -500,6 +505,24 @@ const NewRebalancerForm = () => {
                   </option>
                 ))}
               </select>
+            </div>
+
+            <div className={styles.inputGroup}>
+              <label htmlFor="sipAmount" className={styles.label}>
+                SIP Amount
+              </label>
+
+              <input
+                className={styles.input}
+                type="number"
+                min="1000"
+                step="1"
+                placeholder="15000"
+                id="sipAmount"
+                name="sipAmount"
+                onChange={resetMessages}
+                required
+              />
             </div>
 
             <div className={styles.inputGroup}>

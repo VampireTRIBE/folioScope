@@ -141,6 +141,12 @@ const portfolioRebalancerSchema = new Schema(
       index: true,
     },
 
+    sipAmount: {
+      type: Number,
+      required: true,
+      min: 1000,
+    },
+
     rebalancerName: {
       type: String,
       required: true,
@@ -182,24 +188,9 @@ const roundTwo = (value) => {
 // Validation: Total Weights
 // ===============================
 portfolioRebalancerSchema.pre("validate", function (next) {
-  const portfolioGroups = this.portfolioGroups || [];
-  const totalGroupWeight = portfolioGroups.reduce((sum, group) => {
-    return sum + Number(group.targetWeight || 0);
-  }, 0);
-
   const totalAssetWeight = this.assets.reduce((sum, asset) => {
     return sum + Number(asset.targetWeight || 0);
   }, 0);
-
-  if (portfolioGroups.length > 0 && roundTwo(totalGroupWeight) !== 100) {
-    return next(
-      new Error(
-        `Total portfolio group target weight must be exactly 100. Current total is ${roundTwo(
-          totalGroupWeight,
-        )}`,
-      ),
-    );
-  }
 
   if (this.assets.length > 0 && roundTwo(totalAssetWeight) !== 100) {
     return next(
@@ -210,7 +201,6 @@ portfolioRebalancerSchema.pre("validate", function (next) {
       ),
     );
   }
-
   next();
 });
 

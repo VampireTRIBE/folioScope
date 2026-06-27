@@ -33,17 +33,15 @@
 }
 
 .cardsContainer {
-  display: flex;
-  align-items: stretch;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
   gap: var(--space-4);
   padding: var(--space-5);
   background: var(--bg-section);
 }
 
 .card {
-  flex: 1 1 28rem;
-  min-width: 24rem;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
@@ -73,6 +71,7 @@
   flex-direction: column;
   gap: var(--space-2);
   min-width: 0;
+  flex: 1;
 }
 
 .categoryTitle {
@@ -210,8 +209,8 @@
 }
 
 .infoItem {
-  flex: 1 1 9rem;
-  min-width: 9rem;
+  flex: 1 1 8.5rem;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -236,7 +235,7 @@
   font-size: var(--text-base);
   font-weight: var(--fw-bold);
   line-height: var(--lh-tight);
-  white-space: nowrap;
+  overflow-wrap: anywhere;
 }
 
 .positive {
@@ -266,7 +265,7 @@
 
 .detailsSection .infoItem {
   flex: 1 1 8rem;
-  min-width: 8rem;
+  min-width: 0;
   background: var(--bg-card);
 }
 
@@ -280,7 +279,6 @@
   }
 
   .card {
-    flex-basis: 100%;
     min-width: 0;
     padding: var(--space-4);
   }

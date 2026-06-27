@@ -1,4 +1,3 @@
-import PriceBadge from "../../../../../../components/layout/public/priceBadge/PriceBadge";
 import rebalancerHeadStyles from "./rebalancerhead.module.css";
 
 const formatINR = (value) =>
@@ -7,62 +6,68 @@ const formatINR = (value) =>
     maximumFractionDigits: 2,
   });
 
-const getFirstNumber = (...values) => {
-  const value = values.find(
-    (item) => item !== null && item !== undefined && item !== "",
-  );
+const formatSignedINR = (value) => {
+  const number = Number(value || 0);
+  const sign = number < 0 ? "-" : "";
 
-  return Number(value || 0);
+  return `${sign}Rs.${formatINR(Math.abs(number))}`;
+};
+
+const formatPercent = (value) => {
+  if (value === null || value === undefined || value === "") return "-";
+  return `${Number(value).toFixed(2)}%`;
+};
+
+const InfoItem = ({ label, value }) => {
+  return (
+    <div>
+      <h4 className={rebalancerHeadStyles.label}>{label}</h4>
+      <h4 className={rebalancerHeadStyles.amount}>{value}</h4>
+    </div>
+  );
 };
 
 const RebalancerHead = ({ rebalancer }) => {
-  const stats = rebalancer?.stats || rebalancer?.summary || {};
-  const sipAmount = getFirstNumber(
-    rebalancer?.sipAmount,
-    stats?.sipAmount,
-    stats?.monthlySip,
-  );
-  const investedValue = getFirstNumber(
-    rebalancer?.investedValue,
-    stats?.investedValue,
-    stats?.totalInvested,
-  );
-  const currentValue = getFirstNumber(
-    rebalancer?.currentValue,
-    stats?.currentValue,
-    stats?.totalCurrent,
-  );
-  const price = rebalancer?.price || rebalancer?.todayChange || {
-    price: getFirstNumber(rebalancer?.todaysGain?.price, stats?.todaysGain),
-    today: rebalancer?.todaysGain?.today || stats?.today || "0.00%",
-  };
+  const summary = rebalancer?.summary || {};
 
   return (
     <div className={rebalancerHeadStyles.container}>
       <h4 className={rebalancerHeadStyles.title}>Portfolio Rebalancer</h4>
       <div className={rebalancerHeadStyles.contentContainer}>
         <div className={rebalancerHeadStyles.contentTitleContainer}>
-          <h4 className={rebalancerHeadStyles.contentTitle}>SIP AMOUNT</h4>
+          <h4 className={rebalancerHeadStyles.contentTitle}>Rebalancer Name</h4>
           <h4 className={rebalancerHeadStyles.sipAmount}>
-            ₹{formatINR(sipAmount)}
+            {rebalancer?.rebalancerName || "-"}
           </h4>
+          <h4 className={rebalancerHeadStyles.contentTitle}>
+            Description
+          </h4>
+          <p className={rebalancerHeadStyles.description}>
+            {rebalancer?.rebalancerDescription || "-"}
+          </p>
         </div>
+
         <div className={rebalancerHeadStyles.investmentStatsContainer}>
-          <div>
-            <h4 className={rebalancerHeadStyles.label}>INVESTED VALUE</h4>
-            <h4 className={rebalancerHeadStyles.amount}>
-              ₹{formatINR(investedValue)}
-            </h4>
-          </div>
-          <div>
-            <h4 className={rebalancerHeadStyles.label}>INVESTED VALUE</h4>
-            <h4 className={rebalancerHeadStyles.amount}>
-              ₹{formatINR(currentValue)}
-            </h4>
-          </div>
-          <div>
-            <PriceBadge price={price} priceValue={true} percentage={true} currency={true} />
-          </div>
+          <InfoItem
+            label="SIP Amount"
+            value={`Rs.${formatINR(summary.sipAmount)}`}
+          />
+          <InfoItem
+            label="Invested Value"
+            value={`Rs.${formatINR(summary.investmentValue)}`}
+          />
+          <InfoItem
+            label="Current Value"
+            value={`Rs.${formatINR(summary.currentValue)}`}
+          />
+          <InfoItem
+            label="Profit / Loss"
+            value={formatSignedINR(summary.price?.price)}
+          />
+          <InfoItem
+            label="Profit / Loss %"
+            value={formatPercent(summary.price?.today)}
+          />
         </div>
       </div>
     </div>

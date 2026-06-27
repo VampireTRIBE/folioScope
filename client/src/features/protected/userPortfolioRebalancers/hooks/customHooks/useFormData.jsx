@@ -1,5 +1,3 @@
-import { useCallback } from "react";
-
 export const useFormDataActions = () => {
   const submitNewRebalancerFormData = async (
     e,
@@ -13,13 +11,12 @@ export const useFormDataActions = () => {
 
     const payload = {
       portfolioGroupId: values.portfolioGroupId,
+      sipAmount: Number(values.sipAmount),
       rebalancerName: values.rebalancerName,
       rebalancerDescription: values.rebalancerDescription || "",
       assets,
       marketFallRules,
     };
-
-    console.log("NEW REBALANCER PAYLOAD:", payload);
 
     return mutationFn({
       accessToken,

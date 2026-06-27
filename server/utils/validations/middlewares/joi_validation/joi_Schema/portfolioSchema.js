@@ -246,6 +246,12 @@ const createPortfolioRebalancerValidationSchema = Joi.object({
     "string.empty": "Portfolio group id is required",
   }),
 
+  sipAmount: Joi.number().min(1000).required().messages({
+    "any.required": "SIP Amount is required",
+    "number.base": "SIP Amount Should be Number",
+    "number.min": "SIP Amount must be at least 1000",
+  }),
+
   rebalancerName: Joi.string().trim().min(2).max(100).required().messages({
     "string.empty": "Rebalancer name is required",
     "string.min": "Rebalancer name must be at least 2 characters",
@@ -323,6 +329,11 @@ const createPortfolioRebalancerValidationSchema = Joi.object({
 // ===============================
 
 const updatePortfolioRebalancerValidationSchema = Joi.object({
+  sipAmount: Joi.number().min(1000).optional().messages({
+    "number.base": "SIP Amount Should be Number",
+    "number.min": "SIP Amount must be at least 1000",
+  }),
+
   rebalancerName: Joi.string().trim().min(2).max(100).optional().messages({
     "string.empty": "Rebalancer name cannot be empty",
     "string.min": "Rebalancer name must be at least 2 characters",

@@ -15,6 +15,9 @@ const {
   read_User_Holdings,
 } = require("../../utils/mongodb/aggregations/readModels/read_FinancialAsset_Models/read_User_Holdings");
 const {
+  read_compute_Rebalancer,
+} = require("../../utils/mongodb/aggregations/readModels/read_PortfolioGroup_Models/read_compute_RebalancerById");
+const {
   find_validate_portfolioGroup,
 } = require("../../utils/mongodb/aggregations/readModels/read_PortfolioGroup_Models/read_PortfolioGroup_Metadata");
 const {
@@ -151,7 +154,7 @@ module.exports.fetchRebalancerList = async (req, res, next) => {
       userId: userID,
     })
       .select(
-        "rebalancerName rebalancerDescription portfolioGroupId assets marketFallRules isActive createdAt updatedAt",
+        "rebalancerName rebalancerDescription portfolioGroupId sipAmount assets marketFallRules isActive createdAt updatedAt",
       )
       .sort({ createdAt: -1 })
       .lean();
@@ -171,19 +174,12 @@ module.exports.fetchRebalancerById = async (req, res, next) => {
     const userID = req.userId;
     const { rebalancerId } = req.params;
 
-    const rebalancer = await PORTFOLIOREBALANCER_MODEL.findOne({
-      _id: rebalancerId,
-      userId: userID,
-    }).lean();
-
-    if (!rebalancer) {
-      throw new customError("Rebalancer not found", 404);
-    }
+    const respData = await read_compute_Rebalancer(userID, rebalancerId);
 
     return res.status(200).json({
       success: true,
       message: "Rebalancer Fetched",
-      data: rebalancer,
+      data: respData,
     });
   } catch (error) {
     next(error);

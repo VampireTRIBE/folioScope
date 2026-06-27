@@ -1,953 +1,802 @@
 # FolioScope API Reference
 
-Updated from current code inspection.
+This API reference reflects the latest inspected codebase of FolioScope.
 
-This document maps the current backend routes and the frontend API helpers used by FolioScope. The backend is mounted from `server/server.js`, and frontend Axios instances are defined in `client/src/constants/axiosInstance.js`.
+Backend entry point:
+
+```txt
+server/server.js
+```
+
+Main backend route mounts:
+
+```js
+app.use("/", userRoute);
+app.use("/", publicRoute);
+app.use("/price", priceRangeRoute);
+app.use("/analytic", analyticsRoute);
+app.use("/admin/dataseeders", adminRoute);
+app.use("/portfolio", portfolioRoute);
+```
+
+The test route exists in the codebase but is currently commented out in `server/server.js`:
+
+```js
+// app.use("/test", testRoutes);
+```
+
+Keep it disabled outside controlled local development.
 
 ---
 
 ## Base URLs
 
-| Layer                               | Base URL                                 | Notes                                              |
-| ----------------------------------- | ---------------------------------------- | -------------------------------------------------- |
-| Backend                             | `http://localhost:3000`                  | `PORT` environment variable can override the port. |
-| Frontend Vite dev server            | `http://localhost:5173`                  | Default Vite development server.                   |
-| Frontend `BASE_URL`                 | `http://<window.location.hostname>:3000` | Axios instance without credentials.                |
-| Frontend `BASE_URL_withCredentials` | `http://<window.location.hostname>:3000` | Axios instance with cookies enabled.               |
+| Layer | Default |
+|---|---|
+| Backend | `http://localhost:3000` |
+| Frontend Vite | `http://localhost:5173` |
+| Frontend Axios `BASE_URL` | `http://<window.location.hostname>:3000` |
+| Frontend Axios with credentials | `http://<window.location.hostname>:3000` |
 
 ---
 
-## Authentication Conventions
+## Authentication
 
-Protected routes expect an access token header:
+Protected routes require:
 
 ```http
 Authorization: Bearer <accessToken>
 ```
 
-Refresh-token routes use HTTP-only cookies:
+Refresh-token based routes use cookies:
 
-| Cookie         | Set by                                                   | Used by              |
-| -------------- | -------------------------------------------------------- | -------------------- |
-| `refreshToken` | `POST /login`, `POST /verifyemail`, `POST /refreshtoken` | `POST /refreshtoken` |
-| `sessionId`    | `POST /login`, `POST /verifyemail`, `POST /refreshtoken` | `POST /refreshtoken` |
+| Cookie | Purpose |
+|---|---|
+| `refreshToken` | Refresh-token rotation |
+| `sessionId` | Session document lookup |
 
-Common global error response:
+Common protected backend middleware:
 
-```json
-{
-  "success": false,
-  "statusCode": 500,
-  "message": "Some Error"
-}
-```
-
-Some controllers still return local error shapes such as:
-
-```json
-{
-  "error": "Duplicate group name"
-}
-```
-
-or string-valued success fields such as:
-
-```json
-{
-  "success": "Group created",
-  "data": {}
-}
+```js
+verifyAccessToken
 ```
 
 ---
 
-## User and Authentication Routes
+# User/Auth Routes
 
-Mounted at `/`.
+Mounted at root `/`.
 
-### `GET /userdetails`
+## `GET /userdetails`
 
-Returns the authenticated user's basic details and grouped portfolio group references.
+Protected.
 
-| Field | Value               |
-| ----- | ------------------- |
-| Auth  | Bearer access token |
-| Body  | None                |
+Returns authenticated user details.
 
-Example response:
+Frontend use:
 
-```json
-{
-  "success": true,
-  "message": "User details fetched successfully",
-  "user": {
-    "firstName": "Amir",
-    "lastName": "...",
-    "role": "client",
-    "groups": {
-      "level1": {},
-      "level2": {},
-      "level3": {},
-      "level4": {}
-    }
-  }
-}
-```
-
-### `POST /signup`
-
-Registers a new user and sends an email verification link.
-
-Auth: Public
-
-Body:
-
-```json
-{
-  "firstName": "Amir",
-  "lastName": "Khan",
-  "email": "amir@example.com",
-  "password": "password123",
-  "role": "client",
-  "isActive": true
-}
-```
-
-Validation:
-
-| Field       | Rule                                      |
-| ----------- | ----------------------------------------- |
-| `firstName` | Required string, max 50                   |
-| `lastName`  | Required string, max 50                   |
-| `email`     | Required valid email                      |
-| `password`  | Required, min 6, max 128                  |
-| `role`      | `client` or `admin`, defaults to `client` |
-| `isActive`  | Boolean, defaults to `true`               |
-
-Success response:
-
-```json
-{
-  "success": true,
-  "message": "Registration successful. Please verify your email."
-}
-```
-
-### `POST /sendverificationemail`
-
-Resends an email verification link.
-
-Auth: Public
-
-Body:
-
-```json
-{
-  "email": "amir@example.com"
-}
-```
-
-Success response:
-
-```json
-{
-  "success": true,
-  "message": "Check your mail for verification: amir@example.com"
-}
-```
-
-Implementation behavior:
-
-- 1-minute resend cooldown
-- Daily retry reset
-- Maximum retry limit before temporary lockout
-
-### `POST /verifyemail`
-
-Verifies the email token, creates the default root portfolio group if missing, creates a session, sets refresh cookies, and returns an access token.
-
-Auth: Email verification token
-
-Header:
-
-```http
-Authorization: Bearer <emailVerifyToken>
-```
-
-Body: Empty JSON object is accepted.
-
-Success response:
-
-```json
-{
-  "success": true,
-  "message": "Email verified successfully",
-  "accessToken": "jwt-access-token",
-  "user": {
-    "firstName": "Amir",
-    "lastName": "Khan",
-    "role": "client",
-    "groups": {
-      "level1": {},
-      "level2": {},
-      "level3": {},
-      "level4": {}
-    }
-  }
-}
-```
-
-### `POST /login`
-
-Logs a user in, creates a session, sets refresh cookies, and returns an access token.
-
-Auth: Public
-
-Body:
-
-```json
-{
-  "email": "amir@example.com",
-  "password": "password123",
-  "role": "client"
-}
-```
-
-Validation:
-
-| Field      | Rule                          |
-| ---------- | ----------------------------- |
-| `email`    | Required valid email          |
-| `password` | Required, min 6, max 128      |
-| `role`     | Required, `client` or `admin` |
-
-Success response:
-
-```json
-{
-  "success": true,
-  "message": "Login successful",
-  "accessToken": "jwt-access-token",
-  "user": {
-    "firstName": "Amir",
-    "lastName": "Khan",
-    "role": "client",
-    "groups": {
-      "level1": {},
-      "level2": {},
-      "level3": {},
-      "level4": {}
-    }
-  }
-}
-```
-
-### `POST /refreshtoken`
-
-Rotates the refresh token and returns a new access token.
-
-| Field | Value                                  |
-| ----- | -------------------------------------- |
-| Auth  | `refreshToken` and `sessionId` cookies |
-| Body  | None                                   |
-
-Success response:
-
-```json
-{
-  "success": true,
-  "message": "Access token generated",
-  "accessToken": "new-access-token"
-}
-```
-
-Security behavior:
-
-- Verifies refresh token
-- Verifies session cookie match
-- Looks up active session document
-- Hashes and rotates refresh token
-- Revokes all sessions if refresh-token reuse is detected
-
-### `POST /forgotpassword`
-
-Sends OTP to a verified user.
-
-Auth: Public
-
-Body:
-
-```json
-{
-  "email": "amir@example.com"
-}
-```
-
-Success response:
-
-```json
-{
-  "success": true,
-  "message": "OTP sent to amir@example.com",
-  "email": "amir@example.com"
-}
-```
-
-### `POST /verifyotp/:email`
-
-Verifies a 6-digit OTP for password reset.
-
-Auth: Public
-
-Params:
-
-| Param   | Description        |
-| ------- | ------------------ |
-| `email` | User email address |
-
-Body:
-
-```json
-{
-  "otp": "123456"
-}
-```
-
-Success response:
-
-```json
-{
-  "success": true,
-  "message": "OTP verified successfully"
-}
-```
-
-### `POST /confirmpassword/:email`
-
-Changes password after OTP verification.
-
-Auth: Public
-
-Params:
-
-| Param   | Description        |
-| ------- | ------------------ |
-| `email` | User email address |
-
-Body:
-
-```json
-{
-  "newPassword": "newPassword123",
-  "confirmPassword": "newPassword123"
-}
-```
-
-Validation:
-
-| Field             | Rule                               |
-| ----------------- | ---------------------------------- |
-| `newPassword`     | Required, min 6, max 128           |
-| `confirmPassword` | Required, must match `newPassword` |
-
-Success response:
-
-```json
-{
-  "success": true,
-  "message": "Password changed successfully "
-}
-```
-
-### `POST /logoutuser`
-
-Revokes the current session and clears cookies.
-
-Auth: Bearer access token
-
-Success response:
-
-```json
-{
-  "success": true,
-  "message": "Logout successful"
-}
-```
-
-### `POST /logoutalluser`
-
-Revokes all active sessions for the user and clears cookies.
-
-Auth: Bearer access token
-
-Success response:
-
-```json
-{
-  "success": true,
-  "message": "Logout All successful"
-}
-```
+- Auth bootstrap/user detail loading.
 
 ---
 
-## Public Market Data Routes
+## `POST /signup`
 
-Mounted at `/`.
+Registers a new user.
 
-### `GET /allsecuritieslist`
+Validation:
 
-Returns all security names from the asset metadata cache.
-
-Auth: Public
-
-Success response:
-
-```json
-{
-  "success": true,
-  "data": ["NIFTY 50", "NIFTY NEXT 50"]
-}
-```
-
-### `GET /defaultmetadata`
-
-Returns default market metadata used by the homepage market-glance section.
-
-Auth: Public
-
-Success response:
-
-```json
-{
-  "success": true,
-  "data": {}
-}
-```
-
-### `GET /top/securities`
-
-Returns structured today's-market sections such as stocks, ETFs, mutual funds, gainers, losers, and 52-week groups.
-
-Auth: Public
-
-Success response:
-
-```json
-{
-  "success": true,
-  "data": {}
-}
-```
-
-### `GET /security/:securityId`
-
-Returns a security overview by asset metadata/security ID.
-
-Auth: Public
-
-Params:
-
-| Param        | Description                |
-| ------------ | -------------------------- |
-| `securityId` | Asset metadata/security ID |
-
-Success response:
-
-```json
-{
-  "success": true,
-  "data": {}
-}
-```
+- `validate_RegisterData`
 
 ---
 
-## Price Range Routes
+## `POST /sendverificationemail`
+
+Sends verification email.
+
+Validation:
+
+- `validate_email`
+
+---
+
+## `POST /verifyemail`
+
+Verifies email using email verification token.
+
+Middleware:
+
+- `verifyEmailTokenCheck`
+
+Also sets session cookies and returns access token.
+
+---
+
+## `POST /login`
+
+Logs in a user.
+
+Validation:
+
+- `validate_loginDATA`
+
+Returns:
+
+- access token
+- user/session data
+
+Sets:
+
+- `refreshToken`
+- `sessionId`
+
+---
+
+## `POST /refreshtoken`
+
+Rotates refresh token and returns a new access token.
+
+Middleware:
+
+- `verifyRefreshToken`
+
+Used by frontend auth restoration.
+
+---
+
+## `POST /forgotpassword`
+
+Starts password reset flow.
+
+Validation:
+
+- `validate_email`
+
+---
+
+## `POST /verifyotp/:email`
+
+Verifies OTP for password reset.
+
+Validation:
+
+- `validate_otp`
+- `validateParamsEmail("email")`
+
+---
+
+## `POST /confirmpassword/:email`
+
+Confirms new password after OTP verification.
+
+Validation:
+
+- `validate_ChangePasswordDATA`
+- `validateParamsEmail("email")`
+
+---
+
+## `POST /logoutuser`
+
+Protected.
+
+Logs out current session.
+
+---
+
+## `POST /logoutalluser`
+
+Protected.
+
+Logs out all user sessions.
+
+---
+
+# Public Data Routes
+
+Mounted at root `/`.
+
+## `GET /allsecuritieslist`
+
+Returns grouped/listed public securities metadata.
+
+Used by:
+
+- Mobile search bar
+- Trade form
+- Comparison analysis
+- Rebalancer asset search
+- `usePublicSecurities`
+- SessionStorage cache
+
+---
+
+## `GET /defaultmetadata`
+
+Returns default public metadata.
+
+---
+
+## `GET /top/securities`
+
+Returns today's top securities / market discovery data.
+
+---
+
+## `GET /security/:securityId`
+
+Returns overview for a security.
+
+---
+
+# Price Routes
 
 Mounted at `/price`.
 
-Supported `range` query values:
+## `GET /price/security/:securityId`
 
-```txt
-W, M, Y, 3Y, MAX
-```
+Public.
 
-If no `range` is provided, the controller returns 1D data.
-
-### `GET /price/security/:securityId`
-
-Returns public price range data for a security.
-
-Auth: Public
-
-Examples:
-
-```http
-GET /price/security/SECURITY_ID
-GET /price/security/SECURITY_ID?range=W
-GET /price/security/SECURITY_ID?range=M
-GET /price/security/SECURITY_ID?range=Y
-GET /price/security/SECURITY_ID?range=3Y
-GET /price/security/SECURITY_ID?range=MAX
-```
-
-Success response:
-
-```json
-{
-  "success": true,
-  "message": "W Price Range",
-  "data": {}
-}
-```
-
-### `GET /price/group/:groupId`
-
-Returns protected NAV range data for a portfolio group.
-
-Auth: Bearer access token
-
-Params:
-
-| Param     | Description                             |
-| --------- | --------------------------------------- |
-| `groupId` | MongoDB ObjectId of the portfolio group |
-
-Examples:
-
-```http
-GET /price/group/GROUP_ID
-GET /price/group/GROUP_ID?range=W
-GET /price/group/GROUP_ID?range=M
-GET /price/group/GROUP_ID?range=Y
-GET /price/group/GROUP_ID?range=3Y
-GET /price/group/GROUP_ID?range=MAX
-```
-
-Success response:
-
-```json
-{
-  "success": true,
-  "message": "M Price Range",
-  "data": {}
-}
-```
+Returns price range/history data for a security.
 
 ---
 
-## Analytics Routes
+## `GET /price/group/:groupId`
+
+Protected.
+
+Returns group NAV/price range data.
+
+Middleware:
+
+- `validateID("groupId")`
+- `verifyAccessToken`
+
+---
+
+# Analytics Routes
 
 Mounted at `/analytic`.
 
-### `GET /analytic/drawdown/security/:securityId`
+## `GET /analytic/drawdown/security/:securityId`
 
-Returns drawdown analysis for a public security.
+Public.
 
-Auth: Public
+Returns drawdown analytics for a security.
 
-Success response:
+Middleware:
 
-```json
-{
-  "success": true,
-  "message": "Price Drawdown Analysis",
-  "data": {}
-}
-```
-
-### `GET /analytic/drawdown/group/:groupId`
-
-Returns NAV drawdown analysis for a protected portfolio group.
-
-Auth: Bearer access token
-
-Success response:
-
-```json
-{
-  "success": true,
-  "message": "Price Drawdown Analysis",
-  "data": {}
-}
-```
+- `validateID("securityId")`
 
 ---
 
-## Portfolio Routes
+## `GET /analytic/drawdown/group/:groupId`
+
+Protected.
+
+Returns group drawdown analytics.
+
+Middleware:
+
+- `validateID("groupId")`
+- `verifyAccessToken`
+
+---
+
+## `POST /analytic/xirr/group/:groupId`
+
+Protected.
+
+Computes XIRR for a portfolio group.
+
+Middleware:
+
+- `validateID("groupId")`
+- `verifyAccessToken`
+
+---
+
+## `GET /analytic/comparision/xirr/:groupId/:indexId`
+
+Protected.
+
+Compares group XIRR against an index/benchmark.
+
+Middleware:
+
+- `validateID("groupId")`
+- `validateID("indexId")`
+- `verifyAccessToken`
+
+Note: The route spelling is currently `comparision`, not `comparison`.
+
+---
+
+## `GET /analytic/comparision/nav/:groupId/:indexId`
+
+Protected.
+
+Compares normalized NAV between group and benchmark/index.
+
+Middleware:
+
+- `validateID("groupId")`
+- `validateID("indexId")`
+- `verifyAccessToken`
+
+Note: The route spelling is currently `comparision`, not `comparison`.
+
+---
+
+# Admin Seeder Routes
+
+Mounted at `/admin/dataseeders`.
+
+All protected.
+
+## `POST /admin/dataseeders/seedclassification`
+
+Seeds/updates asset classification data.
+
+Middleware:
+
+- `verifyAccessToken`
+
+---
+
+## `POST /admin/dataseeders/seedassetmetadata`
+
+Seeds/updates asset metadata.
+
+Middleware:
+
+- `verifyAccessToken`
+
+---
+
+## `POST /admin/dataseeders/seedpricehistory`
+
+Seeds/inserts price history.
+
+Middleware:
+
+- `verifyAccessToken`
+
+---
+
+# Portfolio Routes
 
 Mounted at `/portfolio`.
 
-All portfolio routes require:
+## `POST /portfolio/holdings`
 
-```http
-Authorization: Bearer <accessToken>
+Protected.
+
+Fetches current user holdings for a selected group.
+
+Request body:
+
+```json
+{
+  "groupId": "MongoObjectId"
+}
 ```
 
-`pg_id` must be a valid MongoDB ObjectId in current route validation.
+Backend flow:
 
-### `GET /portfolio/:pg_id`
+```txt
+groupId
+→ leaf group IDs
+→ active financial assets
+→ latest/previous LTP
+→ current value
+→ invested value
+→ average price
+→ one-day gain
+→ P/L
+→ expense ratio/bucket cost
+→ total stats
+→ holdings list
+```
 
-Returns portfolio group metadata, consolidated snapshot, current investment snapshot, net worth range, current-year values, and lifetime values.
-
-Auth: Bearer access token
-
-Success response shape:
+Response shape:
 
 ```json
 {
   "success": true,
   "message": "Metadata Fetched",
   "data": {
-    "_id": "group-id",
-    "groupName": "NET WORTH",
-    "description": "...",
-    "level": 1,
-    "consolidatedSnapshot": {
-      "netcurrentvalue": 0,
-      "consolidatedcash": 0,
-      "consolidatedtax": 0
-    },
-    "currentInvestment": {
-      "investmentvalue": 0,
-      "currentvalue": 0,
-      "pl": "0.00",
-      "pl%": "0.00"
-    },
-    "networth": {},
-    "currentyear": {},
-    "lifetime": {}
+    "totalStats": {},
+    "holdings": []
   }
 }
 ```
 
-### `POST /portfolio/:pg_id`
+Frontend use:
 
-Adds a child group under a parent group.
+- Holdings page
+- Holdings filter
+- Summary cards
+- Holding cards
 
-Auth: Bearer access token
+---
 
-Body:
+# Portfolio Rebalancer Routes
 
-```json
-{
-  "name": "Core Equity",
-  "description": "Long-term equity portfolio"
-}
-```
+## `POST /portfolio/rebalancer/new`
 
-Business rules:
+Protected.
 
-- Parent group must exist
-- Parent must belong to the authenticated user
-- Parent group cannot already contain a direct asset
-- Maximum group depth is enforced
+Creates a new rebalancer configuration.
 
-Success response:
+Middleware:
 
-```json
-{
-  "success": "Group created",
-  "data": {}
-}
-```
+- `verifyAccessToken`
+- `validate_CreatePortfolioRebalancerData`
 
-### `PATCH /portfolio/:pg_id`
-
-Updates an existing portfolio group.
-
-Auth: Bearer access token
-
-Body:
+Request body example:
 
 ```json
 {
-  "name": "Updated Group Name",
-  "description": "Updated description"
-}
-```
-
-Success response:
-
-```json
-{
-  "success": "Group updated",
-  "data": {}
-}
-```
-
-### `DELETE /portfolio/:pg_id`
-
-Soft-deletes a portfolio group and descendants.
-
-Auth: Bearer access token
-
-Rules:
-
-- Group must exist
-- Group must belong to authenticated user
-- Root level group cannot be deleted
-
-Success response:
-
-```json
-{
-  "success": "Group deleted"
-}
-```
-
-### `POST /portfolio/:pg_id/grouptransaction`
-
-Creates a group-level cash transaction on a leaf portfolio group.
-
-Auth: Bearer access token
-
-Body:
-
-```json
-{
-  "type": "deposit",
-  "date": "2026-06-20T10:30:00.000Z",
-  "amount": 10000
+  "portfolioGroupId": "MongoObjectId",
+  "rebalancerName": "Core Portfolio Rebalancer",
+  "rebalancerDescription": "Target allocation and market-fall deployment rules",
+  "assets": [
+    {
+      "assetId": "MongoObjectId",
+      "groupId": "MongoObjectId",
+      "targetWeight": 20,
+      "band": 5,
+      "multiplier": 1
+    }
+  ],
+  "marketFallRules": [
+    {
+      "fallPercentage": 10,
+      "deployPercentage": 20,
+      "assets": [
+        {
+          "assetId": "MongoObjectId",
+          "multiplier": 1,
+          "min": 0.15
+        }
+      ]
+    }
+  ]
 }
 ```
 
 Validation:
 
-| Field    | Rule                              |
-| -------- | --------------------------------- |
-| `type`   | `deposit`, `withdrawal`, or `tax` |
-| `date`   | ISO date string                   |
-| `amount` | Number greater than 0             |
+- Portfolio group ID is required.
+- Rebalancer name is required.
+- At least one asset is required.
+- Total asset target weight must equal 100.
+- Duplicate assets are not allowed.
+- Market-fall rule assets must exist inside the main assets list.
+- Duplicate market-fall percentages are not allowed.
+- Backend validates that selected assets are tradable and groups are leaf groups.
 
-Success response:
+Response:
 
 ```json
 {
-  "success": "Transaction completed successfully",
-  "result": {}
+  "success": true,
+  "message": "Rebalancer Created",
+  "data": {}
 }
 ```
 
-### `POST /portfolio/:pg_id/trade/:a_id`
+Current limitation:
 
-Executes a buy, sell, or dividend transaction for an asset inside a portfolio group.
+- This creates persisted rebalancer configuration. It does not yet calculate real current allocation, drift, SIP/lumpsum suggestions, or deployment output.
 
-Auth: Bearer access token
+---
 
-Params:
+## `GET /portfolio/rebalancer/list`
 
-| Param   | Description                      |
-| ------- | -------------------------------- |
-| `pg_id` | Portfolio group ObjectId         |
-| `a_id`  | Asset metadata/security ObjectId |
+Protected.
 
-Buy body:
+Fetches the authenticated user's rebalancer configurations.
+
+Response:
+
+```json
+{
+  "success": true,
+  "message": "Rebalancers Fetched",
+  "data": []
+}
+```
+
+---
+
+## `GET /portfolio/rebalancer/:rebalancerId`
+
+Protected.
+
+Fetches one rebalancer by ID.
+
+Middleware:
+
+- `verifyAccessToken`
+- `validateID("rebalancerId")`
+
+Response:
+
+```json
+{
+  "success": true,
+  "message": "Rebalancer Fetched",
+  "data": {}
+}
+```
+
+---
+
+# Portfolio Group Routes
+
+## `GET /portfolio/:pg_id`
+
+Protected.
+
+Fetches group metadata and current dashboard stats.
+
+Middleware:
+
+- `verifyAccessToken`
+- `validateID("pg_id")`
+
+Returns:
+
+- group name
+- description
+- level
+- consolidated snapshot
+- current investment stats
+- net worth range
+- current year stats
+- lifetime stats
+
+---
+
+## `POST /portfolio/:pg_id`
+
+Protected.
+
+Creates a child group under `pg_id`.
+
+Middleware:
+
+- `verifyAccessToken`
+- `validateID("pg_id")`
+
+Important rules:
+
+- Parent must exist.
+- Parent must belong to user.
+- Parent cannot already contain financial assets.
+- Max depth is enforced.
+- Duplicate group names are handled.
+
+---
+
+## `PATCH /portfolio/:pg_id`
+
+Protected.
+
+Updates group name/description.
+
+Middleware:
+
+- `verifyAccessToken`
+- `validateID("pg_id")`
+
+---
+
+## `DELETE /portfolio/:pg_id`
+
+Protected.
+
+Soft-deletes a group subtree by setting `isDeleted: true`.
+
+Middleware:
+
+- `verifyAccessToken`
+- `validateID("pg_id")`
+
+Important:
+
+- Root group cannot be deleted.
+- Frontend `DeleteGroupForm` is still placeholder.
+- Delete/archive behavior should be reviewed carefully because portfolio history, transactions, NAV, and analytics depend on historical state.
+
+---
+
+# Group Statement Transaction Route
+
+## `POST /portfolio/:pg_id/grouptransaction`
+
+Protected.
+
+Creates deposit, withdrawal, or tax group transaction.
+
+Middleware:
+
+- `verifyAccessToken`
+- `validateID("pg_id")`
+- `validate_GroupStatementData`
+
+Request body:
+
+```json
+{
+  "type": "deposit",
+  "date": "2026-06-27T00:00:00.000Z",
+  "amount": 10000
+}
+```
+
+Allowed `type` values:
+
+- `deposit`
+- `withdrawal`
+- `tax`
+
+Backend behavior:
+
+- Validates group.
+- Handles group cash movement.
+- Applies insufficient cash checks.
+- Fills NAV/future NAV.
+- Syncs portfolio state.
+
+---
+
+# Trade Route
+
+## `POST /portfolio/:pg_id/trade/:a_id`
+
+Protected.
+
+Creates buy, sell, or dividend transaction for an asset/security.
+
+Middleware:
+
+- `verifyAccessToken`
+- `validateID("pg_id")`
+- `validateID("a_id")`
+- `validate_tradeData`
+
+Buy/sell request:
 
 ```json
 {
   "type": "buy",
-  "date": "2026-06-20T10:30:00.000Z",
+  "date": "2026-06-27T00:00:00.000Z",
   "qty": 10,
   "price": 100
 }
 ```
 
-Sell body:
-
-```json
-{
-  "type": "sell",
-  "date": "2026-06-20T10:30:00.000Z",
-  "qty": 5,
-  "price": 120
-}
-```
-
-Dividend body:
+Dividend request:
 
 ```json
 {
   "type": "dividend",
-  "date": "2026-06-20T10:30:00.000Z",
+  "date": "2026-06-27T00:00:00.000Z",
   "dividendAmount": 500
 }
 ```
 
-Validation:
+Allowed `type` values:
 
-| Type       | Required fields          |
-| ---------- | ------------------------ |
-| `buy`      | `date`, `qty`, `price`   |
-| `sell`     | `date`, `qty`, `price`   |
-| `dividend` | `date`, `dividendAmount` |
+- `buy`
+- `sell`
+- `dividend`
 
 Backend behavior:
 
-- Validates transaction type
-- Requires leaf portfolio group
-- Prevents direct index transactions
-- Prevents backdated or same timestamp transactions
-- Fills missing NAVs before mutation
-- Handles FIFO lots for sells
-- Calculates realized gains and STCG/LTCG
-- Updates cash and asset quantities
-- Uses MongoDB sessions for transaction flow
-
-Success response:
-
-```json
-{
-  "success": true,
-  "message": "Trade Executed Successfully"
-}
-```
+- Handles buy/sell/dividend.
+- Maintains FIFO lots.
+- Validates sell quantity.
+- Updates realized/unrealized data.
+- Handles dividend.
+- Fills future NAV.
+- Syncs portfolio.
 
 ---
 
-## Admin Seeder Routes
+# Frontend API Helper Mapping
 
-Mounted at `/admin/dataseeders`.
+## Auth/public helpers
 
-All routes require bearer access token. Admin authorization is checked inside controllers through `is_Admin`.
+Key frontend API helpers include:
 
-### `POST /admin/dataseeders/seedclassification`
+- `FETCH_USERDETAILS`
+- `FETCH_SECURITIESLIST`
+- public security overview APIs
+- auth mutation APIs
 
-Seeds asset classification data from Apps Script.
+## Holdings
 
-Success response:
-
-```json
-{
-  "success": "Classification Seeding Successful"
-}
+```js
+FETCH_USERSHOLDINGS({ accessToken, data })
 ```
 
-### `POST /admin/dataseeders/seedassetmetadata`
+Calls:
 
-Seeds asset metadata and refreshes related cache/live ticker setup.
-
-Success response:
-
-```json
-{
-  "success": "AssetMetaData Update Successful",
-  "summary": {}
-}
+```txt
+POST /portfolio/holdings
 ```
 
-### `POST /admin/dataseeders/seedpricehistory`
+## Rebalancer
 
-Seeds historical price data for a named security or group of securities depending on seeder implementation.
-
-Body:
-
-```json
-{
-  "name": "NIFTY 50"
-}
+```js
+POST_NEWREBALANCER({ accessToken, data })
 ```
 
-Success response:
+Calls:
 
-```json
-{
-  "success": "Price History Insertion is Successful",
-  "summary": {}
-}
+```txt
+POST /portfolio/rebalancer/new
 ```
+
+```js
+FETCH_REBALANCERLIST(accessToken)
+```
+
+Calls:
+
+```txt
+GET /portfolio/rebalancer/list
+```
+
+```js
+FETCH_REBALANCER(accessToken, rebalancerId)
+```
+
+Calls:
+
+```txt
+GET /portfolio/rebalancer/:rebalancerId
+```
+
+## Portfolio Dashboard
+
+Includes API helpers for:
+
+- group metadata
+- group NAV chart
+- drawdown
+- XIRR
+- XIRR comparison
+- NAV comparison
+- add/update group
+- group transaction
+- trade transaction
 
 ---
 
-## Test Routes
+# Current API Risks and Cleanup Notes
 
-Mounted at `/test` in the currently inspected `server/server.js`.
-
-> Warning: These routes are development-only and should not be exposed in production.
-
-### `GET /test/cleardatabase`
-
-Deletes major collections, including client users, NAV performance, financial assets, portfolio groups, ledger statements, group statements, and FIFO lots.
-
-Success response:
-
-```json
-{
-  "success": "Clearing Database Successful"
-}
-```
-
-### `GET /test/:g_id`
-
-Attempts to return a portfolio group by ID. Current implementation reads `req.user.id`, so it may fail unless upstream middleware provides `req.user`.
+1. `/analytic/comparision/...` route spelling is currently `comparision`; keep frontend/backend aligned or add corrected aliases later.
+2. `server/package.json` does not have a real `dev`, `start`, or `test` script yet.
+3. No automated API tests are present.
+4. Rebalancer persists configuration but does not yet calculate real allocation drift or suggestions.
+5. `portfolioRebalancer.js` references `this.portfolioGroups`, but the schema does not define `portfolioGroups`.
+6. `get_RebalancerListByUserId` filters by `isDeleted: false`, but the rebalancer schema currently defines `isActive`, not `isDeleted`.
+7. The test route file exists and can clear database data, but it is currently not mounted in `server.js`. Keep it disabled outside local controlled development.
+8. Some response shapes are inconsistent between controllers, for example `{ success: true, message, data }` vs `{ success: "Group updated" }` or `{ error }`.
 
 ---
 
-## Frontend API Helper Map
+# Recommended API Priorities
 
-### Shared Axios Instances
-
-| Export                     | File                                    | Purpose                                   |
-| -------------------------- | --------------------------------------- | ----------------------------------------- |
-| `BASE_URL`                 | `client/src/constants/axiosInstance.js` | Axios client without cookies              |
-| `BASE_URL_withCredentials` | `client/src/constants/axiosInstance.js` | Axios client with `withCredentials: true` |
-
-### Global Helpers
-
-| Helper                                              | File                                     | Backend call                            |
-| --------------------------------------------------- | ---------------------------------------- | --------------------------------------- |
-| `POST_TOKENROTATION()`                              | `client/src/APIs/FETCH_APIs.js`          | `POST /refreshtoken`                    |
-| `FETCH_RANGEPRICE(securityID, range?)`              | `client/src/features/apis/FETCH_APIs.js` | `GET /price/security/:securityID`       |
-| `FETCH_RANGENAVGROUP(groupID, accessToken, range?)` | `client/src/features/apis/FETCH_APIs.js` | `GET /price/group/:groupID`             |
-| `FETCH_USERDETAILS(accessToken)`                    | `client/src/features/apis/FETCH_APIs.js` | `GET /userdetails`                      |
-| `FETCH_GROUPDRAWDOWN(groupId, accessToken)`         | `client/src/features/apis/FETCH_APIs.js` | `GET /analytic/drawdown/group/:groupId` |
-
-### Public Helpers
-
-| Helper                               | File                                                             | Backend call                                  |
-| ------------------------------------ | ---------------------------------------------------------------- | --------------------------------------------- |
-| `FETCH_SECURITIESLIST()`             | `client/src/features/public/header/api/FETCH_APIs.js`            | `GET /allsecuritieslist`                      |
-| `FETCH_MARKETGLANCE()`               | `client/src/features/public/home/api/FETCH_APIs.js`              | `GET /defaultmetadata`                        |
-| `FETCH_TODAYS_MARKETS()`             | `client/src/features/public/home/api/FETCH_APIs.js`              | `GET /top/securities`                         |
-| `FETCH_SECURITYOVERVIEW(securityID)` | `client/src/features/public/securityDashboard/api/FETCH_APIs.js` | `GET /security/:securityID`                   |
-| `FETCH_SECURITYDRAWDOWN(securityID)` | `client/src/features/public/securityDashboard/api/FETCH_APIs.js` | `GET /analytic/drawdown/security/:securityID` |
-
-### Authentication Helpers
-
-| Helper                                 | Backend call                   |
-| -------------------------------------- | ------------------------------ |
-| `POST_LOGINFORM(data)`                 | `POST /login`                  |
-| `POST_SIGNUPFORM(data)`                | `POST /signup`                 |
-| `POST_VERIFYEMAIL(token)`              | `POST /verifyemail`            |
-| `POST_SENDVERIFICATIONEMAIL(data)`     | `POST /sendverificationemail`  |
-| `POST_SENDOTPEMAIL(data)`              | `POST /forgotpassword`         |
-| `POST_VERIFYOTP({ email, otp })`       | `POST /verifyotp/:email`       |
-| `POST_CHANGEPASSWORD({ email, data })` | `POST /confirmpassword/:email` |
-
-### Protected Dashboard Helpers
-
-| Helper                                                  | Backend call                            |
-| ------------------------------------------------------- | --------------------------------------- |
-| `FETCH_GROUPMETADATA(accessToken, gp_id)`               | `GET /portfolio/:gp_id`                 |
-| `POST_ADDGROUPFORM({ accessToken, groupId, data })`     | `POST /portfolio/:groupId`              |
-| `PATCH_UPDATEGROUPFORM({ accessToken, groupId, data })` | `PATCH /portfolio/:groupId`             |
-| `use1DNavRangeGroup(groupid, accessToken)`              | `GET /price/group/:groupid`             |
-| `useNavGroupChartRange(groupid, accessToken, range)`    | `GET /price/group/:groupid?range=...`   |
-| `useGroupDrawdown(groupId, accessToken)`                | `GET /analytic/drawdown/group/:groupId` |
-
----
-
-## Current Implementation Notes
-
-These notes reflect the inspected code state and should be resolved before production deployment:
-
-| Area                       | Note                                                                                                                     |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| Test route                 | `/test/cleardatabase` is mounted and deletes data. Guard or remove before production.                                    |
-| Admin auth                 | Admin controllers should be checked to ensure they consistently use `req.userId` with `verifyAccessToken`.               |
-| Password reset             | `passwordResetVerified` and `passwordResetVerifiedAt` are used by service logic. Confirm they exist in the user schema.  |
-| Protected Add Group helper | `POST_APIs.js` uses a deep relative import for `axiosInstance`; verify build resolution.                                 |
-| Response consistency       | Some routes return `{ success: true }`, others return string-valued `success`, and some local errors return `{ error }`. |
-| Tests                      | No complete automated test suite exists yet for financial correctness.                                                   |
-| Startup jobs               | `systemBootup`, `sync_CurrentPrices`, and `sync_AllUsersPortfolio` run directly from `server.js`.                        |
+1. Add rebalancer calculation endpoint.
+2. Add rebalancer update/delete/archive endpoints.
+3. Add holdings table/sorting/filtering API support if needed.
+4. Add backup/export API.
+5. Add test setup and integration tests.
+6. Add route aliases for corrected spelling: `/comparison/...`.
+7. Standardize response shapes.
+8. Add safe deployment guard around test utilities.

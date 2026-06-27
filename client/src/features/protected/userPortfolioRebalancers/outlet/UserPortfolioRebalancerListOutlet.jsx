@@ -27,6 +27,13 @@ const getTotalWeight = (assets = []) => {
   }, 0);
 };
 
+const formatINR = (value) => {
+  return Number(value || 0).toLocaleString("en-IN", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+};
+
 const getErrorMessage = (error) => {
   return (
     error?.response?.data?.message ||
@@ -126,6 +133,10 @@ const UserPortfolioRebalencerListOutlet = () => {
                   <div>
                     <span>Deploy Rules</span>
                     <strong>{rebalancer.marketFallRules?.length || 0}</strong>
+                  </div>
+                  <div>
+                    <span>SIP Amount</span>
+                    <strong>₹{formatINR(rebalancer.sipAmount)}</strong>
                   </div>
                   <div>
                     <span>Total Weight</span>

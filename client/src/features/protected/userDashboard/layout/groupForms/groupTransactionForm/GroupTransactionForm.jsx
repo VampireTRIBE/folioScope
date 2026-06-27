@@ -79,7 +79,6 @@ const GroupTransactionForm = () => {
     {
       id: "tax",
       text: "TAX",
-      varient: "chartFilter",
       varient:
         activeGroupTransactionType === "tax"
           ? "chartFilterActive"
