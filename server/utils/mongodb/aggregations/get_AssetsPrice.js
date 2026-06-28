@@ -324,3 +324,73 @@ module.exports.get_52WStatsByAssetId = async (assetId, count = 252) => {
     },
   };
 };
+
+module.exports.getAssetPriceStatsByIds = async (assetIds = []) => {
+  if (!Array.isArray(assetIds)) {
+    throw new Error("assetIds must be an array");
+  }
+  const AssetPriceHistory_Model = mongoose.model("AssetPriceHistory");
+
+  const uniqueAssetIds = [
+    ...new Set(assetIds.map((id) => id?.toString()).filter(Boolean)),
+  ];
+
+  if (uniqueAssetIds.length === 0) {
+    return {};
+  }
+
+  const objectIds = uniqueAssetIds.map((id) => {
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw new Error(`Invalid assetId: ${id}`);
+    }
+    return new mongoose.Types.ObjectId(id);
+  });
+
+  const priceStats = await AssetPriceHistory_Model.aggregate([
+    {
+      $match: {
+        assetId: { $in: objectIds },
+      },
+    },
+    {
+      $sort: {
+        assetId: 1,
+        date: -1,
+      },
+    },
+    {
+      $group: {
+        _id: "$assetId",
+        maxPrice: { $max: "$close" },
+        currentPrice: { $first: "$close" },
+      },
+    },
+  ]);
+
+  const result = {};
+
+  for (const assetId of uniqueAssetIds) {
+    result[assetId] = {
+      maxPrice: null,
+      currentPrice: null,
+      fallPercentage: null,
+    };
+  }
+
+  for (const item of priceStats) {
+    const assetId = item._id.toString();
+
+    const maxPrice = item.maxPrice;
+    const currentPrice = item.currentPrice;
+
+    result[assetId] = {
+      maxPrice,
+      currentPrice,
+      fallPercentage:
+        maxPrice > 0
+          ? Number((((maxPrice - currentPrice) / maxPrice) * 100).toFixed(2))
+          : null,
+    };
+  }
+  return result;
+};

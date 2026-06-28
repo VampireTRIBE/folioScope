@@ -21,6 +21,7 @@ const createAllocationRow = () => ({
   weight: "",
   band: "",
   multiplier: "1",
+  isCashReserve: false,
 });
 
 const createDeploymentAssetRow = () => ({
@@ -123,16 +124,49 @@ const NewRebalancerForm = () => {
       uniqueAssets.set(row.assetId, {
         assetId: row.assetId,
         assetName: row.assetName.trim(),
+        isCashReserve: row.isCashReserve,
       });
     });
 
     return Array.from(uniqueAssets.values());
   }, [allocationRows]);
 
+  const deployableAllocationAssets = useMemo(() => {
+    return selectedAllocationAssets.filter((asset) => !asset.isCashReserve);
+  }, [selectedAllocationAssets]);
+
   const handleAllocationChange = (rowId, field, value) => {
     setAllocationRows((rows) =>
       rows.map((row) => (row.id === rowId ? { ...row, [field]: value } : row)),
     );
+
+    resetMessages();
+  };
+
+  const handleCashReserveChange = (rowId) => {
+    const nextCashReserveAssetId = allocationRows.find(
+      (row) => row.id === rowId,
+    )?.assetId;
+
+    setAllocationRows((rows) =>
+      rows.map((row) => ({
+        ...row,
+        isCashReserve: row.id === rowId,
+      })),
+    );
+
+    if (nextCashReserveAssetId) {
+      setMarketFallRules((rules) =>
+        rules.map((rule) => ({
+          ...rule,
+          assets: rule.assets.map((asset) =>
+            asset.assetId === nextCashReserveAssetId
+              ? { ...asset, assetId: "", assetName: "" }
+              : asset,
+          ),
+        })),
+      );
+    }
 
     resetMessages();
   };
@@ -240,7 +274,7 @@ const NewRebalancerForm = () => {
   };
 
   const selectMarketFallAsset = (ruleIndex, assetIndex, assetId) => {
-    const selectedAsset = selectedAllocationAssets.find(
+    const selectedAsset = deployableAllocationAssets.find(
       (asset) => asset.assetId === assetId,
     );
 
@@ -372,7 +406,22 @@ const NewRebalancerForm = () => {
       return;
     }
 
+    const cashReserveCount = allocationRows.filter(
+      (row) => row.isCashReserve,
+    ).length;
+
+    if (cashReserveCount !== 1) {
+      setError("Select exactly one allocation asset as cash reserve.");
+      return;
+    }
+
     const allocationAssetIds = new Set(allocationAssetIdsArray);
+    const cashReserveAssetIds = new Set(
+      allocationRows
+        .filter((row) => row.isCashReserve)
+        .map((row) => row.assetId)
+        .filter(Boolean),
+    );
 
     const hasIncompleteDeploymentRule = marketFallRules.some(
       (rule) =>
@@ -386,8 +435,17 @@ const NewRebalancerForm = () => {
 
     if (hasIncompleteDeploymentRule) {
       setError(
-        "Add market fall %, deploy %, and choose valid allocation assets for every deployment rule.",
+        "Add market fall %, deploy %, and choose valid non-cash allocation assets for every deployment rule.",
       );
+      return;
+    }
+
+    const hasCashReserveDeploymentAsset = marketFallRules.some((rule) =>
+      rule.assets.some((asset) => cashReserveAssetIds.has(asset.assetId)),
+    );
+
+    if (hasCashReserveDeploymentAsset) {
+      setError("Cash reserve assets cannot be selected in market fall rules.");
       return;
     }
 
@@ -433,6 +491,7 @@ const NewRebalancerForm = () => {
       targetWeight: toNumber(row.weight),
       band: toNumber(row.band),
       multiplier: toNumber(row.multiplier || 1),
+      isCashReserve: row.isCashReserve,
     }));
 
     const normalizedMarketFallRules = marketFallRules.map((rule) => ({
@@ -819,6 +878,22 @@ const NewRebalancerForm = () => {
                       }
                     />
                   </div>
+
+                  <label
+                    className={`${styles.cashReserveOption} ${
+                      row.isCashReserve ? styles.cashReserveSelected : ""
+                    }`}
+                    htmlFor={`cashReserve-${row.id}`}>
+                    <input
+                      type="radio"
+                      id={`cashReserve-${row.id}`}
+                      name="cashReserveAsset"
+                      checked={row.isCashReserve}
+                      onChange={() => handleCashReserveChange(row.id)}
+                      required
+                    />
+                    <span>Cash Reserve</span>
+                  </label>
                 </div>
               </div>
             ))}
@@ -916,7 +991,7 @@ const NewRebalancerForm = () => {
                       className={styles.secondaryButton}
                       type="button"
                       onClick={() => addMarketFallAssetRule(ruleIndex)}
-                      disabled={!selectedAllocationAssets.length}>
+                      disabled={!deployableAllocationAssets.length}>
                       Add Asset
                     </button>
                   </div>
@@ -943,12 +1018,12 @@ const NewRebalancerForm = () => {
                           }
                           required>
                           <option value="">
-                            {selectedAllocationAssets.length
+                            {deployableAllocationAssets.length
                               ? "Select allocation asset"
-                              : "Select allocation assets first"}
+                              : "Select non-cash allocation assets first"}
                           </option>
 
-                          {selectedAllocationAssets.map((allocationAsset) => (
+                          {deployableAllocationAssets.map((allocationAsset) => (
                             <option
                               key={allocationAsset.assetId}
                               value={allocationAsset.assetId}>

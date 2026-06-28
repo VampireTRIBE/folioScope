@@ -117,6 +117,12 @@ const AssetLevelRebalancerCards = ({ data = [] }) => {
                 </div>
 
                 <div className={styles.badgeGroup}>
+                  {meta.isCashReserve && (
+                    <span className={`${styles.actionBadge} ${styles.noBuy}`}>
+                      Cash Reserve
+                    </span>
+                  )}
+
                   <span
                     className={`${styles.statusBadge} ${getStatusClass(
                       metrics.status,
@@ -166,6 +172,10 @@ const AssetLevelRebalancerCards = ({ data = [] }) => {
                 <DetailGroup title="Allocation">
                   <InfoItem label="Asset Name" value={meta.assetName || "-"} />
                   <InfoItem label="Group Name" value={meta.groupName || "-"} />
+                  <InfoItem
+                    label="Cash Reserve"
+                    value={meta.isCashReserve ? "Yes" : "No"}
+                  />
                   <InfoItem
                     label="Target Weight"
                     value={formatPercent(meta.targetWeight)}

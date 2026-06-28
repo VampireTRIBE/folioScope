@@ -59,6 +59,8 @@ module.exports.validate_NewRebalancer_ReqData = async (data) => {
 
     const cleanAssets = [];
     const selectedAssetIds = new Set();
+    const cashReserveAssetIds = new Set();
+    let cashReserveCount = 0;
 
     // ===============================
     // Validate Main Assets
@@ -86,6 +88,11 @@ module.exports.validate_NewRebalancer_ReqData = async (data) => {
 
       selectedAssetIds.add(assetId);
 
+      if (asset.isCashReserve) {
+        cashReserveCount += 1;
+        cashReserveAssetIds.add(assetId);
+      }
+
       cleanAssets.push({
         assetId,
         assetName,
@@ -94,7 +101,15 @@ module.exports.validate_NewRebalancer_ReqData = async (data) => {
         targetWeight: Number(asset.targetWeight),
         band: Number(asset.band),
         multiplier: Number(asset.multiplier || 1),
+        isCashReserve: Boolean(asset.isCashReserve),
       });
+    }
+
+    if (cleanAssets.length && cashReserveCount !== 1) {
+      throw new customError(
+        "Exactly one allocation asset must be cash reserve",
+        400,
+      );
     }
 
     // ===============================
@@ -118,6 +133,13 @@ module.exports.validate_NewRebalancer_ReqData = async (data) => {
         if (!selectedAssetIds.has(assetId)) {
           throw new customError(
             "Market fall asset must exist inside main assets",
+            400,
+          );
+        }
+
+        if (cashReserveAssetIds.has(assetId)) {
+          throw new customError(
+            "Cash reserve assets cannot be selected in market fall rules",
             400,
           );
         }

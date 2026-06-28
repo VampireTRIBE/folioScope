@@ -47,6 +47,7 @@ const assetTargetSchema = new Schema(
       default: 1,
       min: [0, "Multiplier cannot be negative"],
     },
+    isCashReserve: { type: Boolean, default: false },
   },
   { _id: false },
 );
@@ -99,6 +100,11 @@ const marketFallRuleSchema = new Schema(
     },
 
     isTriggered: {
+      type: Boolean,
+      default: false,
+    },
+
+    isLocked: {
       type: Boolean,
       default: false,
     },
@@ -201,6 +207,15 @@ portfolioRebalancerSchema.pre("validate", function (next) {
       ),
     );
   }
+
+  const cashReserveCount = this.assets.filter((asset) => {
+    return asset.isCashReserve;
+  }).length;
+
+  if (this.assets.length > 0 && cashReserveCount !== 1) {
+    return next(new Error("Exactly one allocation asset must be cash reserve"));
+  }
+
   next();
 });
 

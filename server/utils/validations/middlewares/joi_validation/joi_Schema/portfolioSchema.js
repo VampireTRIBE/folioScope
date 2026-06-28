@@ -92,6 +92,16 @@ const getAssetId = (asset) => {
   return String(asset?.assetId || asset);
 };
 
+const validateSingleCashReserveAsset = (assets, helpers) => {
+  const cashReserveCount = assets.filter((asset) => asset.isCashReserve).length;
+
+  if (cashReserveCount !== 1) {
+    return helpers.error("array.singleCashReserve");
+  }
+
+  return assets;
+};
+
 // ===============================
 // Cross Validation Helper
 // This validates that marketFallRules assets exist inside main assets
@@ -114,8 +124,12 @@ const validateMarketFallAssetsAgainstMainAssets = (payload, helpers) => {
   }
 
   const allowedAssetIds = new Set(mainAssets.map(getAssetId));
+  const cashReserveAssetIds = new Set(
+    mainAssets.filter((asset) => asset?.isCashReserve).map(getAssetId),
+  );
 
   const invalidAssetIds = [];
+  const cashReserveRuleAssetIds = [];
 
   marketFallRules.forEach((rule) => {
     const ruleAssets = rule.assets || [];
@@ -125,6 +139,11 @@ const validateMarketFallAssetsAgainstMainAssets = (payload, helpers) => {
 
       if (!allowedAssetIds.has(assetId)) {
         invalidAssetIds.push(assetId);
+        return;
+      }
+
+      if (cashReserveAssetIds.has(assetId)) {
+        cashReserveRuleAssetIds.push(assetId);
       }
     });
   });
@@ -132,6 +151,12 @@ const validateMarketFallAssetsAgainstMainAssets = (payload, helpers) => {
   if (invalidAssetIds.length) {
     return helpers.error("object.marketFallAssetMismatch", {
       invalidAssetIds: [...new Set(invalidAssetIds)].join(", "),
+    });
+  }
+
+  if (cashReserveRuleAssetIds.length) {
+    return helpers.error("object.marketFallCashReserveAsset", {
+      cashReserveAssetIds: [...new Set(cashReserveRuleAssetIds)].join(", "),
     });
   }
 
@@ -171,6 +196,10 @@ const assetTargetValidationSchema = Joi.object({
   multiplier: Joi.number().min(0).default(1).messages({
     "number.base": "Multiplier must be a number",
     "number.min": "Multiplier cannot be negative",
+  }),
+
+  isCashReserve: Joi.boolean().default(false).messages({
+    "boolean.base": "Cash reserve flag must be true or false",
   }),
 });
 
@@ -284,13 +313,14 @@ const createPortfolioRebalancerValidationSchema = Joi.object({
         return helpers.error("array.duplicateAsset");
       }
 
-      return assets;
+      return validateSingleCashReserveAsset(assets, helpers);
     })
     .messages({
       "array.base": "Assets must be an array",
       "array.min": "At least one asset is required",
       "any.required": "Assets are required",
       "array.duplicateAsset": "Duplicate assets are not allowed",
+      "array.singleCashReserve": "Exactly one allocation asset must be cash reserve",
     }),
 
   marketFallRules: Joi.array()
@@ -317,6 +347,8 @@ const createPortfolioRebalancerValidationSchema = Joi.object({
       "Market fall rule contains asset ids that are not present in main assets: {{#invalidAssetIds}}",
     "object.marketFallAssetsNeedMainAssets":
       "Main assets are required to validate market fall rule assets",
+    "object.marketFallCashReserveAsset":
+      "Cash reserve assets cannot be selected in market fall rules: {{#cashReserveAssetIds}}",
   })
   .options({
     abortEarly: false,
@@ -365,12 +397,13 @@ const updatePortfolioRebalancerValidationSchema = Joi.object({
         return helpers.error("array.duplicateAsset");
       }
 
-      return assets;
+      return validateSingleCashReserveAsset(assets, helpers);
     })
     .messages({
       "array.base": "Assets must be an array",
       "array.min": "At least one asset is required",
       "array.duplicateAsset": "Duplicate assets are not allowed",
+      "array.singleCashReserve": "Exactly one allocation asset must be cash reserve",
     }),
 
   marketFallRules: Joi.array()
@@ -400,6 +433,8 @@ const updatePortfolioRebalancerValidationSchema = Joi.object({
       "Market fall rule contains asset ids that are not present in main assets: {{#invalidAssetIds}}",
     "object.marketFallAssetsNeedMainAssets":
       "Main assets are required to validate market fall rule assets",
+    "object.marketFallCashReserveAsset":
+      "Cash reserve assets cannot be selected in market fall rules: {{#cashReserveAssetIds}}",
   })
   .options({
     abortEarly: false,

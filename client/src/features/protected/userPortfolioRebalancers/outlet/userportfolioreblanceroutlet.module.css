@@ -34,7 +34,8 @@
 
 .title,
 .sectionHeader h4,
-.cardTitle {
+.cardTitle,
+.subTitle {
   margin: 0;
   color: var(--text-primary);
   font-weight: var(--fw-bold);
@@ -109,6 +110,10 @@
   font-size: var(--text-base);
 }
 
+.subTitle {
+  font-size: var(--text-sm);
+}
+
 .detailGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -131,14 +136,55 @@
   gap: var(--space-2);
 }
 
-.deploymentRow {
+.benchmarkBox {
+  min-width: 0;
+  padding: var(--space-3);
+  border: var(--border-width-sm) solid var(--border-light);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-section);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.deploymentRow,
+.deploymentStatsRow {
   min-width: 0;
   padding: var(--space-2);
   border-radius: var(--radius-sm);
   background-color: var(--bg-hover);
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) repeat(2, minmax(0, 0.8fr));
   gap: var(--space-2);
+}
+
+.deploymentRow {
+  grid-template-columns: minmax(0, 1.2fr) repeat(2, minmax(0, 0.8fr));
+}
+
+.deploymentStatsRow {
+  grid-template-columns:
+    minmax(8rem, 1.3fr)
+    repeat(7, minmax(5.5rem, 1fr));
+  align-items: center;
+}
+
+.deploymentStatsRow span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.deploymentStatsRow strong {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.deploymentStatsRow span {
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+}
+
+.deploymentStatsRow strong {
+  color: var(--text-primary);
 }
 
 .statusBadge,
@@ -208,6 +254,7 @@
   }
 
   .deploymentRow,
+  .deploymentStatsRow,
   .detailGrid {
     grid-template-columns: 1fr;
   }
