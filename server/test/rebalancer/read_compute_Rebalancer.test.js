@@ -29,6 +29,13 @@ const mongoose = require("mongoose");
 const {
   USER_ID,
   REBALANCER_ID,
+  GROUP_COMMODITIES,
+  GROUP_EQUITY,
+  GROUP_CASH,
+  ASSET_GOLD,
+  ASSET_NIFTY,
+  ASSET_MIDCAP,
+  ASSET_CASH,
 
   baseRebalancerDoc,
 
@@ -801,4 +808,74 @@ test("marks deployment tier completed when shot number is 3", async () => {
   expect(firstRule.deploymeta.status).toBe(
     expected_Shot3Completed.firstRule.status,
   );
+});
+
+test("returns zero amounts instead of NaN when all SIP and lumpsum scores are zero", async () => {
+  const zeroScoreRebalancerDoc = {
+    ...baseRebalancerDoc,
+    marketFallRules: [],
+  };
+  const zeroScoreFinancialAssets = {
+    [GROUP_COMMODITIES]: {
+      [ASSET_GOLD]: {
+        investedValue: 200000,
+        currentValue: 200000,
+      },
+    },
+    [GROUP_EQUITY]: {
+      [ASSET_NIFTY]: {
+        investedValue: 400000,
+        currentValue: 400000,
+      },
+      [ASSET_MIDCAP]: {
+        investedValue: 250000,
+        currentValue: 250000,
+      },
+    },
+    [GROUP_CASH]: {
+      [ASSET_CASH]: {
+        investedValue: 150000,
+        currentValue: 150000,
+      },
+    },
+  };
+
+  setupCommonMocks({
+    rebalancerDoc: zeroScoreRebalancerDoc,
+    financialAssets: zeroScoreFinancialAssets,
+    priceStats: {},
+  });
+
+  const result = await read_compute_Rebalancer(USER_ID, REBALANCER_ID);
+
+  for (const asset of result.assetLevelData) {
+    expect(asset.metrics.sipScore).toBe(0);
+    expect(asset.metrics.lumpsumScore).toBe(0);
+    expect(asset.metrics.sipAmount).toBe(0);
+    expect(asset.metrics.lumpsumAmount).toBe(0);
+    expect(Number.isNaN(asset.metrics.sipAmount)).toBe(false);
+    expect(Number.isNaN(asset.metrics.lumpsumAmount)).toBe(false);
+  }
+});
+
+test("excludes cash reserve from deployment assets and never deploys more than available amount", async () => {
+  setupCommonMocks({
+    rebalancerDoc: mockRebalancerDoc_Fall12,
+    financialAssets: mockFinancialAssets_Fall12,
+    priceStats: mockPriceStats_Fall12,
+  });
+
+  const result = await read_compute_Rebalancer(USER_ID, REBALANCER_ID);
+  const firstRule = findRule(result, 10);
+  const totalAssetDeployment = firstRule.assets.reduce((sum, asset) => {
+    return sum + Number(asset.deployAmount || 0);
+  }, 0);
+
+  expect(
+    firstRule.assets.some((asset) => asset.assetName === "LIQUIDCASH"),
+  ).toBe(false);
+  expect(totalAssetDeployment).toBeLessThanOrEqual(
+    firstRule.deploymeta.deployAmount,
+  );
+  expect(totalAssetDeployment).toBeCloseTo(firstRule.deploymeta.deployAmount, 0);
 });

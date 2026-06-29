@@ -97,6 +97,12 @@ const createSortChain = (result) => ({
   sort: jest.fn(() => Promise.resolve(result)),
 });
 
+const createLotFindChain = (lots) => ({
+  sort: jest.fn(() => ({
+    session: jest.fn(() => Promise.resolve(lots)),
+  })),
+});
+
 const createRequest = (bodyOverrides = {}) => ({
   userId: "user-id",
   sessionDocId: "session-doc-id",
@@ -291,5 +297,177 @@ describe("tradeTransaction", () => {
       message: "Asset does not exist",
     });
     expect(FinancialAssetModel.create).not.toHaveBeenCalled();
+  });
+
+  test("executes sell using FIFO lots, realizes gain, increases cash, and reduces quantity", async () => {
+    FinancialAssetModel.findOne.mockResolvedValue({
+      _id: "financial-asset-id",
+    });
+    FinancialAssetModel.findOneAndUpdate.mockResolvedValue({
+      _id: "financial-asset-id",
+    });
+
+    const firstLot = {
+      remainingQty: 8,
+      buyPrice: 80,
+      buyDate: new Date("2024-01-01T10:00:00.000Z"),
+      save: jest.fn().mockResolvedValue(undefined),
+    };
+    const secondLot = {
+      remainingQty: 5,
+      buyPrice: 90,
+      buyDate: new Date("2026-01-01T10:00:00.000Z"),
+      save: jest.fn().mockResolvedValue(undefined),
+    };
+    FifoLotModel.find.mockReturnValue(
+      createLotFindChain([firstLot, secondLot]),
+    );
+
+    const result = await tradeTransaction(
+      createRequest({
+        type: "sell",
+        qty: 10,
+        price: 120,
+      }),
+    );
+    const session = await mongoose.startSession.mock.results[0].value;
+
+    expect(result).toMatchObject({
+      success: true,
+      message: "Transaction Completed",
+    });
+    expect(firstLot.remainingQty).toBe(0);
+    expect(secondLot.remainingQty).toBe(3);
+    expect(firstLot.save).toHaveBeenCalledWith({ session });
+    expect(secondLot.save).toHaveBeenCalledWith({ session });
+    expect(LedgerStatementModel.create).toHaveBeenCalledWith(
+      [
+        expect.objectContaining({
+          type: "sell",
+          qty: 10,
+          price: 120,
+          amount: 1200,
+          cost: 820,
+          profit: 380,
+          LTCG: 320,
+          STCG: 60,
+        }),
+      ],
+      { session },
+    );
+    expect(PortfolioGroupModel.updateMany).toHaveBeenCalledWith(
+      { _id: { $in: ["parent-id", "group-id"] } },
+      {
+        $inc: {
+          consolidatedCash: 1200,
+          "groupSnapshot.lifetime.realizedGain": 380,
+        },
+      },
+      { session },
+    );
+    expect(FinancialAssetModel.updateOne).toHaveBeenCalledWith(
+      { _id: "financial-asset-id" },
+      {
+        $inc: {
+          "snapshot.lifetime.realizedGain": 380,
+          "snapshot.tax.STCG": 60,
+          "snapshot.tax.LTCG": 320,
+          "snapshot.totalQty": -10,
+        },
+      },
+      { session },
+    );
+  });
+
+  test("rejects sell quantity greater than available FIFO quantity", async () => {
+    FinancialAssetModel.findOne.mockResolvedValue({
+      _id: "financial-asset-id",
+    });
+    FifoLotModel.find.mockReturnValue(
+      createLotFindChain([
+        {
+          remainingQty: 2,
+          buyPrice: 80,
+          buyDate: new Date("2024-01-01T10:00:00.000Z"),
+          save: jest.fn().mockResolvedValue(undefined),
+        },
+      ]),
+    );
+
+    const result = await tradeTransaction(
+      createRequest({
+        type: "sell",
+        qty: 10,
+        price: 120,
+      }),
+    );
+
+    expect(result).toEqual({
+      success: false,
+      message: "Insufficient quantity",
+    });
+    expect(LedgerStatementModel.create).not.toHaveBeenCalled();
+  });
+
+  test("executes dividend without changing asset quantity", async () => {
+    FinancialAssetModel.findOne.mockResolvedValue({
+      _id: "financial-asset-id",
+    });
+    FinancialAssetModel.findOneAndUpdate.mockResolvedValue({
+      _id: "financial-asset-id",
+    });
+
+    const result = await tradeTransaction(
+      createRequest({
+        type: "dividend",
+        qty: undefined,
+        price: undefined,
+        dividendAmount: 250,
+      }),
+    );
+    const session = await mongoose.startSession.mock.results[0].value;
+
+    expect(result).toMatchObject({
+      success: true,
+      message: "Transaction Completed",
+    });
+    expect(LedgerStatementModel.create).toHaveBeenCalledWith(
+      [
+        expect.objectContaining({
+          type: "dividend",
+          dividendAmount: 250,
+          amount: 250,
+        }),
+      ],
+      { session },
+    );
+    expect(PortfolioGroupModel.updateMany).toHaveBeenCalledWith(
+      { _id: { $in: ["parent-id", "group-id"] } },
+      {
+        $inc: {
+          consolidatedCash: 250,
+          "groupSnapshot.lifetime.dividend": 250,
+        },
+      },
+      { session },
+    );
+    expect(FinancialAssetModel.updateOne).toHaveBeenCalledWith(
+      { _id: "financial-asset-id" },
+      {
+        $inc: {
+          "snapshot.lifetime.dividend": 250,
+        },
+      },
+      { session },
+    );
+    expect(FinancialAssetModel.updateOne).not.toHaveBeenCalledWith(
+      { _id: "financial-asset-id" },
+      expect.objectContaining({
+        $inc: expect.objectContaining({
+          "snapshot.totalQty": expect.any(Number),
+        }),
+      }),
+      { session },
+    );
   });
 });
