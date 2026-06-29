@@ -21,7 +21,7 @@ const {
   get_GroupChildrenMap,
 } = require("../../utils/mongodb/aggregations/get_GroupChildrenMap");
 
-module.exports.getSortedLeafToRoot = (parentChilds) => {
+const getSortedLeafToRoot = (parentChilds) => {
   const depthMap = {};
   const visiting = new Set();
 
@@ -58,6 +58,8 @@ module.exports.getSortedLeafToRoot = (parentChilds) => {
 
   return Object.keys(parentChilds).sort((a, b) => depthMap[a] - depthMap[b]);
 };
+
+module.exports.getSortedLeafToRoot = getSortedLeafToRoot;
 
 module.exports.fill_MissingNAVs = async (
   userId,
@@ -131,7 +133,7 @@ module.exports.fill_MissingNAVs = async (
     }
 
     const parentChilds = await get_GroupChildrenMap(userId);
-    const leafToBotton = this.getSortedLeafToRoot(parentChilds);
+    const leafToBotton = getSortedLeafToRoot(parentChilds);
 
     let lastNavData = {};
     let bulkOps = [];

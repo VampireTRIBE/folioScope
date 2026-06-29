@@ -325,10 +325,6 @@ module.exports.read_User_Holdings = async ({ filterObj = null }) => {
         })
       : [];
 
-    // const userHoldings = financialAssets.map(
-    //   ({ expenseRatioValue, ...financialAsset }) => financialAsset,
-    // );
-
     const respObj = {
       totalStats: buildHoldingsStats({
         financialAssets,

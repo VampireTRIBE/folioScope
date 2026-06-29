@@ -7,11 +7,17 @@ module.exports.normalizeToCurrentFinancialYear = () => {
 
 module.exports.normalizeToISTMidnight = (date = null) => {
   const d = new Date(date);
-  const IST_OFFSET = 330;
-  const utc = d.getTime() + d.getTimezoneOffset() * 60000;
-  const ist = new Date(utc + IST_OFFSET * 60000);
-  ist.setHours(0, 0, 0, 0);
-  return new Date(ist.getTime() - IST_OFFSET * 60000);
+  const IST_OFFSET_MS = 5.5 * 60 * 60 * 1000;
+  if (Number.isNaN(d.getTime())) {
+    return new Date(NaN);
+  }
+
+  const istTime = new Date(d.getTime() + IST_OFFSET_MS);
+  const year = istTime.getUTCFullYear();
+  const month = istTime.getUTCMonth();
+  const day = istTime.getUTCDate();
+  // IST midnight = UTC previous day 18:30.
+  return new Date(Date.UTC(year, month, day, 0, 0, 0, 0) - IST_OFFSET_MS);
 };
 
 module.exports.normalizeToISTEndOfDay = (inputDate) => {

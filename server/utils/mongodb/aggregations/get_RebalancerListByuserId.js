@@ -21,7 +21,7 @@ module.exports.get_RebalancerListByUserId = async (
     const query = REBALANCER_MODEL.find(
       {
         userId: userObjectId,
-        isActive: false,
+        isActive: true,
       },
       {
         assets: 1,

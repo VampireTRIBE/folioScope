@@ -60,7 +60,6 @@ module.exports.XIRR_Group = async (
     }
 
     const groupXirr = Number(computeIRR(groupCashflows)).toFixed(2);
-
     return groupXirr;
   } catch (error) {
     throw new customError("Error IN computation", 422);
