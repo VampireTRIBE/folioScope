@@ -4,7 +4,6 @@ module.exports.comparisonDrawdownFunction = (
   normalizeNavsSeries,
 ) => {
   if (!currentDate || !startDate || !normalizeNavsSeries) return;
-
   const MS_PER_DAY = 1000 * 60 * 60 * 24;
   const endTarget = new Date(currentDate);
   const startTarget = new Date(startDate);

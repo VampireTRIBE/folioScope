@@ -99,10 +99,20 @@ const createAssetLevelData = () => ({
 const getDiscountFactor = (pnlPercentage = 0) => {
   const numericPnl = Number(pnlPercentage) || 0;
 
-  return Math.min(
-    1.35,
-    numericPnl < -0.07 ? 1 + (Math.abs(numericPnl) - 0.07) * 1.5 : 1,
-  );
+  const triggerFallPercentage = 7;
+  const maxDiscountFactor = 1.35;
+  const discountSpeed = 1.5;
+
+  // No discount boost unless loss is more than 7%
+  if (numericPnl >= -triggerFallPercentage) {
+    return 1;
+  }
+
+  const fallBeyondTrigger = Math.abs(numericPnl) - triggerFallPercentage;
+
+  const discountFactor = 1 + (fallBeyondTrigger / 100) * discountSpeed;
+
+  return Math.min(maxDiscountFactor, discountFactor);
 };
 
 const createFallDeploymentAssetData = () => ({
@@ -227,7 +237,9 @@ const calculateMarketFallScore = ({
     const sameAsset = item?.meta?.assetName === assetName;
 
     if (groupId) {
-      return sameAsset && item?.meta?.groupId?.toString() === groupId.toString();
+      return (
+        sameAsset && item?.meta?.groupId?.toString() === groupId.toString()
+      );
     }
 
     return sameAsset;
@@ -305,7 +317,8 @@ const updateDeploymentMetaStatus = ({
           2,
         )}`;
       } else {
-        deployRule.deploymeta.status = "Locked Until Benchmark Reaches ATH Again";
+        deployRule.deploymeta.status =
+          "Locked Until Benchmark Reaches ATH Again";
       }
 
       return;
@@ -515,7 +528,9 @@ module.exports.read_compute_Rebalancer = async (
           consolidatedMetrics.investedValue += toNumber(
             asset.position.investedValue,
           );
-          consolidatedMetrics.currentValue += toNumber(asset.position.currentValue);
+          consolidatedMetrics.currentValue += toNumber(
+            asset.position.currentValue,
+          );
         }
       }
 
@@ -572,8 +587,7 @@ module.exports.read_compute_Rebalancer = async (
       asset.metrics.driftPercentage = currentWeight - asset.meta.targetWeight;
 
       asset.metrics.driftAmount =
-        respData.summary.currentValue *
-        (asset.metrics.driftPercentage / 100);
+        respData.summary.currentValue * (asset.metrics.driftPercentage / 100);
 
       asset.metrics.status =
         currentWeight < asset.meta.lowerLimit
@@ -637,8 +651,7 @@ module.exports.read_compute_Rebalancer = async (
       group.metrics.driftPercentage = currentWeight - group.meta.targetWeight;
 
       group.metrics.driftAmount =
-        respData.summary.currentValue *
-        (group.metrics.driftPercentage / 100);
+        respData.summary.currentValue * (group.metrics.driftPercentage / 100);
 
       group.metrics.status =
         currentWeight < group.meta.lowerLimit
@@ -708,7 +721,9 @@ module.exports.read_compute_Rebalancer = async (
 
     const deployAssetBenchmarkIdsArray = [...deployAssetBenchmarkIds];
 
-    const priceStats = await getAssetPriceStatsByIds(deployAssetBenchmarkIdsArray);
+    const priceStats = await getAssetPriceStatsByIds(
+      deployAssetBenchmarkIdsArray,
+    );
 
     // ======================================================
     // Market Fall Deployment Computation
@@ -762,7 +777,10 @@ module.exports.read_compute_Rebalancer = async (
         asset.currentPrice = assetPrice.currentPrice;
         asset.fallPercentage = toNumber(assetPrice.fallPercentage);
 
-        const groupId = getGroupIdByAssetId(rebalancerDoc.assets, asset.assetId);
+        const groupId = getGroupIdByAssetId(
+          rebalancerDoc.assets,
+          asset.assetId,
+        );
 
         const score = calculateMarketFallScore({
           assetName: asset.assetName,

@@ -4,7 +4,9 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "dev": "echo \"Error: no test specified\" && exit 1"
+    "dev": "nodemon server.js",
+    "start": "node server.js",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -24,10 +26,18 @@
     "joi": "^18.0.1",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^8.18.1",
-    "nodemailer": "^8.0.7"
+    "nodemailer": "^9.0.1"
   },
   "bugs": {
     "url": "https://github.com/VampireTRIBE/wealthManager-new/issues"
   },
-  "homepage": "https://github.com/VampireTRIBE/wealthManager-new#readme"
+  "homepage": "https://github.com/VampireTRIBE/wealthManager-new#readme",
+  "devDependencies": {
+    "babel-jest": "^30.4.1",
+    "jest": "^30.4.2",
+    "jest-environment-jsdom": "^30.4.1"
+  },
+  "overrides": {
+    "js-yaml": "^5.2.0"
+  }
 }

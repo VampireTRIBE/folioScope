@@ -4,6 +4,13 @@ module.exports.computeIRR = (cashflows, guess = 0.1) => {
   if (!valid || cashflows.length < 2) return null;
   const hasPositive = cashflows.some((c) => c.amount > 0);
   const hasNegative = cashflows.some((c) => c.amount < 0);
+  const hasDifferentDates = cashflows.some((cashflow) => {
+    return cashflow.date.getTime() !== cashflows[0].date.getTime();
+  });
+
+  if (!hasDifferentDates) {
+    return null;
+  }
   if (!hasPositive || !hasNegative) return null;
   const t0 = cashflows[0].date.getTime();
   let rate = guess;
