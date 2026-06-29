@@ -301,7 +301,7 @@ test("triggers first market fall deployment rule correctly", async () => {
   expect(firstRule.deploymeta.action).toBe("Deploy Action Needed");
   expect(firstRule.deploymeta.status).toBe("Not Deployed Yet");
 
-  expect(firstRule.totalTeirscore).toBeCloseTo(
+  expect(firstRule.totalTierScore).toBeCloseTo(
     expected_Fall12.firstRule.totalTierScoreApprox,
     1,
   );

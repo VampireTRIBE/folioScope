@@ -153,7 +153,7 @@ const createDeployementFallData = () => ({
 
   assets: [],
 
-  totalTeirscore: 0,
+    totalTierScore: 0,
 });
 
 // ======================================================
@@ -796,7 +796,7 @@ module.exports.read_compute_Rebalancer = async (
         totalTierScore += score;
       }
 
-      deployRule.totalTeirscore = roundNumber(totalTierScore, 2);
+      deployRule.totalTierScore = roundNumber(totalTierScore, 2);
 
       for (const asset of deployRule.assets) {
         asset.deployAmount =
