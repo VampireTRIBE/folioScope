@@ -2,10 +2,11 @@
   padding-top: var(--space-2);
   background-color: inherit;
   color: inherit;
+  min-height: 10rem;
 }
 
 .noContent {
-  height: 5rem;
+  height: 15rem;
   padding-top: var(--space-2);
   background-color: inherit;
   color: inherit;

@@ -16,8 +16,6 @@
 
 .content {
   padding-top: var(--space-3);
-  background-color: inherit;
-  color: inherit;
   display: flex;
   flex-flow: row wrap;
   justify-content: space-between;

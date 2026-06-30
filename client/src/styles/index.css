@@ -45,8 +45,11 @@
   --gradient-accent: linear-gradient(135deg, #10b981, #059669);
   --gradient-hero: linear-gradient(135deg, #0f172a, #2563eb);
   --gradient-button: linear-gradient(135deg, #10b981, #059669);
-  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
-  --font-mono: "Fira Code", monospace;
+  --font-sans:
+    "Aptos", "Inter", "Segoe UI Variable", "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
+  --font-mono:
+    "Cascadia Code", "Fira Code", "SFMono-Regular", Consolas, monospace;
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
   --text-base: 1rem;
@@ -105,9 +108,19 @@
   text-decoration: none;
 }
 
-body {
+html,
+body,
+#root {
   width: 100%;
   min-height: 100vh;
+  font-family: var(--font-sans);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
   height: fit-content;
   background-color: var(--bg-main);
   color: var(--text-primary);
@@ -126,12 +139,14 @@ a {
 a,
 button,
 input,
+select,
 textarea {
+  font-family: inherit;
   transition: all 0.3s ease-in-out;
 }
 
-/*
-======================
-  Media Query
-======================
-*/
+@media (min-width: 992px) {
+  :root {
+    --container-padding: 2.5%;
+  }
+}

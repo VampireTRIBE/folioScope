@@ -5,7 +5,7 @@
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-md);
   scroll-margin-top: calc(var(--header-height) + 2.5rem);
-  min-height: 15rem;
+  min-height: 18rem;
   display: flex;
   flex-direction: column;
 }
@@ -30,4 +30,39 @@
   box-shadow: var(--shadow-lg);
   border-radius: var(--radius-md);
   background-color: var(--text-muted);
+}
+
+@media (min-width: 700px) {
+  .content {
+    width: 290px;
+  }
+}
+@media (min-width: 800px) {
+  .content {
+    width: 330px;
+  }
+}
+
+@media (min-width: 850px) {
+  .content {
+    width: 350px;
+  }
+}
+
+@media (min-width: 900px) {
+  .content {
+    width: 380px;
+  }
+}
+
+@media (min-width: 1022px) {
+  .content {
+    width: 290px;
+  }
+}
+
+@media (min-width: 1400px) {
+  .content {
+    width: 300px;
+  }
 }

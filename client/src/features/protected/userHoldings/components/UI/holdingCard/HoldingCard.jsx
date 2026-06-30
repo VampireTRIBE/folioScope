@@ -34,43 +34,49 @@ const HoldingCard = ({ holding = {} }) => {
             <PriceBadge price={ltp} priceValue={true} percentage={true} />
           </div>
         </div>
-
-        <div className={holdingCardStyles.oneDayPrice}>
-          <PriceBadge
-            price={{
-              price: oneDayPrice,
-              today: oneDayPercentage,
-            }}
-            currency={true}
-          />
-        </div>
       </div>
 
       <div className={holdingCardStyles.content}>
-        <div className={holdingCardStyles.leftContent}>
-          <div className={holdingCardStyles.qty}>
-            Qty - <span>{qty}</span>
-          </div>
+        <div className={holdingCardStyles.metricItem}>
+          <span className={holdingCardStyles.metricLabel}>Qty</span>
+          <span className={holdingCardStyles.metricValue}>{qty}</span>
+        </div>
 
-          <div className={holdingCardStyles.avg}>
-            Avg - <span>{avg}</span>
+        <div className={holdingCardStyles.metricItem}>
+          <span className={holdingCardStyles.metricLabel}>Avg</span>
+          <span className={holdingCardStyles.metricValue}>{avg}</span>
+        </div>
+
+        <div className={holdingCardStyles.metricItem}>
+          <span className={holdingCardStyles.metricLabel}>Today</span>
+          <div className={holdingCardStyles.oneDayPrice}>
+            <PriceBadge
+              price={{
+                price: oneDayPrice,
+                today: oneDayPercentage,
+              }}
+              currency={true}
+            />
           </div>
         </div>
 
-        <div className={holdingCardStyles.oneDayPrice}>
-          <PriceBadge
-            price={{
-              price: profitLoss,
-              today: profitLossPercentage,
-            }}
-            currency={true}
-          />
+        <div className={holdingCardStyles.metricItem}>
+          <span className={holdingCardStyles.metricLabel}>P / L</span>
+          <div className={holdingCardStyles.oneDayPrice}>
+            <PriceBadge
+              price={{
+                price: profitLoss,
+                today: profitLossPercentage,
+              }}
+              currency={true}
+            />
+          </div>
         </div>
       </div>
 
       <div className={holdingCardStyles.contentValue}>
         <div className={holdingCardStyles.valueWrapper}>
-          <div className={holdingCardStyles.invested}>Invested :</div>
+          <div className={holdingCardStyles.metricLabel}>Invested</div>
 
           <div className={holdingCardStyles.oneDayPrice}>
             <PriceBadge
@@ -83,7 +89,7 @@ const HoldingCard = ({ holding = {} }) => {
         </div>
 
         <div className={holdingCardStyles.valueWrapper}>
-          <div className={holdingCardStyles.current}>Current :</div>
+          <div className={holdingCardStyles.metricLabel}>Current</div>
 
           <div className={holdingCardStyles.oneDayPrice}>
             <PriceBadge
@@ -95,8 +101,8 @@ const HoldingCard = ({ holding = {} }) => {
           </div>
         </div>
         <div className={holdingCardStyles.expenseRatio}>
-          <div>Expense Ratio : </div>
-          <span>
+          <div className={holdingCardStyles.metricLabel}>Expense Ratio</div>
+          <span className={holdingCardStyles.metricValue}>
             {"n/a" !== expenseRatioValue
               ? `${expenseRatioValue}%`
               : expenseRatioValue}

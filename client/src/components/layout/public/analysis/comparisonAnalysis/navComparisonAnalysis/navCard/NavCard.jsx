@@ -1,9 +1,12 @@
 import PriceBadge from "../../../../priceBadge/PriceBadge";
 import navCardStyles from "./navcard.module.css";
 
-const NavCard = ({ meta, drawdown, peak }) => {
+const NavCard = ({ meta, drawdown, peak, isDummy }) => {
   return (
-    <div className={navCardStyles.analysisContainer}>
+    <div
+      className={`${navCardStyles.analysisContainer} ${
+        isDummy ? navCardStyles.dummy : ""
+      }`}>
       <div className={navCardStyles.summaryContainer}>
         <div className={navCardStyles.summaryItem}>
           <div className={navCardStyles.label}>Period :</div>

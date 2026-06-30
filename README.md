@@ -1,58 +1,140 @@
 # FolioScope
 
-FolioScope is a MERN-based, SaaS-style personal wealth-management and portfolio analytics system. It started as a Google Sheet-based personal finance/portfolio system and is being converted into a full-stack application for long-term private use.
+FolioScope is a MERN-based private wealth-management and portfolio analytics system built to manage personal money decisions with better accuracy than a spreadsheet-only workflow.
 
-The project is not a simple portfolio tracker. Its core focus is financial state correctness: portfolio group hierarchy, cash movement, buy/sell/dividend handling, FIFO lots, NAV reconstruction, holdings aggregation, drawdown analysis, XIRR, benchmark comparison, and rebalancing workflows.
+It started as a Google Sheet portfolio system, but the Google Sheet approach had an important limitation: deposits and withdrawals distorted daily return tracking. FolioScope solves this with NAV-based tracking, cashflow-aware analytics, portfolio hierarchy, trade accounting, holdings aggregation, XIRR, drawdown, benchmark comparison, and a Rebalancer decision engine.
 
-> Current status: advanced prototype under active development. The portfolio analytics core, holdings V1, comparison V1, and rebalancer configuration V1 are implemented. Production hardening, automated tests, backup/export, deployment safety, real rebalancer calculation, and rental income module are still pending.
+> Primary goal: reliable personal money management.  
+> SaaS/commercial use is not the primary goal right now.
 
 ---
 
-## Current Codebase Snapshot
+## Latest Inspected Status
 
-Latest inspected zip: `updated folioScope-main.zip`
+Latest inspected zip:
 
-| Metric | Current |
+```txt
+updated folioScope-main.zip
+```
+
+Latest assessment status:
+
+| Area | Status |
 |---|---:|
-| Total files | 454 |
-| Directories | 303 |
-| JavaScript files | 183 |
-| Server JS files | 122 |
-| Client JS files | 61 |
-| Client JSX files | 138 |
-| CSS files | 92 |
-| Markdown docs | 7 |
-| HTML files | 2 |
-| Images/assets | 22 |
-| Server JS LOC | ~11,041 |
-| Client JS LOC | ~1,718 |
-| Client JSX LOC | ~9,589 |
-| Client CSS LOC | ~6,391 |
-| Useful source/docs LOC excluding package-lock | ~33k+ |
+| Implemented portfolio analytics prototype | ~98.5% complete |
+| Full personal FolioScope vision | ~89% complete |
+| Production readiness | ~75% complete |
+| Backend Jest tests | 51 suites / 343 tests passing |
+| Client production build | Passing |
+| Relative import scan | 0 unresolved imports |
+| Server syntax check | 0 syntax errors |
+| Server npm audit | 0 vulnerabilities |
+| Client npm audit | 7 vulnerabilities remaining |
+| Client lint | Failing with 59 problems |
+| Main goal | Personal financial operating system |
+
+Current project label:
+
+```txt
+Advanced private financial operating system with meaningful backend automated test protection.
+```
 
 ---
 
-## What FolioScope Solves
+## Why FolioScope Exists
 
-Most personal portfolio tools show current value, simple gains, or manual transactions. FolioScope is built around a deeper problem:
+Broker apps and simple spreadsheets usually show current value, P/L, and day change. FolioScope was built to answer deeper personal-investing questions:
 
-> How can a personal wealth system correctly track money movement, trades, holdings, historical NAV, portfolio snapshots, drawdowns, XIRR, benchmark performance, and future rebalancing decisions over time?
+- What is my real cashflow-adjusted portfolio return?
+- Are deposits/withdrawals distorting my performance tracking?
+- What is my real portfolio drawdown?
+- Is my portfolio beating or lagging a benchmark?
+- Which assets/groups are overweight or underweight?
+- Where should my SIP go?
+- Should I deploy lumpsum during a market fall?
+- Can I track my portfolio using my own rules instead of emotional decisions?
 
-The system supports:
+The core idea is not only tracking. It is decision support.
 
-- Hierarchical portfolio groups.
-- Group-level and asset-level snapshots.
-- Buy, sell, and dividend transactions.
-- Deposit, withdrawal, and tax transactions.
-- FIFO lot accounting.
-- Cash propagation across portfolio groups.
-- NAV reconstruction and future NAV synchronization.
-- Holdings aggregation with latest and previous market prices.
-- Drawdown analytics.
-- XIRR and benchmark comparison.
-- Public market/security dashboard.
-- Session-aware authentication.
-- Rebalancer configuration with target weights, bands, multipliers, and market-fall deployment rules.
+---
+
+## Core Features
+
+### Portfolio Hierarchy
+
+- Multi-level portfolio groups
+- Parent/child group structure
+- Leaf-group validation
+- Group metadata
+- Group-level cash and snapshot data
+- Soft-delete backend support
+- Consolidated group analytics
+
+### Trade & Transaction Engine
+
+- Buy transactions
+- Sell transactions
+- Dividend transactions
+- Group deposits
+- Withdrawals
+- Tax payments
+- FIFO accounting
+- Sell quantity guard
+- Cash updates
+- Ledger/group statements
+- Future NAV sync after trade
+
+### NAV System
+
+- NAV-based portfolio tracking
+- NAV gap filling
+- Future NAV reconstruction
+- Group NAV updates
+- Cashflow-adjusted performance
+- Deposit/withdrawal separation from investment return
+- Drawdown/stress-test foundation
+
+### Holdings
+
+- Holdings endpoint
+- Leaf-group holdings aggregation
+- Latest and previous LTP lookup
+- Current value
+- Invested value
+- Average price
+- One-day gain
+- P/L
+- Expense-ratio/bucket-cost basic logic
+- Summary cards and holding cards
+
+### Analytics
+
+- XIRR / IRR helpers
+- Group XIRR
+- Price drawdown
+- NAV comparison
+- XIRR comparison
+- Rolling return comparison
+- Benchmark comparison cards
+- Excess return / excess drawdown
+
+### Rebalancer
+
+- Rebalancer creation flow
+- Rebalancer list and detail pages
+- Target allocation
+- Cash reserve selection
+- Current allocation calculation
+- Drift calculation
+- SIP score
+- Lumpsum score
+- SIP/lumpsum amount distribution
+- Market-fall deployment rules
+- Benchmark fall calculation
+- Asset fall calculation
+- Deployment score and deploy amount per asset
+- Active-only rebalancer helper fixed
+- Rebalancer Jest tests added
 
 ---
 
@@ -60,293 +142,67 @@ The system supports:
 
 ### Frontend
 
-- React 19
+- React
 - Vite
-- React Router
+- JavaScript
+- CSS Modules / CSS
+- Redux Toolkit
+- React Redux
 - TanStack Query
-- React Redux / Redux Toolkit
-- Axios
 - Lightweight Charts
-- CSS Modules
-- SessionStorage caching for public securities list
+- Axios
+- React Router
 
 ### Backend
 
 - Node.js
-- Express 5
+- Express
 - MongoDB
 - Mongoose
-- Joi
 - JWT
 - bcrypt
-- cookie-parser
-- nodemailer
-- Handlebars email templates
+- Joi
+- Nodemailer
+- Axios
+- Handlebars
 
-### Current Architecture Style
+### Testing
 
-- Feature-based React structure.
-- Protected dashboard modules separated by domain.
-- Server-state handled mainly with TanStack Query.
-- UI/global toggle state handled with Redux.
-- Auth/session handled with React Context + backend refresh-token flow.
-- Backend organized around routes, controllers, models, validations, sync scripts, and aggregation/read-model utilities.
-
----
-
-## Major Features
-
-### 1. Authentication and Session System
-
-Implemented:
-
-- User registration.
-- Email verification.
-- Login.
-- Password hashing with bcrypt.
-- Access token authentication.
-- Refresh-token based session restoration.
-- Token rotation.
-- Logout current session.
-- Logout all sessions.
-- Password reset with OTP verification.
-- Protected routes using `verifyAccessToken`.
-
-Current auth design:
-
-```txt
-login / verify email
-      ↓
-access token returned to frontend
-      ↓
-refreshToken + sessionId stored in cookies
-      ↓
-frontend keeps access token in memory
-      ↓
-refresh endpoint restores session after reload
-      ↓
-protected APIs use Authorization: Bearer <accessToken>
-```
+- Jest
+- Backend unit tests
+- Backend mocked integration-style tests
+- Backend route/e2e behavior tests started
 
 ---
 
-### 2. Public Market Data
+## Current Codebase Health
 
-Implemented:
-
-- Public securities list.
-- Default metadata.
-- Today's top securities.
-- Security overview page.
-- Security price range endpoint.
-- Security drawdown endpoint.
-
-The public securities list is bootstrapped at app startup using:
-
-```txt
-AppInitializerWithSessionStorage
-→ usePublicSecurities
-→ sessionStorage cache
-→ TanStack Query
-```
-
-This avoids repeatedly fetching a large, slow-changing securities list and supports:
-
-- Mobile search.
-- Trade form asset lookup.
-- Benchmark/index lookup.
-- Rebalancer asset search.
-
----
-
-### 3. Portfolio Group System
-
-Implemented:
-
-- Hierarchical portfolio groups.
-- Add group.
-- Update group.
-- Backend soft-delete logic for group/subtree.
-- Group metadata.
-- Group current snapshot.
-- Group current-year and lifetime stats.
-- Leaf-group validation.
-- Group-level NAV range.
-- Group-level drawdown.
-
-Current frontend gap:
-
-- `DeleteGroupForm` is still a placeholder. Deletion requires careful archive/soft-delete/history design before exposing it as a UI action.
-
----
-
-### 4. Trade Engine
-
-Implemented transaction types:
-
-- Buy
-- Sell
-- Dividend
-
-The backend trade flow includes:
-
-- User/group validation.
-- Asset validation.
-- FIFO lot handling.
-- Sell quantity checks.
-- Realized gain calculation.
-- Dividend tracking.
-- NAV fill/future sync after trade.
-- Portfolio sync after trade.
-
----
-
-### 5. Group Statement Transactions
-
-Implemented transaction types:
-
-- Deposit
-- Withdrawal
-- Tax
-
-The group statement transaction flow includes:
-
-- Group validation.
-- Leaf checks.
-- Cash movement.
-- Insufficient cash guard.
-- NAV fill/future sync.
-- Portfolio sync after transaction.
-
----
-
-### 6. NAV Reconstruction and Sync
-
-FolioScope has a dedicated NAV reconstruction/sync layer.
-
-Implemented ideas include:
-
-- Fill missing NAVs.
-- Future NAV synchronization after historical transactions.
-- Group NAV updates.
-- Asset snapshot updates.
-- All-group snapshot updates.
-- Current price sync.
-- Portfolio-wide sync.
-
-This is one of the most complex and valuable parts of the project.
-
----
-
-### 7. Analytics
-
-Implemented:
-
-- Security drawdown.
-- Group drawdown.
-- Group XIRR action.
-- XIRR comparison against benchmark.
-- NAV comparison against benchmark.
-- Normalized NAV comparison chart.
-- Excess return/excess drawdown cards.
-- Security price range analytics.
-
-Current limitation:
-
-- Benchmark/index is still hardcoded in some frontend comparison flow, for example `NIFTY 50`. Custom benchmark selection is pending.
-
----
-
-### 8. Holdings Module
-
-Holdings is now a real-data wired V1.
-
-Implemented:
-
-- Protected Holdings route.
-- Header navigation to Holdings.
-- Group filter/search.
-- Backend holdings endpoint.
-- Leaf-group based holdings aggregation.
-- Latest and previous LTP lookup.
-- Current value calculation.
-- Invested value calculation.
-- Average price.
-- One-day gain.
-- Profit/loss.
-- Expense ratio / bucket cost basic calculations.
-- Holdings summary cards.
-- Holding cards.
-- Mobile-first responsive layout.
-
-Pending:
-
-- Advanced sorting/filtering.
-- Table view.
-- Real strategic insight logic.
-- Deeper rebalancer integration.
-- Export support.
-
----
-
-### 9. Portfolio Rebalancer Module
-
-The Rebalancer has moved from skeleton to persisted configuration V1.
-
-Implemented:
-
-- Rebalancer routes.
-- Rebalancer create page.
-- Rebalancer list page.
-- Rebalancer detail page.
-- Backend schema.
-- Joi validation.
-- Custom validation against tradable securities and leaf groups.
-- Create rebalancer API.
-- Fetch rebalancer list API.
-- Fetch rebalancer by ID API.
-- Asset allocation rows.
-- Target weight validation.
-- Band and multiplier fields.
-- Market-fall deployment rules.
-- Asset-level and group-level rebalancer UI cards.
-
-Still pending:
-
-- Real current allocation integration from holdings.
-- Actual drift calculation.
-- Actual buy/SIP/lumpsum suggestion engine.
-- Google Sheet rebalancer formula conversion into backend/frontend utility.
-- Tests for rebalancer validation and formulas.
-
-Known issue to review:
-
-- `portfolioRebalancer.js` contains validation logic referencing `this.portfolioGroups`, but `portfolioGroups` is not currently defined in the schema. This is currently dead/unused validation and should be removed or implemented properly.
-- `get_RebalancerListByUserId` filters with `isDeleted: false`, while the rebalancer schema currently uses `isActive` and does not define `isDeleted`. Align the schema/query before relying on this helper.
-
----
-
-## Current Completion Estimate
-
-There are three different completion numbers depending on scope.
-
-| Scope | Current estimate |
+| Check | Result |
 |---|---:|
-| Implemented portfolio analytics prototype | ~95% |
-| Full personal lifetime FolioScope vision | ~82% |
-| Production readiness | ~60% |
+| Backend Jest | 51 suites / 343 tests passing |
+| Client build | Passing |
+| Server syntax | 0 syntax errors |
+| Relative imports | 0 unresolved |
+| Server audit | 0 vulnerabilities |
+| Client audit | 7 vulnerabilities |
+| Client lint | 59 problems |
 
-The prototype is very strong, but the full lifetime system still needs:
+Client build passes, but lint and client dependency cleanup are still needed before polished deployment.
 
-- Real rebalancer calculation engine.
-- Rental income module.
-- Backup/export.
-- Audit trail.
-- Tests.
-- Safe sync job orchestration.
-- Deployment hardening.
-- Custom benchmark selection.
-- UI polish.
+---
+
+## Main Backend Route Mounts
+
+```js
+app.use("/", userRoute);
+app.use("/", publicRoute);
+app.use("/price", priceRangeRoute);
+app.use("/analytic", analyticsRoute);
+app.use("/admin/dataseeders", adminRoute);
+app.use("/portfolio", portfolioRoute);
+```
+
+Test routes are gated through `enableTestRoutes` and are not exposed by default.
 
 ---
 
@@ -358,79 +214,50 @@ folioScope-main/
 │   ├── src/
 │   │   ├── app/
 │   │   ├── components/
-│   │   ├── constants/
 │   │   ├── context/
-│   │   ├── CustomProviders/
 │   │   ├── features/
-│   │   │   ├── public/
-│   │   │   └── protected/
-│   │   │       ├── userDashboard/
-│   │   │       ├── userHoldings/
-│   │   │       └── userPortfolioRebalancers/
+│   │   │   ├── protected/
+│   │   │   └── public/
 │   │   ├── hooks/
 │   │   └── utils/
-│   ├── package.json
-│   └── vite.config.js
+│   └── package.json
+│
 ├── server/
+│   ├── app.js
+│   ├── server.js
+│   ├── config/
 │   ├── controllers/
-│   ├── init_Scripts/
 │   ├── middlewares/
 │   ├── models/
 │   ├── routes/
+│   ├── services/
 │   ├── sync_Scripts/
 │   ├── sync_System/
-│   ├── utils/
-│   ├── package.json
-│   └── server.js
-├── docs/
-│   └── API_REFERENCE.md
-└── README.md
+│   ├── test/
+│   └── utils/
+│
+└── docs/
 ```
 
 ---
 
-## Installation and Setup
-
-### Prerequisites
-
-- Node.js
-- MongoDB
-- npm
+## Setup
 
 ### Backend
 
 ```bash
 cd server
 npm install
+cp .env.example .env
+npm run dev
 ```
 
-Create a `.env` file.
-
-Typical backend environment variables:
-
-```env
-PORT=3000
-MONGO_URL=<mongodb_connection_string>
-JWT_SECRET=<access_token_secret>
-JWT_REFRESH_SECRET=<refresh_token_secret>
-EMAIL_USER=<email_user>
-EMAIL_PASS=<email_password>
-CLIENT_URL=http://localhost:5173
-NODE_ENV=development
-```
-
-Start script currently needs cleanup. The current `server/package.json` still has:
-
-```json
-"dev": "echo \"Error: no test specified\" && exit 1"
-```
-
-Recommended scripts:
+Backend scripts:
 
 ```json
 {
-  "start": "node server.js",
   "dev": "nodemon server.js",
+  "start": "node server.js",
   "test": "jest"
 }
 ```
@@ -443,76 +270,216 @@ npm install
 npm run dev
 ```
 
-Frontend default:
+Build:
 
-```txt
-http://localhost:5173
+```bash
+npm run build
 ```
 
-Backend default:
+Lint:
 
-```txt
-http://localhost:3000
+```bash
+npm run lint
 ```
 
 ---
 
-## Known Limitations
+## Environment Variables
 
-Important current limitations:
+`server/.env.example` exists and includes:
 
-1. No automated test suite yet.
-2. Server scripts need cleanup.
-3. Startup sync jobs run directly from `server.js`.
-4. `DeleteGroupForm` is still a placeholder.
-5. Rebalancer configuration persists, but real rebalancing calculation/suggestion engine is pending.
-6. Rental income module is not implemented yet.
-7. Backup/export is not implemented yet.
-8. Audit trail and archive/delete policy are pending.
-9. Custom benchmark selection is pending.
-10. CSS Modules have grown significantly; UI system enforcement and cleanup are needed.
-11. Some older code still has inconsistent naming/spelling from the learning phase.
-12. `prototype.html` still exists in the active protected source tree and should eventually move to docs/design-reference.
+```txt
+PORT=3000
+DB_URL=mongodb://127.0.0.1:27017/folioscope
+JWT_SECRET=replace_with_a_strong_secret
+MAIL_USER=your_email@example.com
+MAIL_PASSWORD=your_email_app_password
+APPSCRIPT_SEEDER_URL=https://script.google.com/macros/s/your-script-id/exec
+APPSCRIPT_SEEDER_API_KEY=replace_with_apps_script_key
+```
 
 ---
 
-## Development Priorities
+## Testing
 
-Recommended next order:
+Run backend tests:
 
-1. Connect Rebalancer detail to real holdings/current allocation.
-2. Convert Google Sheet rebalancer logic into JS utility.
-3. Fix rebalancer schema/query inconsistencies.
-4. Add tests for holdings aggregation and rebalancer formulas.
-5. Fix server scripts.
-6. Add backup/export before serious private deployment.
-7. Deploy private version safely.
-8. Decide Delete Group as archive/soft delete/delete-empty-only.
-9. Add custom benchmark selection.
-10. Start Rental Income V1.
+```bash
+cd server
+npm test
+```
+
+Latest result:
+
+```txt
+Test Suites: 51 passed, 51 total
+Tests: 343 passed, 343 total
+```
+
+Current testing coverage includes:
+
+- Rebalancer
+- Market-fall deployment
+- Trade actions
+- Portfolio controllers
+- Group statements
+- Portfolio trade controllers
+- Holdings read model
+- Fill missing NAVs
+- Sync portfolio
+- Update group NAV
+- XIRR group
+- NAV comparison
+- XIRR comparison
+- Rolling returns comparison
+- Drawdown
+- IRR helper
+- Auth middleware
+- Token rotation
+- Password reset
+- Verification service
+- Apps Script service
+- Validation utilities
+- Model tests
+- Public data controllers
+- Admin controllers
+- App route behavior
 
 ---
 
-## Why This Project Stands Out
+## What Is Still Pending
 
-Compared with normal fresher MERN projects, FolioScope includes:
+### High Priority
 
-- Historical state reconstruction.
-- Financial transaction processing.
-- FIFO accounting.
-- NAV reconstruction.
-- Portfolio hierarchy propagation.
-- Holdings aggregation.
-- Benchmark comparison.
-- Session-aware auth.
-- Rebalancer rule configuration.
+- Rebalancer verification against Google Sheet
+- Trade → NAV → Holdings full integration tests
+- Deposit/withdrawal NAV correctness tests
+- Backup/export
+- Client dependency vulnerabilities
+- Client lint cleanup
 
-This makes it closer to a private SaaS-style financial operating system than a tutorial dashboard.
+### Medium Priority
+
+- Rebalancer edit/update
+- Rebalancer archive/delete
+- Custom benchmark selection
+- Frontend automated tests
+- Deployment checklist
+- Production logging/monitoring
+- Safer background job handling
+
+### Later
+
+- Rental Income module as separate Next.js + TypeScript app
+- Audit trail
+- More SaaS-like UI polish if needed
+- Public/commercial hardening if ever required
 
 ---
 
-## Disclaimer
+## Rental Income Direction
 
-FolioScope is a personal financial software project under active development. It is not financial advice, not a regulated investment product, and not production-hardened for public users yet.
+The current plan is not to add Rental Income directly into the existing React/Vite FolioScope UI.
 
-Use real money data carefully. Backup/export, tests, and audit trails should be added before depending on it as the only financial record system.
+Planned direction:
+
+```txt
+Same MongoDB database
+Separate Next.js + TypeScript rental-income app
+Loose integration with FolioScope through summary APIs
+```
+
+This keeps FolioScope focused while allowing Next.js, TypeScript, and modular architecture learning.
+
+---
+
+## Reliability Status
+
+Current private-use reliability:
+
+```txt
+Around 80% reliable for controlled personal use.
+```
+
+The system is now manually verified plus backend-test protected. The remaining reliability blockers are backup/export, deeper integration tests, Rebalancer Google Sheet verification, client lint cleanup, and client dependency cleanup.
+
+---
+
+## Peer-Level Assessment
+
+Compared with an average MERN fresher project, FolioScope is far ahead in complexity and domain depth.
+
+Average fresher projects usually contain:
+
+```txt
+login
+CRUD
+basic dashboard
+forms
+MongoDB APIs
+simple CSS
+```
+
+FolioScope contains:
+
+```txt
+portfolio hierarchy
+trade engine
+FIFO accounting
+NAV reconstruction
+cashflow-aware performance
+holdings aggregation
+XIRR
+drawdown
+NAV comparison
+XIRR comparison
+rolling returns
+public securities cache
+session-aware auth
+rebalancer rules
+SIP/lumpsum scoring
+market-fall deployment
+343 backend tests
+passing client production build
+```
+
+Current level:
+
+```txt
+Advanced fresher / early-junior execution.
+Junior+ backend/domain complexity.
+Production maturity still developing.
+```
+
+---
+
+## Practical Next Steps
+
+```txt
+1. Verify Rebalancer output against Google Sheet.
+2. Add trade → NAV → holdings integration tests.
+3. Add deposit/withdrawal NAV correctness tests.
+4. Add backup/export.
+5. Fix client dependency vulnerabilities.
+6. Fix client lint errors/warnings.
+7. Add deployment checklist and env checks.
+8. Add custom benchmark selection later.
+9. Start Rental Income separately with Next.js + TypeScript after core stabilizes.
+```
+
+---
+
+## Project Philosophy
+
+FolioScope is decision-driven.
+
+No feature should be added unless it improves:
+
+- money-decision accuracy
+- allocation discipline
+- portfolio survival
+- risk visibility
+- data safety
+- long-term maintainability
+
+The goal is not to add random SaaS features. The goal is to manage personal money better.

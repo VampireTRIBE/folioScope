@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { useParams } from "react-router-dom";
 
 // ! styles
@@ -8,11 +9,32 @@ import DrawdownAnalysisCard from "../../../../../../components/layout/public/ana
 
 // ! tanStack Query Hook
 import { useSecurityDrawdown } from "../../../hooks/RTK Query/useSecurityQuery";
+import { usePublicSecurities } from "../../../../../../hooks/RTK Query Hooks/sessionStorage";
+
+// ! utils
+import {
+  getSecurityId,
+  getSecurityLabel,
+  normalizeSecuritiesList,
+} from "../../../../../../utils/sessionStorage/securityListTransforms";
 
 const DrawdownAnalysis = () => {
   const { securityID } = useParams();
-  const { data: drawdownData } = useSecurityDrawdown(securityID);
+  const { data: securities } = usePublicSecurities();
 
+  const drawdownSecurityID = useMemo(() => {
+    const securityParam = securityID?.trim();
+    if (!securityParam) return "";
+    const normalizedSecurityParam = securityParam.toLowerCase();
+    const security = normalizeSecuritiesList(securities).find((item) => {
+      const label = String(getSecurityLabel(item)).toLowerCase();
+      const id = String(getSecurityId(item));
+      return label === normalizedSecurityParam || id === securityParam;
+    });
+    return getSecurityId(security);
+  }, [securities, securityID]);
+
+  const { data: drawdownData } = useSecurityDrawdown(drawdownSecurityID);
   const drawdownDetails = [];
   const drawdownDataKeys = drawdownData ? Object.keys(drawdownData) : [];
 

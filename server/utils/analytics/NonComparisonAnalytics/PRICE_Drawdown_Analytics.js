@@ -24,13 +24,8 @@ module.exports.priceDrawdownAnalysis = async ({
   let pastPrices = null;
 
   if (!nav) {
-    const securityDetail = get_SingleAssetMetaDataName(assetId);
-    if (!securityDetail) {
-      throw new customError("Data Not Available", 404);
-    }
-    const { _id } = securityDetail;
     pastPrices = await get_DailyClosePricesByAsset(
-      _id,
+      assetId,
       new Date(startDate),
       nav,
       session,

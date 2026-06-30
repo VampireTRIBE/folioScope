@@ -1,9 +1,19 @@
 import PriceBadge from "../../priceBadge/PriceBadge";
 import drawdownAnalysisCardStyle from "./drawdownanalysiscard.module.css";
 
-const DrawdownAnalysisCard = ({ meta, drawdown, peak, trough, recovery }) => {
+const DrawdownAnalysisCard = ({
+  meta,
+  drawdown,
+  peak,
+  trough,
+  recovery,
+  isDummy,
+}) => {
   return (
-    <div className={drawdownAnalysisCardStyle.analysisContainer}>
+    <div
+      className={`${drawdownAnalysisCardStyle.analysisContainer} ${
+        isDummy ? drawdownAnalysisCardStyle.dummy : ""
+      }`}>
       <div className={drawdownAnalysisCardStyle.summaryContainer}>
         <div className={drawdownAnalysisCardStyle.summaryItem}>
           <div className={drawdownAnalysisCardStyle.label}>Period :</div>

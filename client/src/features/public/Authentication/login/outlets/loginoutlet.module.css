@@ -1,8 +1,17 @@
 .container {
   width: 100%;
-  min-height: 75vh;
+  min-height: calc(100svh - var(--header-height));
   margin-top: var(--header-height);
-  padding: var(--space-5) var(--container-padding);
+  padding: var(--space-6) var(--container-padding);
   background-color: var(--bg-section);
+  display: grid;
+  place-items: center;
+  overflow-x: hidden;
+}
+
+@media screen and (max-width: 480px) {
+  .container {
+    padding: var(--space-4) var(--space-3);
+  }
 }
 

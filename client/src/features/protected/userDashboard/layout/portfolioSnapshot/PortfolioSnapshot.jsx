@@ -18,10 +18,14 @@ import { AuthenticationContext } from "../../../../../context/authenticationCont
 // ! Tanstack Query
 import { useGROUPMETADATA } from "../../hooks/ReactQuery/useQuery";
 
-const PortfolioSnapshot = () => {
+const PortfolioSnapshot = ({ netPortfolio = false }) => {
   const { gp_id, level } = useParams();
   const { accessToken, userData } = useContext(AuthenticationContext);
-  const groupId = `${userData?.groups?.[`level${level}`]?.[gp_id]?._id}`;
+  const grouplevel1 = Object.keys(userData?.groups?.level1 || {});
+  const groupId =
+    netPortfolio === true
+      ? `${userData?.groups?.[`level${1}`]?.[grouplevel1[0]]?._id}`
+      : `${userData?.groups?.[`level${level}`]?.[gp_id]?._id}`;
   const { data: GroupMeatadataData } = useGROUPMETADATA(accessToken, groupId);
 
   return (
@@ -30,22 +34,26 @@ const PortfolioSnapshot = () => {
         snapshot={GroupMeatadataData?.data?.consolidatedSnapshot}
       />
       <h3 className={portfolioSnapshotStyles.title}>Snapshot</h3>
-      <SnapshotHead
-        snapshotHead={{
-          text: GroupMeatadataData?.data?.groupName,
-          price: {
-            price:GroupMeatadataData?.data?.networth?.currentPrice,
-            today:GroupMeatadataData?.data?.networth?.todayChange,
-          }
-        }}
-      />
-      <CurrentStatus
-        currentStatus={GroupMeatadataData?.data?.currentInvestment}
-      />
-      <CurrentYearPerformence
-        currentyear={GroupMeatadataData?.data?.currentyear}
-      />
-      <LifetimePerformence lifetime={GroupMeatadataData?.data?.lifetime} />
+      <div className={portfolioSnapshotStyles.content}>
+        <div>
+          <SnapshotHead
+            snapshotHead={{
+              text: GroupMeatadataData?.data?.groupName,
+              price: {
+                price: GroupMeatadataData?.data?.networth?.currentPrice,
+                today: GroupMeatadataData?.data?.networth?.todayChange,
+              },
+            }}
+          />
+          <CurrentStatus
+            currentStatus={GroupMeatadataData?.data?.currentInvestment}
+          />
+        </div>
+        <CurrentYearPerformence
+          currentyear={GroupMeatadataData?.data?.currentyear}
+        />
+        <LifetimePerformence lifetime={GroupMeatadataData?.data?.lifetime} />
+      </div>
     </div>
   );
 };

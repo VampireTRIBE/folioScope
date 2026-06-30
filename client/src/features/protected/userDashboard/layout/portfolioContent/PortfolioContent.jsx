@@ -36,11 +36,8 @@ const PortfolioContent = () => {
   return (
     <div className={portfolioContentStyles.container}>
       <ButtonContainers isLeaf={isLeaf} />
-
       <PortfolioSnapshot />
-
       <OverView {...overview} />
-
       <DrawdownAnalysis />
       <ComparisonAnalysis />
     </div>

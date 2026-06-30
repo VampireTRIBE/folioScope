@@ -11,3 +11,15 @@
     border-radius: var(--radius-md);
 
 }
+
+
+@media (min-width: 700px) {
+  .cardWrapper {
+    width: 48%;
+  }
+}
+@media (min-width: 1200px) {
+  .cardWrapper {
+    width: 32%;
+  }
+}

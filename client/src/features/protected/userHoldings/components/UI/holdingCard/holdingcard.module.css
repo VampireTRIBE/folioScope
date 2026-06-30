@@ -1,8 +1,8 @@
 .container {
   width: 100%;
-  height: 100%;
-  max-width: 350px;
+  max-width: 27rem;
   min-width: 0;
+  justify-self: center;
   padding: var(--space-3);
   border: var(--border-width-sm) solid var(--border-default);
   border-radius: var(--radius-md);
@@ -25,18 +25,20 @@
 }
 
 .head {
-  display: flex;
-  justify-content: space-between;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
   align-items: flex-start;
-  gap: var(--space-2);
+  gap: var(--space-1);
   padding-bottom: var(--space-2);
   border-bottom: var(--border-width-sm) solid var(--border-light);
 }
 
 .headSub {
   min-width: 0;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
   gap: var(--space-1);
 }
 
@@ -48,81 +50,144 @@
   overflow-wrap: anywhere;
 }
 
-.oneDayPrice,
-.rightContent {
+.oneDayPrice {
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
+  gap: var(--space-1);
   font-size: var(--text-sm);
   text-align: right;
 }
 
 .content,
-.contentValue,
-.valueWrapper,
+.ltpContainer {
+  min-width: 0;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-1);
+  padding-bottom: var(--space-2);
+  border-bottom: var(--border-width-sm) solid var(--border-light);
+}
+
+.contentValue {
+  min-width: 0;
+  display: grid;
+  gap: var(--space-1);
+  align-content: start;
+}
+
 .ltpContainer {
   display: flex;
-  justify-content: space-between;
+  align-items: center;
+  min-width: 0;
+  width: fit-content;
+  max-width: 100%;
+  gap: var(--space-1);
+  color: var(--text-secondary);
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.metricItem {
+  min-width: 0;
+  min-height: 2.5rem;
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width-sm) solid var(--border-light);
+  border-radius: var(--radius-sm);
+  background-color: var(--bg-main);
+  display: grid;
+  grid-template-columns: minmax(5.5rem, 0.8fr) minmax(0, 1.2fr);
   align-items: center;
   gap: var(--space-2);
 }
 
-.leftContent {
-  display: flex;
-  flex-flow: row wrap;
-  justify-content: flex-start;
-  align-items: center;
-  gap: var(--space-1);
-}
-
-.leftContent > .qty,
-.leftContent > .avg,
-.current,
-.invested,
-.ltp {
+.ltp,
+.metricLabel {
   font-weight: var(--fw-bold);
 }
-.leftContent > .qty span,
-.leftContent > .avg span {
-  font-weight: var(--fw-regular);
-  font-size: var(--text-sm);
+
+.metricLabel {
   color: var(--text-secondary);
+  font-size: var(--text-xs);
+  line-height: var(--lh-tight);
+  overflow-wrap: anywhere;
 }
 
-.contentValue {
-  flex-direction: column;
-  gap: var(--space-1);
+.metricValue {
+  font-weight: var(--fw-regular);
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+  text-align: right;
 }
 
 .valueWrapper {
   width: 100%;
+  min-width: 0;
+  min-height: 2.5rem;
+  padding: var(--space-1) var(--space-2);
+  display: grid;
+  grid-template-columns: minmax(5.5rem, 0.8fr) minmax(0, 1.2fr);
+  align-items: center;
+  gap: var(--space-2);
   color: var(--text-secondary);
+  border: var(--border-width-sm) solid var(--border-light);
+  border-radius: var(--radius-sm);
 }
 
-.ltpContainer {
-  gap: var(--space-1);
-  font-size: var(--text-xs);
-  color: var(--text-secondary);
+.valueWrapper .oneDayPrice {
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .expenseRatio {
   width: 100%;
-  display: flex;
-  flex-flow: row wrap;
+  min-width: 0;
+  min-height: 2.5rem;
+  padding: var(--space-1) var(--space-2);
+  display: grid;
+  grid-template-columns: minmax(5.5rem, 0.8fr) minmax(0, 1fr) auto;
   align-items: center;
   gap: var(--space-2);
-  margin-top: var(--space-1);
-  padding-top: var(--space-2);
-  border-top: var(--border-width-sm) solid var(--border-light);
+  border: var(--border-width-sm) solid var(--border-light);
+  border-radius: var(--radius-sm);
   color: var(--text-secondary);
 }
 
 .alert {
-  flex: 1;
+  width: fit-content;
+  max-width: 5.5rem;
+  justify-self: end;
   text-align: center;
-  min-width: 4rem;
+  min-width: 3.75rem;
   padding: var(--space-1) var(--space-2);
   border-radius: var(--radius-full);
   background-color: var(--color-warning-bg);
   color: var(--color-warning);
   font-weight: var(--fw-semibold);
+  white-space: nowrap;
+}
+
+@media (min-width: 600px) {
+  .headSub {
+    grid-template-columns: minmax(0, 1fr) max-content;
+    gap: var(--space-2);
+  }
+
+  .ltpContainer {
+    justify-self: end;
+    justify-content: flex-end;
+  }
+
+  .content {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2);
+  }
 }
 
 @media (max-width: 480px) {
@@ -130,14 +195,23 @@
     padding: var(--space-2);
   }
 
-  .head,
-  .content,
+  .metricItem,
   .valueWrapper {
-    align-items: flex-start;
-    flex-direction: column;
+    grid-template-columns: minmax(4.5rem, 0.8fr) minmax(0, 1.2fr);
+    align-items: center;
+  }
+
+  .expenseRatio {
+    grid-template-columns: minmax(4.5rem, 0.8fr) minmax(0, 1fr) auto;
+    align-items: center;
   }
 
   .oneDayPrice {
-    text-align: left;
+    justify-content: flex-end;
+    text-align: right;
+  }
+
+  .metricValue {
+    text-align: right;
   }
 }

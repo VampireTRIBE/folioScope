@@ -1,7 +1,6 @@
 .navlinkContainer {
   padding: var(--space-2) 0;
-  background-color: inherit;
-  color: inherit;
+  background-color: var(--bg-section);
   position: sticky;
   top: var(--header-height);
   display: flex;
@@ -9,6 +8,6 @@
   align-items: center;
   gap: var(--space-3);
   box-shadow: var(--shadow-md);
-  border-bottom: var(--border-width-sm) solid var(--border-dark);
   z-index: 900;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
 }

@@ -1,7 +1,16 @@
 .section {
-  height: 100%;
-  padding: var(--space-4);
-  border: var(--border-width-lg) solid var(--border-dark);
-  border-radius: var(--radius-xl);
+  width: min(100%, 34rem);
+  min-height: fit-content;
+  padding: var(--space-5);
+  background-color: var(--bg-card);
+  border: var(--border-width-sm) solid var(--border-dark);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
+}
+
+@media screen and (max-width: 480px) {
+  .section {
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+  }
 }

@@ -5,3 +5,17 @@
   padding: var(--space-5) var(--container-padding);
   background-color: var(--bg-section);
 }
+
+@media (min-width: 992px) {
+  .outlet {
+    display: flex;
+    gap: var(--space-3);
+    position: relative;
+  }
+}
+
+@media (min-width: 1200px) {
+  .outlet {
+    gap: var(--space-5);
+  }
+}

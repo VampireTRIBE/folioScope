@@ -1,4 +1,5 @@
 .container {
+  max-width: 425px;
   margin-top: var(--space-1);
   padding: var(--space-2);
   border: 2px solid var(--border-dark);

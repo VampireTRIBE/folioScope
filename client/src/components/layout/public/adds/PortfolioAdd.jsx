@@ -26,7 +26,13 @@ const PortfolioAdd = () => {
     "Analyze Drawdown",
   ];
 
-  const imgSrc = ["IMAGE 1", "IMAGE 2", "IMAGE 3", "IMAGE 4", "IMAGE 5"];
+  const imgSrc = [
+    "assets/ads/navAnalysis.png",
+    "assets/ads/navComparision.png",
+    "assets/ads/xirrComparision.png",
+    "IMAGE 5",
+    "assets/ads/drawdownComparision.png",
+  ];
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -64,7 +70,7 @@ const PortfolioAdd = () => {
       </div>
 
       <div className={portfolioAddStyle.rightContainer}>
-        {imgSrc[activeRadio]}
+        <img src={imgSrc[activeRadio]} alt="Ad image" />
       </div>
     </aside>
   );

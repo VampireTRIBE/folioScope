@@ -1,7 +1,7 @@
-import { BASE_URL } from "../../../../constants/axiosInstance";
+import { BASE_URL_withCredentials } from "../../../../constants/axiosInstance";
 
 export const POST_LOGOUT = async (accessToken) => {
-  const response = await BASE_URL.get("/logoutuser", {
+  const response = await BASE_URL_withCredentials.post("/logoutuser", null, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
@@ -10,7 +10,7 @@ export const POST_LOGOUT = async (accessToken) => {
 };
 
 export const POST_LOGOUTALL = async (accessToken) => {
-  const response = await BASE_URL.get("/logoutalluser", {
+  const response = await BASE_URL_withCredentials.post("/logoutalluser", null, {
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },

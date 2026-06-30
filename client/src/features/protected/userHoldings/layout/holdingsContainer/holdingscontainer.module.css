@@ -20,12 +20,12 @@
 
 .content {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(17rem, 27rem));
   gap: var(--space-3);
   align-items: stretch;
 }
 
-.noHolding{
+.noHolding {
   min-height: 10rem;
   display: flex;
   justify-content: center;

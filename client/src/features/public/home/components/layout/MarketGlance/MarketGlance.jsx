@@ -51,7 +51,7 @@ const MarketGlance = () => {
         <CardWrapperType1 cardData={data3} onClick={goToSecurityDashboard} />
       </div>
     </section>
-  );
+  );  
 };
 
 export default MarketGlance;

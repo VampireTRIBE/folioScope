@@ -38,7 +38,6 @@ const createApp = ({ enableTestRoutes = false } = {}) => {
       message,
     });
   });
-
   return app;
 };
 

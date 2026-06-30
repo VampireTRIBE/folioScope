@@ -1,15 +1,27 @@
 import { useCallback, useContext, useMemo } from "react";
 import { useDispatch } from "react-redux";
+import { useQueryClient } from "@tanstack/react-query";
 
 import { useNavigationActions } from "../../../hooks/customHooks/useNavigationActions";
 import { publicheaderToggleActions } from "../redux/headerToggleState";
 import { AuthenticationContext } from "../../../../context/authenticationContext";
 import { useLogoutActions } from "./customHooks/useMutationHooks";
+import {
+  useLogoutALLMutation,
+  useLogoutMutation,
+} from "./ReactQuery/useMutation";
 
 export const useHeaderUserActions = () => {
-  const { userData } = useContext(AuthenticationContext);
-  const { LogoutRequest } = useLogoutActions();
+  const authContext = useContext(AuthenticationContext);
+  const { userData, accessToken, setAccessToken, setUserData } = authContext;
+
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
+
+  const logoutMutation = useLogoutMutation();
+  const logoutAllMutation = useLogoutALLMutation();
+
+  const { LogoutRequest } = useLogoutActions();
 
   const {
     goToUserDashboard,
@@ -18,6 +30,46 @@ export const useHeaderUserActions = () => {
     goToUserHoldings,
     goToUserPortfolioRebalencerList,
   } = useNavigationActions();
+
+  const toggle = useCallback(
+    (key) => {
+      dispatch(
+        publicheaderToggleActions.TOGGLE({
+          key,
+        }),
+      );
+    },
+    [dispatch],
+  );
+
+  const clearClientAuth = useCallback(() => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("userData");
+    }
+
+    setAccessToken?.(null);
+    setUserData?.(null);
+    queryClient.clear();
+    gotoHome();
+  }, [queryClient, gotoHome, setAccessToken, setUserData]);
+
+  const handleLogout = useCallback(async () => {
+    await LogoutRequest({
+      mutation: logoutMutation,
+      accessToken,
+      onSuccess: clearClientAuth,
+    });
+  }, [LogoutRequest, logoutMutation, accessToken, clearClientAuth]);
+
+  const handleLogoutAll = useCallback(async () => {
+    await LogoutRequest({
+      mutation: logoutAllMutation,
+      accessToken,
+      onSuccess: clearClientAuth,
+    });
+  }, [LogoutRequest, logoutAllMutation, accessToken, clearClientAuth]);
 
   const level1Array = useMemo(
     () => Object.values(userData?.groups?.level1 || {}),
@@ -37,17 +89,6 @@ export const useHeaderUserActions = () => {
   const level4Array = useMemo(
     () => Object.values(userData?.groups?.level4 || {}),
     [userData],
-  );
-
-  const toggle = useCallback(
-    (key) => {
-      dispatch(
-        publicheaderToggleActions.TOGGLE({
-          key,
-        }),
-      );
-    },
-    [dispatch],
   );
 
   const createGroupDropdownItems = useCallback(
@@ -114,20 +155,27 @@ export const useHeaderUserActions = () => {
       },
       {
         id: "logout-user",
-        onClick: goToUserProfile,
-        children: "Logout",
+        onClick: handleLogout,
+        children: logoutMutation.isPending ? "Logging out..." : "Logout",
         variant: "sideBarbtn",
         order: 4,
       },
       {
         id: "logout-user-all-devices",
-        onClick: goToUserProfile,
-        children: "Logout All",
+        onClick: handleLogoutAll,
+        children: logoutAllMutation.isPending ? "Logging out..." : "Logout All",
         variant: "sideBarbtn",
-        order: 4,
+        order: 5,
       },
     ],
-    [toggle, goToUserProfile],
+    [
+      toggle,
+      goToUserProfile,
+      handleLogout,
+      handleLogoutAll,
+      logoutMutation.isPending,
+      logoutAllMutation.isPending,
+    ],
   );
 
   const userMenuSidebarItems = useMemo(
@@ -145,7 +193,9 @@ export const useHeaderUserActions = () => {
         group: false,
         onClick: () => {
           const level1Group = level1Array[0];
+
           if (!level1Group) return;
+
           goToUserDashboard(level1Group.level, level1Group.name);
         },
         children: "Dashboard",
@@ -196,6 +246,8 @@ export const useHeaderUserActions = () => {
     [
       gotoHome,
       goToUserDashboard,
+      goToUserHoldings,
+      goToUserPortfolioRebalencerList,
       level1Array,
       level2Array,
       level3Array,
@@ -208,6 +260,7 @@ export const useHeaderUserActions = () => {
     toggle,
     userprofileBtn,
     userprofileSidebarItems,
+    userMenuSidebarItems,
     userMneuSidebarItems: userMenuSidebarItems,
   };
 };

@@ -17,3 +17,10 @@
   font-weight: var(--fw-semibold);
   line-height: var(--lh-tight);
 }
+
+
+@media (min-width: 600px) {
+  .container {
+    width: 280px;
+  }
+}

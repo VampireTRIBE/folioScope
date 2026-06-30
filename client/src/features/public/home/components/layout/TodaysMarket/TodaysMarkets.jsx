@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import Head from "../../UI/head/Head";
 import PriceBadge from "../../../../../../components/layout/public/priceBadge/PriceBadge";
 import Content from "../../UI/content/Content";
+import PortfolioSnapshot from "../../../../../protected/userDashboard/layout/portfolioSnapshot/PortfolioSnapshot";
 
 // ! ads components
 import PortfolioAdd from "../../../../../../components/layout/public/adds/PortfolioAdd";
@@ -51,14 +52,25 @@ const TodaysMarkets = () => {
           <Content activeCategory={activeMfCategory} />
         </div>
       </div>
-      {!accessToken && (
-        <aside className={TodaysMarketStyle.adsContainer}>
-          <h3>Connect with us</h3>
-          <LoginAds />
-          <ImgSliderAds />
-          <SignupAds />
-        </aside>
-      )}
+
+      <aside className={TodaysMarketStyle.adsContainer}>
+        {!accessToken && (
+          <>
+            <h3>Connect with us</h3>
+            <div className={TodaysMarketStyle.adsContent}>
+              <LoginAds />
+              <ImgSliderAds />
+              <SignupAds />
+            </div>
+          </>
+        )}
+
+        {accessToken && (
+          <div className={TodaysMarketStyle.adsContent}>
+            <PortfolioSnapshot netPortfolio={true} />
+          </div>
+        )}
+      </aside>
     </section>
   );
 };

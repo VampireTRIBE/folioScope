@@ -5,8 +5,6 @@
 
 .today {
   display: flex;
-  background-color: inherit;
-  color: inherit;
   align-items: center;
   justify-content: end;
   gap: var(--space-1);

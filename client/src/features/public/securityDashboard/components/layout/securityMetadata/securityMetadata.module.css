@@ -1,4 +1,15 @@
-.metadataContainer {
-  background-color: inherit;
-  color: inherit;
+@media (min-width: 992px) {
+  .metadataContainer {
+    min-width: 250px;
+    max-height: fit-content;
+    position: sticky;
+    top: var(--header-height);
+    z-index: 900;
+  }
+}
+
+@media (min-width: 1200px) {
+  .metadataContainer {
+    min-width: 300px;
+  }
 }

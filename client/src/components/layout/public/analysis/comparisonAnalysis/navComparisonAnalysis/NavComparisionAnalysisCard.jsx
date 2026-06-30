@@ -23,7 +23,12 @@ const NavComparisionAnalysisCard = ({
   normalizedNavSeries = [],
 }) => {
   const paddedComparision = useMemo(() => {
-    const safeComparision = Array.isArray(comparision) ? comparision : [];
+    const safeComparision = Array.isArray(comparision)
+      ? comparision.map((item) => ({
+          ...item,
+          isDummy: false,
+        }))
+      : [];
 
     if (safeComparision.length >= 4) {
       return safeComparision;
@@ -39,6 +44,7 @@ const NavComparisionAnalysisCard = ({
           current: "0.00",
           max: "0.00",
         },
+        isDummy: true,
       }),
     );
 
@@ -74,6 +80,7 @@ const NavComparisionAnalysisCard = ({
               key={period?.meta?.period || indx}
               meta={period?.meta}
               drawdown={period?.drawdown}
+              isDummy={period?.isDummy}
             />
           ))}
         </div>

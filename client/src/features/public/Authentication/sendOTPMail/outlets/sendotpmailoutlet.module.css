@@ -1,19 +1,21 @@
 .container {
   width: 100%;
-  min-height: 50vh;
+  min-height: calc(100svh - var(--header-height));
   margin-top: var(--header-height);
-  padding: var(--space-5) var(--container-padding);
+  padding: var(--space-6) var(--container-padding);
   background-color: var(--bg-section);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: grid;
+  place-items: center;
+  overflow-x: hidden;
 }
 
 .section {
-  height: 100%;
-  padding: var(--space-4);
-  border: var(--border-width-lg) solid var(--border-dark);
-  border-radius: var(--radius-xl);
+  width: min(100%, 34rem);
+  min-height: fit-content;
+  padding: var(--space-5);
+  background-color: var(--bg-card);
+  border: var(--border-width-sm) solid var(--border-dark);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
 
   display: flex;
@@ -24,18 +26,22 @@
 }
 
 .form {
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: var(--space-2);
 }
 
 .fieldset {
-  border: none;
+  width: 100%;
+  min-width: 0;
+  padding: var(--space-4);
+  border: var(--border-width-sm) solid var(--border-default);
+  border-radius: var(--radius-md);
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-3);
 }
-
 
 .fieldset > button {
   align-self: self-end;
@@ -45,20 +51,25 @@
   display: flex;
   flex-flow: row wrap;
   align-items: center;
-  gap: var(--space-1);
+  gap: var(--space-2);
 }
 
 .label {
+  width: 35%;
   font-size: var(--text-base);
   font-weight: var(--fw-semibold);
+  color: var(--text-primary);
 }
 
 .input {
   flex: 1;
-  padding: var(--space-1) var(--space-2);
+  min-width: 13rem;
+  padding: var(--space-2);
   border-radius: var(--radius-md);
-  font-size: var(--text-xs);
-  border: 1px solid transparent;
+  font-size: var(--text-base);
+  color: var(--text-primary);
+  background-color: var(--bg-main);
+  border: var(--border-width-sm) solid var(--border-default);
   outline: none;
   transition: border var(--transition-fast);
 }
@@ -69,4 +80,39 @@
 
 .btnContainer:last-child {
   align-self: center;
+}
+
+@media screen and (max-width: 579px) {
+  .container {
+    padding: var(--space-4) var(--space-3);
+  }
+
+  .section {
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+  }
+
+  .fieldset {
+    padding: var(--space-3);
+  }
+
+  .inputGroup {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .label,
+  .input {
+    width: 100%;
+  }
+
+  .input {
+    min-width: 0;
+  }
+
+  .fieldset > button {
+    width: 100%;
+    max-width: none;
+    align-self: stretch;
+  }
 }

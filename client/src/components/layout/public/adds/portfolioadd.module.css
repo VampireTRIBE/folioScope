@@ -71,13 +71,21 @@
 
 .rightContainer {
   flex: 1;
-  background-color: var(--text-muted);
   border-radius: inherit;
   overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: var(--text-5xl);
+}
+
+.rightContainer img {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
 }
 
 /*
@@ -96,7 +104,7 @@
     font-size: var(--text-lg);
   }
 
-  .inputContainer{
+  .inputContainer {
     gap: var(--space-2);
   }
 
@@ -105,7 +113,33 @@
     height: 10px;
   }
 
-  .radio::before{
+  .radio::before {
     width: 14px;
+  }
+}
+
+@media screen and (min-width: 500px) {
+  .rightContainer {
+    max-width: 390px;
+  }
+  .leftContainer {
+    max-width: 390px;
+  }
+}
+
+@media screen and (min-width: 600px) {
+  .addContainer {
+    flex-direction: row;
+    min-height: 18rem;
+    max-height: 20rem;
+  }
+
+  .rightContainer {
+    max-height: 250px;
+  }
+
+  .leftContainer {
+    min-height: 250px;
+    width: 40%;
   }
 }

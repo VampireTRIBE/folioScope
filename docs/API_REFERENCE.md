@@ -1,14 +1,20 @@
 # FolioScope API Reference
 
-This API reference reflects the latest inspected codebase of FolioScope.
+This API reference is based on the latest inspected FolioScope codebase.
 
-Backend entry point:
+Backend app entry:
+
+```txt
+server/app.js
+```
+
+Server entry:
 
 ```txt
 server/server.js
 ```
 
-Main backend route mounts:
+Main route mounts:
 
 ```js
 app.use("/", userRoute);
@@ -19,24 +25,49 @@ app.use("/admin/dataseeders", adminRoute);
 app.use("/portfolio", portfolioRoute);
 ```
 
-The test route exists in the codebase but is currently commented out in `server/server.js`:
+Test routes are available only when the app is created with:
 
 ```js
-// app.use("/test", testRoutes);
+createApp({ enableTestRoutes: true })
 ```
 
-Keep it disabled outside controlled local development.
+They are not exposed by default.
 
 ---
 
-## Base URLs
+## Base URL
 
-| Layer | Default |
-|---|---|
-| Backend | `http://localhost:3000` |
-| Frontend Vite | `http://localhost:5173` |
-| Frontend Axios `BASE_URL` | `http://<window.location.hostname>:3000` |
-| Frontend Axios with credentials | `http://<window.location.hostname>:3000` |
+Default local backend:
+
+```txt
+http://localhost:3000
+```
+
+---
+
+## Standard Response Shape
+
+Most successful responses follow:
+
+```json
+{
+  "success": true,
+  "message": "Action message",
+  "data": {}
+}
+```
+
+Most error responses through the central error middleware follow:
+
+```json
+{
+  "success": false,
+  "statusCode": 400,
+  "message": "Error message"
+}
+```
+
+Some older controllers still return direct `{ error: "..." }` shapes. Standardization is still pending.
 
 ---
 
@@ -48,146 +79,146 @@ Protected routes require:
 Authorization: Bearer <accessToken>
 ```
 
-Refresh-token based routes use cookies:
-
-| Cookie | Purpose |
-|---|---|
-| `refreshToken` | Refresh-token rotation |
-| `sessionId` | Session document lookup |
-
-Common protected backend middleware:
-
-```js
-verifyAccessToken
-```
+Refresh-token flow uses cookies.
 
 ---
 
-# User/Auth Routes
+# User / Auth Routes
 
 Mounted at root `/`.
 
-## `GET /userdetails`
+## GET `/userdetails`
 
 Protected.
 
 Returns authenticated user details.
 
-Frontend use:
+Response:
 
-- Auth bootstrap/user detail loading.
+```json
+{
+  "success": true,
+  "data": {}
+}
+```
 
 ---
 
-## `POST /signup`
+## POST `/signup`
 
 Registers a new user.
 
-Validation:
+Validation middleware:
 
-- `validate_RegisterData`
+```txt
+validate_RegisterData
+```
+
+Body usually includes user registration fields such as name/email/password.
 
 ---
 
-## `POST /sendverificationemail`
+## POST `/sendverificationemail`
 
 Sends verification email.
 
-Validation:
+Validation middleware:
 
-- `validate_email`
+```txt
+validate_email
+```
 
 ---
 
-## `POST /verifyemail`
+## POST `/verifyemail`
 
-Verifies email using email verification token.
+Verifies email token.
 
 Middleware:
 
-- `verifyEmailTokenCheck`
-
-Also sets session cookies and returns access token.
-
----
-
-## `POST /login`
-
-Logs in a user.
-
-Validation:
-
-- `validate_loginDATA`
-
-Returns:
-
-- access token
-- user/session data
-
-Sets:
-
-- `refreshToken`
-- `sessionId`
+```txt
+verifyEmailTokenCheck
+```
 
 ---
 
-## `POST /refreshtoken`
+## POST `/login`
 
-Rotates refresh token and returns a new access token.
+Logs in user.
+
+Validation middleware:
+
+```txt
+validate_loginDATA
+```
+
+Expected result includes access-token/session handling.
+
+---
+
+## POST `/refreshtoken`
+
+Rotates access token using refresh token.
 
 Middleware:
 
-- `verifyRefreshToken`
-
-Used by frontend auth restoration.
+```txt
+verifyRefreshToken
+```
 
 ---
 
-## `POST /forgotpassword`
+## POST `/forgotpassword`
 
 Starts password reset flow.
 
-Validation:
+Validation middleware:
 
-- `validate_email`
+```txt
+validate_email
+```
 
 ---
 
-## `POST /verifyotp/:email`
+## POST `/verifyotp/:email`
 
 Verifies OTP for password reset.
 
-Validation:
+Middleware:
 
-- `validate_otp`
-- `validateParamsEmail("email")`
-
----
-
-## `POST /confirmpassword/:email`
-
-Confirms new password after OTP verification.
-
-Validation:
-
-- `validate_ChangePasswordDATA`
-- `validateParamsEmail("email")`
+```txt
+validate_otp
+validateParamsEmail("email")
+```
 
 ---
 
-## `POST /logoutuser`
+## POST `/confirmpassword/:email`
+
+Confirms new password.
+
+Middleware:
+
+```txt
+validate_ChangePasswordDATA
+validateParamsEmail("email")
+```
+
+---
+
+## POST `/logoutuser`
 
 Protected.
 
-Logs out current session.
+Logs out the current session.
 
 ---
 
-## `POST /logoutalluser`
+## POST `/logoutalluser`
 
 Protected.
 
-Logs out all user sessions.
+Logs out all sessions for the user.
 
 ---
 
@@ -195,61 +226,83 @@ Logs out all user sessions.
 
 Mounted at root `/`.
 
-## `GET /allsecuritieslist`
+## GET `/allsecuritieslist`
 
-Returns grouped/listed public securities metadata.
+Returns public securities grouped by asset class and tradable list.
 
-Used by:
+Response includes:
 
-- Mobile search bar
-- Trade form
-- Comparison analysis
-- Rebalancer asset search
-- `usePublicSecurities`
-- SessionStorage cache
-
----
-
-## `GET /defaultmetadata`
-
-Returns default public metadata.
-
----
-
-## `GET /top/securities`
-
-Returns today's top securities / market discovery data.
+```json
+{
+  "success": true,
+  "message": "All Securities List",
+  "data": {
+    "INDEX": {},
+    "ETF": {},
+    "MUTUAL FUND": {},
+    "BOND": {},
+    "TRADABLE SECURITIES": {}
+  }
+}
+```
 
 ---
 
-## `GET /security/:securityId`
+## GET `/defaultmetadata`
 
-Returns overview for a security.
+Returns default asset metadata.
 
 ---
 
-# Price Routes
+## GET `/top/securities`
+
+Returns today's top securities data.
+
+---
+
+## GET `/security/:securityId`
+
+Returns public security overview.
+
+Params:
+
+| Param | Description |
+|---|---|
+| `securityId` | Asset/security metadata id |
+
+---
+
+# Price Range Routes
 
 Mounted at `/price`.
 
-## `GET /price/security/:securityId`
+## GET `/price/security/:securityId`
 
-Public.
+Returns security price range.
 
-Returns price range/history data for a security.
+Query:
+
+| Query | Allowed |
+|---|---|
+| `range` | `W`, `M`, `Y`, `3Y`, `MAX` |
+
+If `range` is omitted, returns 1D data.
 
 ---
 
-## `GET /price/group/:groupId`
+## GET `/price/group/:groupId`
 
 Protected.
 
-Returns group NAV/price range data.
+Returns group/NAV price range.
 
-Middleware:
+Query:
 
-- `validateID("groupId")`
-- `verifyAccessToken`
+| Query | Allowed |
+|---|---|
+| `range` | `W`, `M`, `Y`, `3Y`, `MAX` |
+
+If `range` is omitted, returns 1D data.
 
 ---
 
@@ -257,109 +310,73 @@ Middleware:
 
 Mounted at `/analytic`.
 
-## `GET /analytic/drawdown/security/:securityId`
+## GET `/analytic/drawdown/security/:securityId`
 
 Public.
 
-Returns drawdown analytics for a security.
-
-Middleware:
-
-- `validateID("securityId")`
+Returns drawdown analysis for a security.
 
 ---
 
-## `GET /analytic/drawdown/group/:groupId`
+## GET `/analytic/drawdown/group/:groupId`
 
 Protected.
 
-Returns group drawdown analytics.
-
-Middleware:
-
-- `validateID("groupId")`
-- `verifyAccessToken`
+Returns drawdown analysis for a portfolio group using NAV.
 
 ---
 
-## `POST /analytic/xirr/group/:groupId`
+## POST `/analytic/xirr/group/:groupId`
 
 Protected.
 
-Computes XIRR for a portfolio group.
+Computes or returns cached group XIRR.
 
-Middleware:
+Behavior:
 
-- `validateID("groupId")`
-- `verifyAccessToken`
+- validates group ownership
+- recomputes if cached value is older than one day
+- stores result in group snapshot cache
+
+Response:
+
+```json
+{
+  "success": true,
+  "message": "Group Xirr Analysis",
+  "data": 12.34
+}
+```
 
 ---
 
-## `GET /analytic/comparision/xirr/:groupId/:indexId`
+## GET `/analytic/comparision/xirr/:groupId/:indexId`
 
 Protected.
 
 Compares group XIRR against an index/benchmark.
 
-Middleware:
+Params:
 
-- `validateID("groupId")`
-- `validateID("indexId")`
-- `verifyAccessToken`
-
-Note: The route spelling is currently `comparision`, not `comparison`.
+| Param | Description |
+|---|---|
+| `groupId` | Portfolio group id |
+| `indexId` | Benchmark/security id |
 
 ---
 
-## `GET /analytic/comparision/nav/:groupId/:indexId`
+## GET `/analytic/comparision/nav/:groupId/:indexId`
 
 Protected.
 
-Compares normalized NAV between group and benchmark/index.
+Compares group NAV performance against a benchmark NAV/price series.
 
-Middleware:
+Params:
 
-- `validateID("groupId")`
-- `validateID("indexId")`
-- `verifyAccessToken`
-
-Note: The route spelling is currently `comparision`, not `comparison`.
-
----
-
-# Admin Seeder Routes
-
-Mounted at `/admin/dataseeders`.
-
-All protected.
-
-## `POST /admin/dataseeders/seedclassification`
-
-Seeds/updates asset classification data.
-
-Middleware:
-
-- `verifyAccessToken`
-
----
-
-## `POST /admin/dataseeders/seedassetmetadata`
-
-Seeds/updates asset metadata.
-
-Middleware:
-
-- `verifyAccessToken`
-
----
-
-## `POST /admin/dataseeders/seedpricehistory`
-
-Seeds/inserts price history.
-
-Middleware:
-
-- `verifyAccessToken`
+| Param | Description |
+|---|---|
+| `groupId` | Portfolio group id |
+| `indexId` | Benchmark/security id |
 
 ---
 
@@ -367,95 +384,84 @@ Middleware:
 
 Mounted at `/portfolio`.
 
-## `POST /portfolio/holdings`
+## POST `/portfolio/holdings`
 
 Protected.
 
-Fetches current user holdings for a selected group.
+Fetches user holdings for a selected group.
 
-Request body:
+Body:
 
 ```json
 {
-  "groupId": "MongoObjectId"
+  "groupId": "portfolioGroupId"
 }
 ```
 
-Backend flow:
+Response data includes holdings aggregation:
 
 ```txt
-groupId
-→ leaf group IDs
-→ active financial assets
-→ latest/previous LTP
-→ current value
-→ invested value
-→ average price
-→ one-day gain
-→ P/L
-→ expense ratio/bucket cost
-→ total stats
-→ holdings list
+selected group
+leaf group IDs
+active financial assets
+latest and previous LTP
+current value
+invested value
+average price
+one-day gain
+profit/loss
+expense ratio
+bucket cost
+total stats
+holdings list
 ```
-
-Response shape:
-
-```json
-{
-  "success": true,
-  "message": "Metadata Fetched",
-  "data": {
-    "totalStats": {},
-    "holdings": []
-  }
-}
-```
-
-Frontend use:
-
-- Holdings page
-- Holdings filter
-- Summary cards
-- Holding cards
 
 ---
 
-# Portfolio Rebalancer Routes
-
-## `POST /portfolio/rebalancer/new`
+## POST `/portfolio/rebalancer/new`
 
 Protected.
 
-Creates a new rebalancer configuration.
+Creates a new portfolio rebalancer.
 
 Middleware:
 
-- `verifyAccessToken`
-- `validate_CreatePortfolioRebalancerData`
+```txt
+validate_CreatePortfolioRebalancerData
+validate_NewRebalancer_ReqData
+```
 
-Request body example:
+Body includes:
 
 ```json
 {
-  "portfolioGroupId": "MongoObjectId",
-  "rebalancerName": "Core Portfolio Rebalancer",
-  "rebalancerDescription": "Target allocation and market-fall deployment rules",
+  "portfolioGroupId": "root/group id",
+  "rebalancerName": "Main Portfolio Rebalancer",
+  "rebalancerDescription": "Rules for SIP and market fall deployment",
+  "sipAmount": 11000,
   "assets": [
     {
-      "assetId": "MongoObjectId",
-      "groupId": "MongoObjectId",
-      "targetWeight": 20,
-      "band": 5,
-      "multiplier": 1
+      "assetId": "asset metadata id",
+      "assetName": "SETFNIF50",
+      "groupId": "portfolio group id",
+      "groupName": "Large Cap",
+      "targetWeight": 18,
+      "band": 2,
+      "multiplier": 1,
+      "isCashReserve": false
     }
   ],
   "marketFallRules": [
     {
       "fallPercentage": 10,
       "deployPercentage": 20,
+      "shotNumber": 0,
+      "isLocked": false,
+      "isTriggered": false,
       "assets": [
         {
-          "assetId": "MongoObjectId",
+          "assetId": "asset metadata id",
+          "assetName": "SETFNIF50",
           "multiplier": 1,
           "min": 0.15
         }
@@ -465,16 +471,12 @@ Request body example:
 }
 ```
 
-Validation:
+Important validation:
 
-- Portfolio group ID is required.
-- Rebalancer name is required.
-- At least one asset is required.
-- Total asset target weight must equal 100.
-- Duplicate assets are not allowed.
-- Market-fall rule assets must exist inside the main assets list.
-- Duplicate market-fall percentages are not allowed.
-- Backend validates that selected assets are tradable and groups are leaf groups.
+- user is injected from access token
+- total target weight validation
+- active rebalancer group duplication validation
+- asset/group validation
 
 Response:
 
@@ -486,317 +488,310 @@ Response:
 }
 ```
 
-Current limitation:
-
-- This creates persisted rebalancer configuration. It does not yet calculate real current allocation, drift, SIP/lumpsum suggestions, or deployment output.
-
 ---
 
-## `GET /portfolio/rebalancer/list`
+## GET `/portfolio/rebalancer/list`
 
 Protected.
 
-Fetches the authenticated user's rebalancer configurations.
+Fetches all user's rebalancers.
 
-Response:
+Response includes:
 
-```json
-{
-  "success": true,
-  "message": "Rebalancers Fetched",
-  "data": []
-}
+```txt
+rebalancerName
+rebalancerDescription
+portfolioGroupId
+sipAmount
+assets
+marketFallRules
+isActive
+createdAt
+updatedAt
 ```
 
 ---
 
-## `GET /portfolio/rebalancer/:rebalancerId`
+## GET `/portfolio/rebalancer/:rebalancerId`
 
 Protected.
 
-Fetches one rebalancer by ID.
+Fetches computed rebalancer detail.
 
-Middleware:
+Computation includes:
 
-- `verifyAccessToken`
-- `validateID("rebalancerId")`
+```txt
+current allocation
+target allocation
+drift percentage
+drift amount
+status
+SIP score
+lumpsum score
+SIP/lumpsum amount distribution
+market-fall deployment rule stats
+benchmark fall
+asset fall
+deployment score
+deployment amount
+```
 
-Response:
+Response data shape:
 
 ```json
 {
   "success": true,
   "message": "Rebalancer Fetched",
-  "data": {}
+  "data": {
+    "groupId": "portfolioGroupId",
+    "rebalancerName": "Main Rebalancer",
+    "rebalancerDescription": "...",
+    "summary": {
+      "sipAmount": 11000,
+      "investmentValue": 0,
+      "currentValue": 0,
+      "price": {
+        "price": 0,
+        "today": 0
+      }
+    },
+    "groupLevelData": [],
+    "assetLevelData": [],
+    "marketFallRulesStats": []
+  }
 }
 ```
 
 ---
 
-# Portfolio Group Routes
-
-## `GET /portfolio/:pg_id`
+## GET `/portfolio/:pg_id`
 
 Protected.
 
-Fetches group metadata and current dashboard stats.
+Returns portfolio group metadata and dashboard snapshot.
 
-Middleware:
+Response data includes:
 
-- `verifyAccessToken`
-- `validateID("pg_id")`
-
-Returns:
-
-- group name
-- description
-- level
-- consolidated snapshot
-- current investment stats
-- net worth range
-- current year stats
-- lifetime stats
+```txt
+group identity
+level
+consolidated snapshot
+current investment
+net worth range
+current-year gain data
+lifetime gain data
+```
 
 ---
 
-## `POST /portfolio/:pg_id`
+## POST `/portfolio/:pg_id`
 
 Protected.
 
-Creates a child group under `pg_id`.
+Creates a child portfolio group under `pg_id`.
 
-Middleware:
+Body:
 
-- `verifyAccessToken`
-- `validateID("pg_id")`
+```json
+{
+  "name": "Group name",
+  "description": "Group description"
+}
+```
 
-Important rules:
+Rules:
 
-- Parent must exist.
-- Parent must belong to user.
-- Parent cannot already contain financial assets.
-- Max depth is enforced.
-- Duplicate group names are handled.
+- parent must exist
+- parent must belong to user
+- cannot create child under group that already has financial assets
+- max level/depth enforced
+- duplicate group names are rejected
 
 ---
 
-## `PATCH /portfolio/:pg_id`
+## PATCH `/portfolio/:pg_id`
 
 Protected.
 
 Updates group name/description.
 
-Middleware:
+Body:
 
-- `verifyAccessToken`
-- `validateID("pg_id")`
-
----
-
-## `DELETE /portfolio/:pg_id`
-
-Protected.
-
-Soft-deletes a group subtree by setting `isDeleted: true`.
-
-Middleware:
-
-- `verifyAccessToken`
-- `validateID("pg_id")`
-
-Important:
-
-- Root group cannot be deleted.
-- Frontend `DeleteGroupForm` is still placeholder.
-- Delete/archive behavior should be reviewed carefully because portfolio history, transactions, NAV, and analytics depend on historical state.
+```json
+{
+  "name": "Updated name",
+  "description": "Updated description"
+}
+```
 
 ---
 
-# Group Statement Transaction Route
-
-## `POST /portfolio/:pg_id/grouptransaction`
+## DELETE `/portfolio/:pg_id`
 
 Protected.
 
-Creates deposit, withdrawal, or tax group transaction.
+Soft-deletes a portfolio group and descendants.
 
-Middleware:
+Current caution:
 
-- `verifyAccessToken`
-- `validateID("pg_id")`
-- `validate_GroupStatementData`
+```txt
+Frontend DeleteGroupForm is still placeholder.
+Use carefully until archive/delete product rules are finalized.
+```
 
-Request body:
+---
+
+## POST `/portfolio/:pg_id/grouptransaction`
+
+Protected.
+
+Creates group-level cash transaction.
+
+Validation:
+
+```txt
+validate_GroupStatementData
+```
+
+Body:
 
 ```json
 {
   "type": "deposit",
-  "date": "2026-06-27T00:00:00.000Z",
+  "date": "2026-06-29T10:30:00.000Z",
   "amount": 10000
 }
 ```
 
-Allowed `type` values:
+Supported conceptual types include:
 
-- `deposit`
-- `withdrawal`
-- `tax`
+```txt
+deposit
+withdrawal
+tax
+```
 
-Backend behavior:
+Behavior:
 
-- Validates group.
-- Handles group cash movement.
-- Applies insufficient cash checks.
-- Fills NAV/future NAV.
-- Syncs portfolio state.
+- validates leaf group
+- checks funds for withdrawal/tax
+- rejects backdated/same timestamp transaction
+- fills missing NAVs
+- creates group statement
+- updates cash/current value
+- updates group NAV
+- syncs future NAVs
 
 ---
 
-# Trade Route
-
-## `POST /portfolio/:pg_id/trade/:a_id`
+## POST `/portfolio/:pg_id/trade/:a_id`
 
 Protected.
 
-Creates buy, sell, or dividend transaction for an asset/security.
+Executes trade for a portfolio group and asset/security.
 
-Middleware:
+Validation:
 
-- `verifyAccessToken`
-- `validateID("pg_id")`
-- `validateID("a_id")`
-- `validate_tradeData`
+```txt
+validate_tradeData
+```
 
-Buy/sell request:
+Params:
+
+| Param | Description |
+|---|---|
+| `pg_id` | Portfolio group id |
+| `a_id` | Asset/security metadata id |
+
+Behavior:
+
+- executes trade transaction
+- fills past NAV gaps
+- updates FIFO/asset/cash/ledger
+- syncs future NAVs
+- syncs portfolio snapshot
+
+Successful response:
 
 ```json
 {
-  "type": "buy",
-  "date": "2026-06-27T00:00:00.000Z",
-  "qty": 10,
-  "price": 100
+  "success": true,
+  "message": "Trade, Sync & NAV Update Completed Successfully"
 }
 ```
 
-Dividend request:
+---
 
-```json
-{
-  "type": "dividend",
-  "date": "2026-06-27T00:00:00.000Z",
-  "dividendAmount": 500
-}
-```
+# Admin Seeder Routes
 
-Allowed `type` values:
+Mounted at `/admin/dataseeders`.
 
-- `buy`
-- `sell`
-- `dividend`
+All protected.
 
-Backend behavior:
+## POST `/admin/dataseeders/seedclassification`
 
-- Handles buy/sell/dividend.
-- Maintains FIFO lots.
-- Validates sell quantity.
-- Updates realized/unrealized data.
-- Handles dividend.
-- Fills future NAV.
-- Syncs portfolio.
+Seeds/updates classification data.
+
+## POST `/admin/dataseeders/seedassetmetadata`
+
+Seeds/updates asset metadata.
+
+## POST `/admin/dataseeders/seedpricehistory`
+
+Seeds/inserts price history.
 
 ---
 
-# Frontend API Helper Mapping
+# Test Routes
 
-## Auth/public helpers
-
-Key frontend API helpers include:
-
-- `FETCH_USERDETAILS`
-- `FETCH_SECURITIESLIST`
-- public security overview APIs
-- auth mutation APIs
-
-## Holdings
+Mounted only when app is created with:
 
 ```js
-FETCH_USERSHOLDINGS({ accessToken, data })
+createApp({ enableTestRoutes: true })
 ```
 
-Calls:
+## GET `/test/cleardatabase`
 
-```txt
-POST /portfolio/holdings
-```
+Dangerous local-only test helper.
 
-## Rebalancer
+Do not expose in production.
 
-```js
-POST_NEWREBALANCER({ accessToken, data })
-```
+## GET `/test/:g_id`
 
-Calls:
-
-```txt
-POST /portfolio/rebalancer/new
-```
-
-```js
-FETCH_REBALANCERLIST(accessToken)
-```
-
-Calls:
-
-```txt
-GET /portfolio/rebalancer/list
-```
-
-```js
-FETCH_REBALANCER(accessToken, rebalancerId)
-```
-
-Calls:
-
-```txt
-GET /portfolio/rebalancer/:rebalancerId
-```
-
-## Portfolio Dashboard
-
-Includes API helpers for:
-
-- group metadata
-- group NAV chart
-- drawdown
-- XIRR
-- XIRR comparison
-- NAV comparison
-- add/update group
-- group transaction
-- trade transaction
+Test helper for group debug.
 
 ---
 
-# Current API Risks and Cleanup Notes
+# Current API Gaps / Cleanup
 
-1. `/analytic/comparision/...` route spelling is currently `comparision`; keep frontend/backend aligned or add corrected aliases later.
-2. `server/package.json` does not have a real `dev`, `start`, or `test` script yet.
-3. No automated API tests are present.
-4. Rebalancer persists configuration but does not yet calculate real allocation drift or suggestions.
-5. `portfolioRebalancer.js` references `this.portfolioGroups`, but the schema does not define `portfolioGroups`.
-6. `get_RebalancerListByUserId` filters by `isDeleted: false`, but the rebalancer schema currently defines `isActive`, not `isDeleted`.
-7. The test route file exists and can clear database data, but it is currently not mounted in `server.js`. Keep it disabled outside local controlled development.
-8. Some response shapes are inconsistent between controllers, for example `{ success: true, message, data }` vs `{ success: "Group updated" }` or `{ error }`.
+## Pending standardization
+
+- Some older controllers return `{ error: "..." }` instead of central `{ success:false, statusCode, message }`.
+- Some response messages use old spelling like `Comparision`.
+- Some routes use `comparision` spelling in URLs; keep for backward compatibility unless refactoring frontend too.
+- Custom benchmark selection is pending in Rebalancer and comparison flows.
+- Delete/archive frontend rules are pending.
+- Backup/export API is not implemented yet.
+- Rental Income API is planned separately in a future Next.js + TypeScript app.
 
 ---
 
-# Recommended API Priorities
+# Testing Status
 
-1. Add rebalancer calculation endpoint.
-2. Add rebalancer update/delete/archive endpoints.
-3. Add holdings table/sorting/filtering API support if needed.
-4. Add backup/export API.
-5. Add test setup and integration tests.
-6. Add route aliases for corrected spelling: `/comparison/...`.
-7. Standardize response shapes.
-8. Add safe deployment guard around test utilities.
+Latest backend test result:
+
+```txt
+Test Suites: 51 passed, 51 total
+Tests: 343 passed, 343 total
+```
+
+Recommended next API testing priorities:
+
+```txt
+1. Trade → NAV → Holdings integration
+2. Deposit/withdrawal NAV correctness
+3. Rebalancer real holdings cases
+4. Backup/export once implemented
+5. Auth full lifecycle
+6. Frontend E2E with Playwright later
+```
