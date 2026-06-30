@@ -28,7 +28,7 @@ const Content = ({ activeCategory = null }) => {
   const { goToSecurityDashboard } = useNavigationActions();
 
   const { category, subCategory, activeFilter } = activeContent ?? null;
-  const { data, isPending, isError, error } = useQuery({
+  const { data, isPending } = useQuery({
     queryKey: ["TodaysMarkets"],
     queryFn: FETCH_TODAYS_MARKETS,
     refetchInterval: 15000,

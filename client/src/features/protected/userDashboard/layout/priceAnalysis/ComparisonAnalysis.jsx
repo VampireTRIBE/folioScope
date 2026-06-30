@@ -171,9 +171,6 @@ const ComparisonAnalysis = () => {
 
   const {
     data: navComparisionData,
-    isPending: isPendingnavComparision,
-    isError: isErrornavComparision,
-    error: errornavComparision,
   } = useNavComparision(groupId, indexId, accessToken);
 
   const safeXirrComparisionData = useMemo(() => {

@@ -27,8 +27,9 @@ const CurrentStatus = ({ currentStatus = null }) => {
 
   useEffect(() => {
     currentGroupIdRef.current = groupId;
-    setXirr(null);
+    const timer = setTimeout(() => setXirr(null), 0);
     resetGroupXirrMutation();
+    return () => clearTimeout(timer);
   }, [groupId, resetGroupXirrMutation]);
 
   const errorMessage =

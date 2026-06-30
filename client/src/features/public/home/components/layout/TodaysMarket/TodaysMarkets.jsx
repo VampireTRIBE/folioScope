@@ -3,7 +3,6 @@ import { useSelector } from "react-redux";
 
 // ! components
 import Head from "../../UI/head/Head";
-import PriceBadge from "../../../../../../components/layout/public/priceBadge/PriceBadge";
 import Content from "../../UI/content/Content";
 import PortfolioSnapshot from "../../../../../protected/userDashboard/layout/portfolioSnapshot/PortfolioSnapshot";
 
@@ -17,11 +16,7 @@ import ImgSliderAds from "../../../../../../components/layout/public/adds/ImgSli
 import TodaysMarketStyle from "./TodaysMarkets.module.css";
 
 // ! Selectors
-import {
-  selectActiveFilterByGroup,
-  selectActiveSubFilterByGroup,
-} from "../../../redux/todaysMarketSelectors";
-import { todaysMarketToggleActions } from "../../../redux/todaysMarketsState";
+import { selectActiveFilterByGroup } from "../../../redux/todaysMarketSelectors";
 
 // ! Context
 import { AuthenticationContext } from "../../../../../../context/authenticationContext";

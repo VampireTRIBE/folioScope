@@ -6,23 +6,23 @@ import portfolioNavlinkStyle from "./portfolionavlink.module.css";
 // ! Components
 import Button from "../../../../../components/UI/buttons/Button";
 
+const SECTIONS = [
+  {
+    id: "overview",
+    text: "Overview",
+  },
+  {
+    id: "analysis",
+    text: "Analysis",
+  },
+  {
+    id: "comparison",
+    text: "Comparison",
+  },
+];
+
 const PortfolioNavlink = () => {
   const [activeSection, setActiveSection] = useState("overview");
-
-  const sections = [
-    {
-      id: "overview",
-      text: "Overview",
-    },
-    {
-      id: "analysis",
-      text: "Analysis",
-    },
-    {
-      id: "comparison",
-      text: "Comparison",
-    },
-  ];
 
   const handleScrollToSection = (id) => {
     const section = document.getElementById(id);
@@ -48,7 +48,7 @@ const PortfolioNavlink = () => {
       },
     );
 
-    sections.forEach((sectionData) => {
+    SECTIONS.forEach((sectionData) => {
       const section = document.getElementById(sectionData.id);
 
       if (section) {
@@ -63,7 +63,7 @@ const PortfolioNavlink = () => {
 
   return (
     <nav className={portfolioNavlinkStyle.navlinkContainer}>
-      {sections.map((section, indx) => (
+      {SECTIONS.map((section, indx) => (
         <Button
           key={section?.id ?? indx}
           text={section.text}

@@ -37,7 +37,7 @@ const SendOTPMailOutlet = () => {
     if (isSuccessOTPForm) {
       goToSubmitOtp(respOTPForm?.email);
     }
-  }, [isSuccessOTPForm, goToSubmitOtp]);
+  }, [isSuccessOTPForm, goToSubmitOtp, respOTPForm?.email]);
 
   return (
     <main className={sendOTPmailOutletStyle.container}>

@@ -1,4 +1,3 @@
-import { useParams } from "react-router-dom";
 import { useContext, useEffect } from "react";
 
 // ! Syles
@@ -15,8 +14,7 @@ import { useNavigationActions } from "../../../hooks/customHooks/useNavigationAc
 // ! Layout Components
 
 const UserProfileOutlet = () => {
-  const { gp_id, level } = useParams();
-  const { accessToken, userData } = useContext(AuthenticationContext);
+  const { accessToken } = useContext(AuthenticationContext);
   const { goToLogin } = useNavigationActions();
 
   useEffect(() => {

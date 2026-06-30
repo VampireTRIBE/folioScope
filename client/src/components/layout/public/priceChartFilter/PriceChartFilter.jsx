@@ -1,11 +1,7 @@
 import Button from "../../../UI/buttons/Button";
 import pricechartfilterStyle from "./pricechartfilter.module.css";
 
-const PriceChartFilter = ({
-  active = "W",
-  action = null,
-  buttonArray = [],
-}) => {
+const PriceChartFilter = ({ action = null, buttonArray = [] }) => {
   return (
     <div className={pricechartfilterStyle.container}>
       {buttonArray.map((button, indx) => (

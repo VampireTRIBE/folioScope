@@ -25,7 +25,7 @@ const MobileHeader = () => {
   const menuToggle = useSelector(selectToggleByKey("menuToggle"));
 
   // ! accessToken state
-  const { accessToken, setAccessToken } = useContext(AuthenticationContext);
+  const { accessToken } = useContext(AuthenticationContext);
 
   // ! header Actions based on roles and User Type
   const { profileBtn, profileSidebarItems } = useHeaderActions();

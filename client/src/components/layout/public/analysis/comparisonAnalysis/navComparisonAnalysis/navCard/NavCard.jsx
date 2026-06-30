@@ -1,7 +1,7 @@
 import PriceBadge from "../../../../priceBadge/PriceBadge";
 import navCardStyles from "./navcard.module.css";
 
-const NavCard = ({ meta, drawdown, peak, isDummy }) => {
+const NavCard = ({ meta, drawdown, isDummy }) => {
   return (
     <div
       className={`${navCardStyles.analysisContainer} ${

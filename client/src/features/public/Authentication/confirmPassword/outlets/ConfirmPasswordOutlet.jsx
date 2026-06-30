@@ -15,8 +15,7 @@ import { useFormDataActions } from "../hooks/customHooks/useSubmitForm";
 import { useChangePasswordMutation } from "../hooks/RTK Query/useFormMutation";
 
 const ConfirmPasswordOutlet = () => {
-  const { goToLogin, goToSendVerificationMail, goToConfirmPassword } =
-    useNavigationActions();
+  const { goToLogin, goToSendVerificationMail } = useNavigationActions();
   const { intialRender, submitChangePassword } = useFormDataActions();
   const { state } = useLocation();
 
@@ -43,7 +42,7 @@ const ConfirmPasswordOutlet = () => {
 
       return () => clearTimeout(timer);
     }
-  }, [isSuccessChangePassword, goToConfirmPassword]);
+  }, [isSuccessChangePassword, goToLogin]);
 
   return (
     <main className={confirmPasswordOutletStyle.container}>

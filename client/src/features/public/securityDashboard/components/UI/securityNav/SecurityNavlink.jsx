@@ -4,23 +4,23 @@ import Button from "../../../../../../components/UI/buttons/Button";
 
 import securityNavlinkStyle from "./securitynavlink.module.css";
 
+const SECTIONS = [
+  {
+    id: "overview",
+    text: "Overview",
+  },
+  {
+    id: "analysis",
+    text: "Analysis",
+  },
+  {
+    id: "comparison",
+    text: "Comparison",
+  },
+];
+
 const SecurityNavlink = () => {
   const [activeSection, setActiveSection] = useState("overview");
-
-  const sections = [
-    {
-      id: "overview",
-      text: "Overview",
-    },
-    {
-      id: "analysis",
-      text: "Analysis",
-    },
-    {
-      id: "comparison",
-      text: "Comparison",
-    },
-  ];
 
   const handleScrollToSection = (id) => {
     const section = document.getElementById(id);
@@ -46,7 +46,7 @@ const SecurityNavlink = () => {
       },
     );
 
-    sections.forEach((sectionData) => {
+    SECTIONS.forEach((sectionData) => {
       const section = document.getElementById(sectionData.id);
 
       if (section) {
@@ -61,7 +61,7 @@ const SecurityNavlink = () => {
 
   return (
     <nav className={securityNavlinkStyle.navlinkContainer}>
-      {sections.map((section, indx) => (
+      {SECTIONS.map((section, indx) => (
         <Button
           key={section?.id ?? indx}
           text={section.text}

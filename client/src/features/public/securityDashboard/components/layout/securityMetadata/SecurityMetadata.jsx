@@ -13,19 +13,9 @@ import { use1DPriceRange } from "../../../../../hooks/RKT Query/usePricesQuery";
 const SecurityMetadata = () => {
   const { securityID } = useParams();
 
-  const {
-    data: overviewData,
-    isPending: overviewPending,
-    isError: overviewisError,
-    error: overviewError,
-  } = useSecurityOverview(securityID);
+  const { data: overviewData } = useSecurityOverview(securityID);
 
-  const {
-    data: price1DData,
-    isPending: price1DPending,
-    isError: price1DisError,
-    error: price1DError,
-  } = use1DPriceRange(securityID);
+  const { data: price1DData } = use1DPriceRange(securityID);
 
   const content = {
     name: overviewData ? overviewData?.name : "",

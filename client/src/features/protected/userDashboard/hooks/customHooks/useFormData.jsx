@@ -13,7 +13,9 @@ export const useFormDataActions = () => {
           groupId,
           data: values,
         });
-      } catch {}
+      } catch {
+        return;
+      }
     },
     [],
   );
@@ -30,7 +32,9 @@ export const useFormDataActions = () => {
           groupId,
           data: values,
         });
-      } catch {}
+      } catch {
+        return;
+      }
     },
     [],
   );
@@ -67,7 +71,9 @@ export const useFormDataActions = () => {
           groupId,
           data: payload,
         });
-      } catch (error) {}
+      } catch {
+        return;
+      }
     },
     [],
   );
@@ -107,7 +113,9 @@ export const useFormDataActions = () => {
           a_id,
           data: payload,
         });
-      } catch (error) {}
+      } catch {
+        return;
+      }
     },
     [],
   );

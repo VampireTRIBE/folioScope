@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 // ! components
 import TextButton from "../../../../../components/UI/buttons/TextButton";
@@ -8,15 +8,12 @@ import RequestStatus from "../../../../../components/layout/public/requestStatus
 // ! Styles
 import sendverificationmailStyle from "./sendverificationmail.module.css";
 
-// ! custom hooks
-import { useNavigationActions } from "../../../../hooks/customHooks/useNavigationActions";
 import { useFormDataActions } from "../hooks/customHooks/useSubmitForm";
 
 // ! tanStack Query hook
 import { useEmailSendVerificationMutation } from "../hooks/RTK Query/useEmailVerificationMutation";
 
 const SendVerificationMailOutlet = () => {
-  const { goToLogin } = useNavigationActions();
   const { state } = useLocation();
   const { submitFormEmailVerificationRetryData } = useFormDataActions();
 

@@ -30,17 +30,9 @@ const UserDashboardOutlet = () => {
 
   const {
     data: GroupMeatadataData,
-    isPending: GroupMeatadataPending,
-    isError: GroupMeatadataisError,
-    error: GroupMeatadataError,
   } = useGROUPMETADATA(accessToken, groupId);
 
-  const {
-    data: nav1DData,
-    isPending: nav1DPending,
-    isError: nav1DisError,
-    error: nav1DError,
-  } = use1DNavRangeGroup(groupId, accessToken);
+  const { data: nav1DData } = use1DNavRangeGroup(groupId, accessToken);
 
   const content = {
     name: GroupMeatadataData?.data?.groupName || "Name",

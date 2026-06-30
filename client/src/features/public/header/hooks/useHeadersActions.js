@@ -1,12 +1,10 @@
 import { useCallback, useMemo } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import { publicheaderToggleActions } from "../redux/headerToggleState";
 import { useNavigationActions } from "../../../hooks/customHooks/useNavigationActions";
 
 export const useHeaderActions = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
 
   const { goToLogin, goToSignup } = useNavigationActions();
 
@@ -38,26 +36,6 @@ export const useHeaderActions = () => {
         id: "auth-option-signup",
         onClick: goToSignup,
         children: "Sign Up",
-        variant: "sideBarbtn",
-        order: 2,
-      },
-    ],
-    [goToLogin, goToSignup],
-  );
-
-  const menuOptions = useMemo(
-    () => [
-      {
-        id: "menu-option-1",
-        onClick: goToLogin,
-        children: "Option-1",
-        variant: "sideBarbtn",
-        order: 1,
-      },
-      {
-        id: "auth-option-signup",
-        onClick: goToSignup,
-        children: "Option-2",
         variant: "sideBarbtn",
         order: 2,
       },

@@ -43,7 +43,7 @@ const LoginForm = () => {
 
       return () => clearTimeout(timer);
     }
-  }, [errorLoginForm, goToSendVerificationMail]);
+  }, [errorLoginForm, goToSendVerificationMail, submittedData]);
 
   useEffect(() => {
     if (isSuccessLoginForm) {
@@ -58,7 +58,14 @@ const LoginForm = () => {
 
       return () => clearTimeout(timer);
     }
-  }, [isSuccessLoginForm, goToUserDashboard]);
+  }, [
+    isSuccessLoginForm,
+    goToUserDashboard,
+    respLoginForm?.accessToken,
+    respLoginForm?.user,
+    setAccessToken,
+    setUserData,
+  ]);
 
   return (
     <form

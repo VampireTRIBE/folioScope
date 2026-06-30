@@ -1,4 +1,5 @@
-import { createContext, useEffect, useRef, useState } from "react";
+/* eslint-disable react-refresh/only-export-components */
+import { createContext, useCallback, useEffect, useRef, useState } from "react";
 
 // ! Tanstack Query
 import { useRotateTokenMutation } from "../hooks/RTK Query Hooks/useRotateToken";
@@ -19,6 +20,7 @@ export const AuthenticationProvider = ({ children }) => {
 
   const timeoutRef = useRef(null);
   const isRunning = useRef(false);
+  const refreshRef = useRef(null);
 
   const clearTimer = () => {
     if (timeoutRef.current) {
@@ -27,14 +29,14 @@ export const AuthenticationProvider = ({ children }) => {
     }
   };
 
-  const schedule = () => {
+  const schedule = useCallback(() => {
     clearTimer();
     timeoutRef.current = setTimeout(() => {
-      refresh();
+      refreshRef.current?.();
     }, ROTATE_TIME);
-  };
+  }, []);
 
-  const refresh = async () => {
+  const refresh = useCallback(async () => {
     if (isRunning.current) return;
     isRunning.current = true;
     try {
@@ -48,14 +50,16 @@ export const AuthenticationProvider = ({ children }) => {
       }
 
       schedule();
-    } catch (err) {
+    } catch {
       setAccessToken(null);
       setUserData(null);
       clearTimer();
     } finally {
       isRunning.current = false;
     }
-  };
+  }, [rotateToken, schedule]);
+
+  refreshRef.current = refresh;
 
   useEffect(() => {
     const bootstrap = async () => {
@@ -71,7 +75,7 @@ export const AuthenticationProvider = ({ children }) => {
         const userDetails = await FETCH_USERDETAILS(accessToken);
         setUserData(userDetails?.user || null);
         schedule();
-      } catch (err) {
+      } catch {
         setAccessToken(null);
         setUserData(null);
         clearTimer();
@@ -85,7 +89,7 @@ export const AuthenticationProvider = ({ children }) => {
     return () => {
       clearTimer();
     };
-  }, []);
+  }, [rotateToken, schedule]);
 
   if (loading) return <h1>loading</h1>;
 

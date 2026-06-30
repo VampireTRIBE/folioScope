@@ -1,7 +1,6 @@
 import { useSelector } from "react-redux";
 import { useContext, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { useQueryClient } from "@tanstack/react-query";
 
 // ! Styles
 import groupTransactionStyles from "./groupTransaction.module.css";
@@ -29,10 +28,7 @@ import { useNavigationActions } from "../../../../../hooks/customHooks/useNaviga
 
 const GroupTransactionForm = () => {
   const { gp_id, level } = useParams();
-  const queryClient = useQueryClient();
-  const { accessToken, userData, setUserData } = useContext(
-    AuthenticationContext,
-  );
+  const { accessToken, userData } = useContext(AuthenticationContext);
   const { goToUserDashboard } = useNavigationActions();
   const {
     FILTER_ACTIVE_GROUPTRANSACTION_TYPE,
@@ -97,7 +93,14 @@ const GroupTransactionForm = () => {
     };
 
     syncAfterSuccess();
-  }, [ACTIVE_GROUP_FORM_RESET, isSuccessgroupTransactionForm, gp_id, level]);
+  }, [
+    ACTIVE_GROUP_FORM_RESET,
+    FILTER_ACTIVE_GROUPTRANSACTION_TYPE_RESET,
+    goToUserDashboard,
+    isSuccessgroupTransactionForm,
+    gp_id,
+    level,
+  ]);
 
   return (
     <form

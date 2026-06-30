@@ -7,11 +7,7 @@ import { POST_SIGNUPFORM } from "../../api/POST_apis";
 // ! Disptch Actions
 import { signupErrorStateActions } from "../../redux/signupFormState";
 
-// ! Custom Hooks
-import { useNavigationActions } from "../../../../hooks/customHooks/useNavigationActions";
-
 export const useFormDataActions = () => {
-  const { goToEmailVerification } = useNavigationActions();
   const dispatch = useDispatch();
 
   const submitFormSignupData = useCallback(
