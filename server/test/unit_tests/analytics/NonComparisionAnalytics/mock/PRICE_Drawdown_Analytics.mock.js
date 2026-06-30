@@ -1,7 +1,6 @@
 const mockIds = {
   userId: "64f000000000000000000001",
   assetName: "NIFTY 50",
-  assetMetadataId: "64f000000000000000000002",
   navGroupId: "64f000000000000000000003",
 };
 
@@ -74,16 +73,10 @@ const navPriceSeries = createNavSeries({
   },
 });
 
-const mockSecurityDetail = {
-  _id: mockIds.assetMetadataId,
-  name: mockIds.assetName,
-};
-
 module.exports = {
   mockIds,
   mockSession,
   mockStartDate,
-  mockSecurityDetail,
   fullPriceSeries,
   partialPriceSeries,
   singlePointPriceSeries,

@@ -1,12 +1,5 @@
 // test/unit_tests/analytics/NonComparisionAnalytics/PRICE_Drawdown_Analytics.test.js
 
-jest.mock(
-  "../../../../init_Scripts/init_Cache/AssetsData_Models_Cache/init_cacheFiles/assetMetaDataCache",
-  () => ({
-    get_SingleAssetMetaDataName: jest.fn(),
-  }),
-);
-
 jest.mock("../../../../utils/mongodb/aggregations/get_AssetsPrice", () => ({
   get_DailyClosePricesByAsset: jest.fn(),
 }));
@@ -20,10 +13,6 @@ const {
 } = require("../../../../utils/analytics/NonComparisonAnalytics/PRICE_Drawdown_Analytics");
 
 const {
-  get_SingleAssetMetaDataName,
-} = require("../../../../init_Scripts/init_Cache/AssetsData_Models_Cache/init_cacheFiles/assetMetaDataCache");
-
-const {
   get_DailyClosePricesByAsset,
 } = require("../../../../utils/mongodb/aggregations/get_AssetsPrice");
 
@@ -35,7 +24,6 @@ const {
   mockIds,
   mockSession,
   mockStartDate,
-  mockSecurityDetail,
   fullPriceSeries,
   partialPriceSeries,
   singlePointPriceSeries,
@@ -82,25 +70,7 @@ describe("priceDrawdownAnalysis", () => {
     });
   });
 
-  test("throws a custom error when asset metadata is not available", async () => {
-    get_SingleAssetMetaDataName.mockReturnValue(null);
-
-    await expect(
-      priceDrawdownAnalysis({
-        assetId: mockIds.assetName,
-        startDate: mockStartDate,
-        session: mockSession,
-      }),
-    ).rejects.toMatchObject({
-      message: "Data Not Available",
-      statusCode: 404,
-    });
-
-    expect(get_DailyClosePricesByAsset).not.toHaveBeenCalled();
-  });
-
   test("builds 3 month, 1 year, and 3 year price drawdown analytics", async () => {
-    get_SingleAssetMetaDataName.mockReturnValue(mockSecurityDetail);
     get_DailyClosePricesByAsset.mockResolvedValue(fullPriceSeries);
 
     const result = await priceDrawdownAnalysis({
@@ -109,12 +79,8 @@ describe("priceDrawdownAnalysis", () => {
       session: mockSession,
     });
 
-    expect(get_SingleAssetMetaDataName).toHaveBeenCalledWith(
-      mockIds.assetName,
-    );
-
     expect(get_DailyClosePricesByAsset).toHaveBeenCalledWith(
-      mockIds.assetMetadataId,
+      mockIds.assetName,
       new Date(mockStartDate),
       false,
       mockSession,
@@ -159,7 +125,6 @@ describe("priceDrawdownAnalysis", () => {
   });
 
   test("returns a 3 month partial result when fewer than 90 price points exist", async () => {
-    get_SingleAssetMetaDataName.mockReturnValue(mockSecurityDetail);
     get_DailyClosePricesByAsset.mockResolvedValue(partialPriceSeries);
 
     const result = await priceDrawdownAnalysis({
@@ -185,7 +150,6 @@ describe("priceDrawdownAnalysis", () => {
   });
 
   test("returns an empty result when price history has fewer than two points", async () => {
-    get_SingleAssetMetaDataName.mockReturnValue(mockSecurityDetail);
     get_DailyClosePricesByAsset.mockResolvedValue(singlePointPriceSeries);
 
     const result = await priceDrawdownAnalysis({
@@ -208,8 +172,6 @@ describe("priceDrawdownAnalysis", () => {
       userID: mockIds.userId,
       session: mockSession,
     });
-
-    expect(get_SingleAssetMetaDataName).not.toHaveBeenCalled();
 
     expect(get_DailyClosePricesByAsset).toHaveBeenCalledWith(
       mockIds.navGroupId,
