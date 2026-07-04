@@ -167,7 +167,8 @@ const GroupTransactionForm = () => {
           <input
             className={groupTransactionStyles.input}
             placeholder="Amount"
-            type="Number"
+            type="number"
+            step="any"
             id="groupAmount"
             name="amount"
             rows="4"

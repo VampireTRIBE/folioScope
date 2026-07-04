@@ -13,7 +13,6 @@ module.exports.validate_AssetMetadata = async (
   validateOnly = false,
 ) => {
   const isId = dataType === "id";
-  console.log(data)
 
   const baseFields = [
     "name",
@@ -180,7 +179,6 @@ module.exports.validate_AssetMetadata = async (
       };
     }
     expenseRatio = data.expenseRatio;
-    console.log(data.expenseRatio);
   }
 
   // -------------------- FORBIDDEN FIELDS --------------------
@@ -229,10 +227,6 @@ module.exports.validate_AssetMetadata = async (
     doc.assetAMC = isId ? data.assetAMC : amcObj._id;
     doc.expenseRatio = expenseRatio;
   }
-
-  console.log();
-  console.log(doc);
-  console.log();
 
   return validateOnly === false
     ? {

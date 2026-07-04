@@ -247,7 +247,8 @@ const TradeForm = () => {
 
               <input
                 className={tradeStyles.input}
-                type="Number"
+                type="number"
+                step="any"
                 placeholder="Qty"
                 id="tradeQty"
                 name="qty"
@@ -261,7 +262,8 @@ const TradeForm = () => {
 
               <input
                 className={tradeStyles.input}
-                type="Number"
+                type="number"
+                step="any"
                 placeholder="Price"
                 id="tradePrice"
                 name="price"
@@ -294,7 +296,8 @@ const TradeForm = () => {
             <input
               className={tradeStyles.input}
               placeholder="Dividend Amount"
-              type="Number"
+              type="number"
+              step="any"
               id="tradeDividendAmount"
               name="dividendAmount"
               rows="4"

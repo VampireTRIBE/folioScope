@@ -5,6 +5,19 @@ const Schema = mongoose.Schema;
 // 1. PriceHistory Model (Daily Prices)
 // 2. Automatic Update
 // ==========================================
+
+
+const numberOrStringField = {
+  type: Schema.Types.Mixed,
+  validate: {
+    validator: (value) =>
+      value == null ||
+      typeof value === "number" ||
+      typeof value === "string",
+    message: "Value must be a number or string",
+  },
+};
+
 const AssetPriceHistorySchema = new Schema(
   {
     assetId: {
@@ -18,9 +31,9 @@ const AssetPriceHistorySchema = new Schema(
       required: true,
       index: true,
     },
-    open: { type: Number, min: 0, required: true },
-    high: { type: Number, min: 0, required: true },
-    low: { type: Number, min: 0, required: true },
+    open: numberOrStringField,
+    high: numberOrStringField,
+    low: numberOrStringField,
     close: { type: Number, min: 0, required: true },
   },
   { timestamps: true },

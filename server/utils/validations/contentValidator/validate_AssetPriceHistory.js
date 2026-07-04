@@ -15,7 +15,7 @@ module.exports.validate_AssetPriceHistory = async (
   if (!data?.assetId) {
     return { result: false, message: "AssetName is Empty", statusCode: 422 };
   }
-  if (!data?.open || !data?.high || !data?.low || !data?.close) {
+  if (!data?.close) {
     return { result: false, message: "Missing Field value", statusCode: 422 };
   }
   const date = await parseISODate(data?.date);
