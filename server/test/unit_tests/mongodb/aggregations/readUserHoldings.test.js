@@ -85,6 +85,17 @@ describe("read_User_Holdings read model", () => {
             investmentValue: 900,
           },
         },
+        {
+          _id: "zero-qty-financial-asset-id",
+          name: "CLOSED",
+          assetMetadataId: {
+            toString: () => "zero-qty-asset-id",
+          },
+          snapshot: {
+            totalQty: 0,
+            investmentValue: 0,
+          },
+        },
       ]),
     );
     priceHistoryModel.aggregate.mockReturnValue(
@@ -118,6 +129,7 @@ describe("read_User_Holdings read model", () => {
       portfolioGroupId: { $in: [expect.any(MockObjectId)] },
       status: true,
     });
+    expect(result).toHaveLength(1);
     expect(result).toEqual([
       {
         _id: "financial-asset-id",
@@ -165,6 +177,17 @@ describe("read_User_Holdings read model", () => {
           snapshot: {
             totalQty: 10,
             investmentValue: 900,
+          },
+        },
+        {
+          _id: "zero-qty-financial-asset-id",
+          name: "CLOSED",
+          assetMetadataId: {
+            toString: () => "zero-qty-asset-id",
+          },
+          snapshot: {
+            totalQty: 0,
+            investmentValue: 0,
           },
         },
       ]),
@@ -215,6 +238,7 @@ describe("read_User_Holdings read model", () => {
       anualCost: 6,
     });
     expect(result.userHoldings).toHaveLength(1);
+    expect(result.userHoldings[0]._id).toBe("financial-asset-id");
   });
 
   test("throws when group does not belong to user", async () => {

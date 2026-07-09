@@ -136,6 +136,6 @@ describe("sync system jobs", () => {
     await sync_CurrentPrices();
 
     expect(fetch_CurrentPrice).toHaveBeenCalledTimes(1);
-    expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), 10 * 60 * 1000);
+    expect(setTimeout).toHaveBeenCalledWith(expect.any(Function), 60 * 60 * 1000);
   });
 });

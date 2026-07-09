@@ -89,69 +89,150 @@ module.exports.get_PeriodCloses = async (
   startDate = normalizeToIST330PM(startDate);
   endDate = normalizeToIST330PM(endDate);
 
-  //!  Needed to seed previous prices before start date
-  const seedData = await AssetPriceHistory.aggregate([
-    {
-      $match: {
-        date: { $lt: startDate },
+  const [seedData, rangeData, firstFuturePriceData] = await Promise.all([
+    // Latest available price before startDate
+    AssetPriceHistory.aggregate([
+      {
+        $match: {
+          date: { $lt: startDate },
+        },
       },
-    },
-    {
-      $sort: { date: -1 },
-    },
-    {
-      $group: {
-        _id: "$assetId",
-        close: { $first: "$close" },
+      {
+        $sort: {
+          assetId: 1,
+          date: -1,
+        },
       },
-    },
-  ]).session(session);
+      {
+        $group: {
+          _id: "$assetId",
+          close: { $first: "$close" },
+          date: { $first: "$date" },
+        },
+      },
+    ]).session(session),
 
-  const rangeData = await AssetPriceHistory.find({
-    date: { $gte: startDate, $lte: endDate },
-  })
-    .sort({ date: 1, assetId: 1 })
-    .session(session)
-    .lean();
+    // Actual prices inside requested period
+    AssetPriceHistory.find({
+      date: {
+        $gte: startDate,
+        $lte: endDate,
+      },
+    })
+      .sort({
+        date: 1,
+        assetId: 1,
+      })
+      .session(session)
+      .lean(),
 
-  // ! latest known prices
+    // First available price on or after startDate.
+    // This is used only when no previous price exists.
+    AssetPriceHistory.aggregate([
+      {
+        $match: {
+          date: { $gte: startDate },
+        },
+      },
+      {
+        $sort: {
+          assetId: 1,
+          date: 1,
+        },
+      },
+      {
+        $group: {
+          _id: "$assetId",
+          close: { $first: "$close" },
+          date: { $first: "$date" },
+        },
+      },
+    ]).session(session),
+  ]);
+
+  // Latest known historical price
   const latestPrice = {};
 
   for (const row of seedData) {
-    latestPrice[row._id.toString()] = row.close;
+    const assetId = row._id.toString();
+    const close = Number(row.close);
+
+    if (!Number.isFinite(close)) {
+      throw new Error(
+        `Invalid seed price: assetId=${assetId}, close=${row.close}`,
+      );
+    }
+
+    latestPrice[assetId] = close;
   }
 
-  // ! group actual rows by date
+  // Future fallback price for assets having no previous price
+  const firstFuturePrice = {};
+
+  for (const row of firstFuturePriceData) {
+    const assetId = row._id.toString();
+    const close = Number(row.close);
+
+    if (!Number.isFinite(close)) {
+      throw new Error(
+        `Invalid future fallback price: assetId=${assetId}, close=${row.close}`,
+      );
+    }
+
+    firstFuturePrice[assetId] = close;
+  }
+
+  // Group actual price records by date
   const byDate = {};
 
   for (const row of rangeData) {
-    const dateKey = row.date.toISOString();
+    const dateKey = normalizeToIST330PM(row.date).toISOString();
     const assetId = row.assetId.toString();
+    const close = Number(row.close);
 
-    if (!byDate[dateKey]) byDate[dateKey] = [];
-    byDate[dateKey].push(row);
+    if (!Number.isFinite(close)) {
+      throw new Error(
+        `Invalid price: assetId=${assetId}, date=${dateKey}, close=${row.close}`,
+      );
+    }
+
+    if (!byDate[dateKey]) {
+      byDate[dateKey] = [];
+    }
+
+    byDate[dateKey].push({
+      assetId,
+      close,
+    });
   }
 
   const result = {};
-
   let current = new Date(startDate);
 
   while (current <= endDate) {
-    const dateKey = current.toISOString();
+    const normalizedCurrent = normalizeToIST330PM(current);
+    const dateKey = normalizedCurrent.toISOString();
 
-    // ! update latest known prices if rows exist today
+    // Update prices when actual records exist for this date
     if (byDate[dateKey]) {
       for (const row of byDate[dateKey]) {
-        latestPrice[row.assetId.toString()] = row.close;
+        latestPrice[row.assetId] = row.close;
       }
     }
 
-    // ! snapshot today's prices
-    result[dateKey] = { ...latestPrice };
+    /*
+     * firstFuturePrice provides the fallback.
+     * latestPrice overrides it whenever a previous or current price exists.
+     */
+    result[dateKey] = {
+      ...firstFuturePrice,
+      ...latestPrice,
+    };
 
-    current.setDate(current.getDate() + 1);
+    current.setUTCDate(current.getUTCDate() + 1);
     current = normalizeToIST330PM(current);
   }
+
   return result;
 };
 
@@ -394,3 +475,5 @@ module.exports.getAssetPriceStatsByIds = async (assetIds = []) => {
   }
   return result;
 };
+
+

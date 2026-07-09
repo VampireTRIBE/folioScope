@@ -189,7 +189,7 @@ describe("mongodb aggregation read helpers", () => {
     expect(result).toEqual(["leaf-1"]);
   });
 
-  test("get_AllUserIDs returns client user ids and applies optional session", async () => {
+  test("get_AllUserIDs returns user ids and applies optional session", async () => {
     const query = createThenableFindChain([
       {
         _id: {
@@ -204,7 +204,7 @@ describe("mongodb aggregation read helpers", () => {
 
     const result = await get_AllUserIDs("session");
 
-    expect(User.find).toHaveBeenCalledWith({ role: "client" }, { _id: 1 });
+    expect(User.find).toHaveBeenCalledWith({});
     expect(query.lean).toHaveBeenCalledTimes(1);
     expect(query.session).toHaveBeenCalledWith("session");
     expect(result).toEqual(["user-1"]);

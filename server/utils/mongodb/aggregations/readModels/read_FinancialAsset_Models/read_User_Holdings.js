@@ -26,6 +26,7 @@ const formatDate = (value) => {
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? null : date.toISOString();
 };
+const hasPositiveQty = (asset) => Number(asset?.snapshot?.totalQty || 0) > 0;
 
 const read_LtpByAssetMetadataIds = async ({
   assetMetadataIds = [],
@@ -281,7 +282,7 @@ const read_User_Holdings_ByGroupIds = async ({
       query.session(session);
     }
 
-    const financialAssets = await query;
+    const financialAssets = (await query).filter(hasPositiveQty);
 
     return await addLtpToFinancialAssets({ financialAssets, session });
   } catch (error) {
