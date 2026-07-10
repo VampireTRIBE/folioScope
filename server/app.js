@@ -12,7 +12,7 @@ const adminRoute = require("./routes/adminRoutes/adminRoutes");
 const portfolioRoute = require("./routes/portfolioRoutes/portfolioRoutes");
 const testRoutes = require("./routes/testRoutes/testRoutes");
 
-const createApp = ({ enableTestRoutes = false } = {}) => {
+const createApp = ({ enableTestRoutes = true } = {}) => {
   const app = express();
 
   corAuth(app);
