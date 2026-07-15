@@ -142,6 +142,72 @@
   border-color: var(--color-info);
 }
 
+.headerNavButton {
+  width: fit-content;
+  max-width: 10rem;
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width-sm) solid transparent;
+  border-radius: var(--radius-sm);
+  background-color: transparent;
+  color: var(--text-inverse);
+  font-size: var(--text-sm);
+  font-weight: var(--fw-medium);
+  line-height: var(--lh-tight);
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  gap: var(--space-1);
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.headerNavButton:hover {
+  border-color: var(--border-accent);
+  background-color: var(--color-primary-light);
+}
+
+.headerDropdownWrapper {
+  width: fit-content;
+  flex: 0 0 auto;
+  position: relative;
+}
+
+.headerDropdownMenu {
+  min-width: 12rem;
+  max-height: calc(var(--header-height) * 8);
+  padding: var(--space-2);
+  background-color: var(--color-primary-light);
+  border: var(--border-width-sm) solid var(--border-default);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  position: absolute;
+  top: calc(100% + var(--space-2));
+  right: 0;
+  z-index: var(--z-dropdown);
+  overflow-y: auto;
+}
+
+.headerDropdownItem {
+  width: 100%;
+  padding: var(--space-1) var(--space-2);
+  border: var(--border-width-sm) solid transparent;
+  border-radius: var(--radius-sm);
+  background-color: transparent;
+  color: var(--text-inverse);
+  font-size: var(--text-sm);
+  font-weight: var(--fw-medium);
+  text-align: left;
+  cursor: pointer;
+}
+
+.headerDropdownItem:hover {
+  border-color: var(--border-accent);
+  background-color: var(--color-primary);
+}
+
 .chartFilter {
   padding: var(--space-2);
   flex: 1;

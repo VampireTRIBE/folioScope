@@ -1,0 +1,12 @@
+.portfoliodetailContainer {
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 992px) {
+  .portfoliodetailContainer {
+    flex: 1;
+  }
+}

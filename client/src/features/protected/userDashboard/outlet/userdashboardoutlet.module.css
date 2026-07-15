@@ -9,6 +9,7 @@
 @media (min-width: 992px) {
   .outlet {
     display: flex;
+    align-items: flex-start;
     gap: var(--space-3);
     position: relative;
   }

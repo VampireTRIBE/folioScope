@@ -5,8 +5,10 @@ const DropdownButton = ({
   variant,
   children,
   items = [],
+  wrapperVariant = "sideDropdownWrapper",
   menuVariant = "sideDropdownMenu",
   itemVariant = "sideDropdownItem",
+  emptyLabel = "No items",
   ...rest
 }) => {
   const [open, setOpen] = useState(false);
@@ -31,30 +33,34 @@ const DropdownButton = ({
   }, []);
 
   return (
-    <div className={buttonStyle.sideDropdownWrapper} ref={dropdownRef}>
+    <div className={buttonStyle[wrapperVariant]} ref={dropdownRef}>
       <button
         type="button"
         className={buttonStyle[variant]}
         onClick={toggleDropdown}
         {...rest}>
         <span>{children}</span>
-        <span className={buttonStyle.dropdownArrow}>{open ? "▲" : "▼"}</span>
+        <span className={buttonStyle.dropdownArrow}>{open ? "^" : "v"}</span>
       </button>
 
       {open && (
         <div className={buttonStyle[menuVariant]}>
-          {items.map((item, index) => (
-            <button
-              key={item.id || index}
-              type="button"
-              className={buttonStyle[item.variant || itemVariant]}
-              onClick={() => {
-                item.onClick?.();
-                setOpen(false);
-              }}>
-              {item.children || item.label || item.name}
-            </button>
-          ))}
+          {items.length > 0 ? (
+            items.map((item, index) => (
+              <button
+                key={item.id || index}
+                type="button"
+                className={buttonStyle[item.variant || itemVariant]}
+                onClick={() => {
+                  item.onClick?.();
+                  setOpen(false);
+                }}>
+                {item.children || item.label || item.name}
+              </button>
+            ))
+          ) : (
+            <span className={buttonStyle[itemVariant]}>{emptyLabel}</span>
+          )}
         </div>
       )}
     </div>
