@@ -18,7 +18,7 @@ import Input from "../../../../../components/UI/inputs/Input";
 import mobileviewsearchbarStyle from "./mobileviewsearchbar.module.css";
 import buttonStyle from "../../../../../components/UI/buttons/button.module.css";
 
-const MobileViewSearchBar = () => {
+const MobileViewSearchBar = ({ desktop = false }) => {
   const navigate = useNavigate();
   const inputRef = useRef(null);
 
@@ -51,7 +51,7 @@ const MobileViewSearchBar = () => {
     resetSearch();
   };
 
-  const handleEnter = (e) => {
+  const handleEnter = (e) => { 
     if (e.key === "Enter") {
       const exactMatch = safeData.find(
         (item) => getSecurityLabel(item).toLowerCase() === query.toLowerCase(),
@@ -65,11 +65,19 @@ const MobileViewSearchBar = () => {
     return <div>Error: {error.message}</div>;
   }
 
+  const navOptionClass = desktop
+    ? mobileviewsearchbarStyle.desktopViewNavOption
+    : mobileviewsearchbarStyle.mobileViewNavOption;
+
+  const previewClass = `${mobileviewsearchbarStyle.suggestionPreview} ${
+    desktop
+      ? mobileviewsearchbarStyle.desktopSuggestionPreview
+      : mobileviewsearchbarStyle.mobileSuggestionPreview
+  }`;
+
   return (
-    <div className={mobileviewsearchbarStyle.mobileViewNavOption}>
-      <div
-        className={mobileviewsearchbarStyle.searchInput}
-        style={{ position: "relative" }}>
+    <div className={navOptionClass}>
+      <div className={mobileviewsearchbarStyle.searchInput}>
         <Input
           ref={inputRef}
           varient="searchBar"
@@ -92,7 +100,7 @@ const MobileViewSearchBar = () => {
         />
 
         {showPreview && filteredList.length > 0 && (
-          <div className={mobileviewsearchbarStyle.suggestionPreview}>
+          <div className={previewClass}>
             {filteredList.map((item, index) => {
               const value = getSecurityLabel(item);
               const securityId = getSecurityId(item);
@@ -101,13 +109,7 @@ const MobileViewSearchBar = () => {
                 <div
                   key={`${securityId || value}-${index}`}
                   onMouseDown={() => navigateToSecurity(item)}
-                  style={{
-                    padding: "var(--space-3)",
-                    cursor: "pointer",
-                    borderBottom: "1px solid var(--border-light)",
-                    backgroundColor: "var(--bg-card)",
-                    color: "var(--text-primary)",
-                  }}>
+                  className={mobileviewsearchbarStyle.suggestionItem}>
                   {value}
                 </div>
               );

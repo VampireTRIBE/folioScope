@@ -1,6 +1,7 @@
 @media (min-width: 992px) {
   .metadataContainer {
     min-width: 250px;
+    max-width: 350px;
     max-height: fit-content;
     position: sticky;
     top: var(--header-height);

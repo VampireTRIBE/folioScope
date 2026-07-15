@@ -1,0 +1,19 @@
+.layout {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+.content {
+  width: 100%;
+  min-width: 0;
+  flex: 1;
+}
+
+@media (max-width: 767px) {
+  .layout {
+    padding-bottom: var(--header-height);
+  }
+}

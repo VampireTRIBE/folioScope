@@ -18,7 +18,14 @@ import { AuthenticationContext } from "../../../../../context/authenticationCont
 // ! Tanstack Query
 import { useGROUPMETADATA } from "../../hooks/ReactQuery/useQuery";
 
-const PortfolioSnapshot = ({ netPortfolio = false }) => {
+const PortfolioSnapshot = ({
+  netPortfolio = false,
+  SnapshotConsolidatedView = true,
+  SnapshotHeadView = true,
+  CurrentStatusView = true,
+  CurrentYearPerformenceView = true,
+  LifetimePerformenceView = true,
+}) => {
   const { gp_id, level } = useParams();
   const { accessToken, userData } = useContext(AuthenticationContext);
   const grouplevel1 = Object.keys(userData?.groups?.level1 || {});
@@ -30,29 +37,41 @@ const PortfolioSnapshot = ({ netPortfolio = false }) => {
 
   return (
     <div className={portfolioSnapshotStyles.container}>
-      <SnapshotConsolidated
-        snapshot={GroupMeatadataData?.data?.consolidatedSnapshot}
-      />
+      {SnapshotConsolidatedView && (
+        <SnapshotConsolidated
+          snapshot={GroupMeatadataData?.data?.consolidatedSnapshot}
+        />
+      )}
       <h3 className={portfolioSnapshotStyles.title}>Snapshot</h3>
       <div className={portfolioSnapshotStyles.content}>
-        <div>
-          <SnapshotHead
-            snapshotHead={{
-              text: GroupMeatadataData?.data?.groupName,
-              price: {
-                price: GroupMeatadataData?.data?.networth?.currentPrice,
-                today: GroupMeatadataData?.data?.networth?.todayChange,
-              },
-            }}
+        {(SnapshotHeadView || CurrentStatusView) && (
+          <div>
+            {SnapshotHeadView && (
+              <SnapshotHead
+                snapshotHead={{
+                  text: GroupMeatadataData?.data?.groupName,
+                  price: {
+                    price: GroupMeatadataData?.data?.networth?.currentPrice,
+                    today: GroupMeatadataData?.data?.networth?.todayChange,
+                  },
+                }}
+              />
+            )}
+            {CurrentStatusView && (
+              <CurrentStatus
+                currentStatus={GroupMeatadataData?.data?.currentInvestment}
+              />
+            )}
+          </div>
+        )}
+        {CurrentYearPerformenceView && (
+          <CurrentYearPerformence
+            currentyear={GroupMeatadataData?.data?.currentyear}
           />
-          <CurrentStatus
-            currentStatus={GroupMeatadataData?.data?.currentInvestment}
-          />
-        </div>
-        <CurrentYearPerformence
-          currentyear={GroupMeatadataData?.data?.currentyear}
-        />
-        <LifetimePerformence lifetime={GroupMeatadataData?.data?.lifetime} />
+        )}
+        {LifetimePerformenceView && (
+          <LifetimePerformence lifetime={GroupMeatadataData?.data?.lifetime} />
+        )}
       </div>
     </div>
   );

@@ -20,6 +20,9 @@ import { AuthenticationContext } from "../../../../../context/authenticationCont
 // ! tanStack Query Hooks
 import { useGROUPMETADATA } from "../../hooks/ReactQuery/useQuery";
 
+// ! Utils Hooks
+import { useWindowWidth } from "../../../../../utils/EventListner/setWindowInnerWidth";
+
 const PortfolioContent = () => {
   const { gp_id, level } = useParams();
   const { accessToken, userData } = useContext(AuthenticationContext);
@@ -27,6 +30,7 @@ const PortfolioContent = () => {
   const groupId = selectedGroup?._id;
   const isLeaf = selectedGroup?.isLeaf === true;
   const { data: GroupMeatadataData } = useGROUPMETADATA(accessToken, groupId);
+  const screenWidth = useWindowWidth();
 
   const overview = {
     title: GroupMeatadataData?.data?.groupName,
@@ -36,7 +40,11 @@ const PortfolioContent = () => {
   return (
     <div className={portfolioContentStyles.container}>
       <ButtonContainers isLeaf={isLeaf} />
-      <PortfolioSnapshot />
+      {screenWidth >= 992 ? (
+        <PortfolioSnapshot SnapshotConsolidatedView={false} />
+      ) : (
+        <PortfolioSnapshot />
+      )}
       <OverView {...overview} />
       <DrawdownAnalysis />
       <ComparisonAnalysis />

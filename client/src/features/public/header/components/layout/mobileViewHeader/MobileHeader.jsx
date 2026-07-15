@@ -20,9 +20,14 @@ import MobileViewSearchBar from "../../mobileSearchbar/MobileViewSearchBar";
 // ! context
 import { AuthenticationContext } from "../../../../../../context/authenticationContext";
 
+// ! Utils Hooks
+import { useWindowWidth } from "../../../../../../utils/EventListner/setWindowInnerWidth";
+
 const MobileHeader = () => {
   const profileToggle = useSelector(selectToggleByKey("profileToggle"));
   const menuToggle = useSelector(selectToggleByKey("menuToggle"));
+
+  const screenWidth = useWindowWidth();
 
   // ! accessToken state
   const { accessToken } = useContext(AuthenticationContext);
@@ -33,15 +38,17 @@ const MobileHeader = () => {
     useHeaderUserActions();
 
   const navbarButtons = accessToken ? userprofileBtn : profileBtn;
-  const profileSidebar = accessToken ? userprofileSidebarItems : profileSidebarItems;
+  const profileSidebar = accessToken
+    ? userprofileSidebarItems
+    : profileSidebarItems;
 
   const menuOptions = accessToken ? userMneuSidebarItems : [];
 
-  const view = true;
   return (
     <header className={mobileHeaderStyle.header}>
       <BrandComponent />
       <nav className={mobileHeaderStyle.nav}>
+        {screenWidth >= 768 && <MobileViewSearchBar desktop={true} />}
         {navbarButtons.map((el, index) => (
           <ImgButton key={el.id || index} {...el} />
         ))}
@@ -51,7 +58,7 @@ const MobileHeader = () => {
 
       {menuToggle && <ProfileSideBar profileSidebarItems={menuOptions} />}
 
-      {view && <MobileViewSearchBar />}
+      {screenWidth < 768 && <MobileViewSearchBar />}
     </header>
   );
 };

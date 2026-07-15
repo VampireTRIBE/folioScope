@@ -30,12 +30,8 @@
 }
 
 .letterType2 {
-  height: 100%;
-  max-height: var(--text-base);
-  aspect-ratio: 1/1;
   color: var(--color-primary);
-  text-align: center;
   font-size: var(--text-base);
   font-weight: var(--fw-bold);
-  -webkit-text-stroke: 1px;
+  line-height: 1;
 }
