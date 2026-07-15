@@ -34,6 +34,7 @@ jest.mock("../../../utils/mongodb/aggregations/get_GroupChildrenMap", () => ({
 const mongoose = require("mongoose");
 
 const {
+  calculateExternalFlowUnitUpdate,
   getSortedLeafToRoot,
   fill_MissingNAVs,
 } = require("../../../sync_Scripts/sync_Portfolio/fill_MissingNavs");
@@ -84,6 +85,32 @@ describe("fill_MissingNavs", () => {
     ).rejects.toThrow("session required");
   });
 
+  test("issues external-flow units independently at each group's own NAV", () => {
+    const child = calculateExternalFlowUnitUpdate({
+      currentValue: 0,
+      currentUnits: 0,
+      amount: 1000,
+      type: "deposit",
+    });
+    const parent = calculateExternalFlowUnitUpdate({
+      currentValue: 8000,
+      currentUnits: 100,
+      amount: 1000,
+      type: "deposit",
+    });
+
+    expect(child).toMatchObject({
+      nav: 100,
+      units: 10,
+      value: 1000,
+    });
+    expect(parent).toMatchObject({
+      nav: 80,
+      units: 112.5,
+      value: 9000,
+    });
+  });
+
   test("creates default NAV rows when no previous NAV document exists", async () => {
     const NAV_Model = {
       bulkWrite: jest.fn().mockResolvedValue({}),
@@ -99,7 +126,11 @@ describe("fill_MissingNavs", () => {
       new Date("2026-06-28T00:00:00.000Z"),
     );
 
-    expect(result).toBe("no Single nav Doc Found");
+    expect(result).toEqual({
+      message: "No NAV document was found. Default NAV documents were created.",
+      insertedDocuments: 2,
+      updatedDocuments: 0,
+    });
     expect(NAV_Model.bulkWrite).toHaveBeenCalledWith(
       [
         {
@@ -107,8 +138,11 @@ describe("fill_MissingNavs", () => {
             document: expect.objectContaining({
               portfolioGroupId: "group-1",
               userId: "user-id",
-              message: "Default",
+              message: "default",
               date: expect.any(Date),
+              nav: 100,
+              units: 0,
+              value: 0,
             }),
           },
         },
@@ -117,19 +151,26 @@ describe("fill_MissingNavs", () => {
             document: expect.objectContaining({
               portfolioGroupId: "group-2",
               userId: "user-id",
-              message: "Default",
+              message: "default",
               date: expect.any(Date),
+              nav: 100,
+              units: 0,
+              value: 0,
             }),
           },
         },
       ],
-      { session: "session" },
+      { session: "session", ordered: true },
     );
   });
 
-  test("fills leaf and parent NAV gaps using prices, quantities, and child NAVs", async () => {
+  test("fills market gaps while preserving the parent's independent units", async () => {
+    const writtenOperations = [];
     const NAV_Model = {
-      bulkWrite: jest.fn().mockResolvedValue({}),
+      bulkWrite: jest.fn(async (operations) => {
+        writtenOperations.push(...operations);
+        return {};
+      }),
     };
     mongoose.model.mockReturnValue(NAV_Model);
 
@@ -138,7 +179,7 @@ describe("fill_MissingNavs", () => {
       nullDate: [],
       nonNullDate: {
         leaf: { nav: 100, units: 2 },
-        parent: { nav: 100, units: 2 },
+        parent: { nav: 50, units: 4 },
       },
       leafGroup: ["leaf"],
     });
@@ -171,10 +212,8 @@ describe("fill_MissingNavs", () => {
       new Date("2026-06-28T00:00:00.000Z"),
     );
 
-    const operations = NAV_Model.bulkWrite.mock.calls[0][0];
-
-    expect(operations).toHaveLength(2);
-    expect(operations[0]).toMatchObject({
+    expect(writtenOperations).toHaveLength(2);
+    expect(writtenOperations[0]).toMatchObject({
       updateOne: {
         filter: {
           portfolioGroupId: "leaf",
@@ -193,7 +232,7 @@ describe("fill_MissingNavs", () => {
       },
     });
 
-    expect(operations[1]).toMatchObject({
+    expect(writtenOperations[1]).toMatchObject({
       updateOne: {
         filter: {
           portfolioGroupId: "parent",
@@ -203,13 +242,83 @@ describe("fill_MissingNavs", () => {
         update: {
           $set: {
             message: "market",
-            nav: 100,
-            units: 2,
+            nav: 50,
+            units: 4,
             value: 200,
           },
         },
         upsert: true,
       },
     });
+  });
+
+  test("rejects a parent that has value but no independently issued units", async () => {
+    const NAV_Model = {
+      bulkWrite: jest.fn().mockResolvedValue({}),
+    };
+    mongoose.model.mockReturnValue(NAV_Model);
+    get_NavMeta.mockResolvedValue({
+      lastDate: new Date("2026-06-27T11:30:00.000Z"),
+      nullDate: [],
+      nonNullDate: {
+        leaf: { nav: 100, units: 1 },
+        parent: { nav: 100, units: 0 },
+      },
+      leafGroup: ["leaf"],
+    });
+    get_PeriodCloses.mockResolvedValue({
+      "2026-06-28T10:00:00.000Z": {},
+    });
+    get_GroupAssetQtyMap.mockResolvedValue({ leaf: {} });
+    get_GroupWithCurrentValueMap.mockResolvedValue({ leaf: 100 });
+    get_GroupChildrenMap.mockResolvedValue({
+      parent: ["leaf"],
+      leaf: [],
+    });
+
+    await expect(
+      fill_MissingNAVs(
+        "user-id",
+        "session",
+        new Date("2026-06-28T00:00:00.000Z"),
+        new Date("2026-06-28T00:00:00.000Z"),
+      ),
+    ).rejects.toThrow("has value 100 but zero units");
+
+    expect(NAV_Model.bulkWrite).not.toHaveBeenCalled();
+  });
+
+  test("rejects a missing close price instead of writing NaN", async () => {
+    const NAV_Model = {
+      bulkWrite: jest.fn().mockResolvedValue({}),
+    };
+    mongoose.model.mockReturnValue(NAV_Model);
+    get_NavMeta.mockResolvedValue({
+      lastDate: new Date("2026-06-27T11:30:00.000Z"),
+      nullDate: [],
+      nonNullDate: {
+        leaf: { nav: 100, units: 1 },
+      },
+      leafGroup: ["leaf"],
+    });
+    get_PeriodCloses.mockResolvedValue({
+      "2026-06-28T10:00:00.000Z": {},
+    });
+    get_GroupAssetQtyMap.mockResolvedValue({
+      leaf: { "asset-without-price": 2 },
+    });
+    get_GroupWithCurrentValueMap.mockResolvedValue({ leaf: 0 });
+    get_GroupChildrenMap.mockResolvedValue({ leaf: [] });
+
+    await expect(
+      fill_MissingNAVs(
+        "user-id",
+        "session",
+        new Date("2026-06-28T00:00:00.000Z"),
+        new Date("2026-06-28T00:00:00.000Z"),
+      ),
+    ).rejects.toThrow("Invalid close price");
+
+    expect(NAV_Model.bulkWrite).not.toHaveBeenCalled();
   });
 });

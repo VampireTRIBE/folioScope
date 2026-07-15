@@ -162,6 +162,42 @@ describe("update_GroupNAV", () => {
     );
   });
 
+  test("derives deposit units from value and units instead of a stale stored NAV", async () => {
+    const Nav = {
+      findOne: jest.fn(() =>
+        createFindOneChain({
+          units: 100,
+          value: 8000,
+          nav: 999,
+        }),
+      ),
+      findOneAndUpdate: jest.fn().mockResolvedValue({ _id: "deposit-nav-id" }),
+    };
+    mongoose.model.mockReturnValue(Nav);
+
+    await update_GroupNAV({
+      session: "session",
+      portfolioGroupId: "parent-id",
+      userId: "user-id",
+      date: new Date("2026-06-30T00:00:00.000Z"),
+      type: "deposit",
+      amount: 1000,
+    });
+
+    expect(Nav.findOneAndUpdate).toHaveBeenCalledWith(
+      expect.any(Object),
+      {
+        $set: {
+          units: 112.5,
+          value: 9000,
+          nav: 80,
+          message: "deposit",
+        },
+      },
+      expect.objectContaining({ session: "session" }),
+    );
+  });
+
   test("withdrawal after market gain reduces units without changing NAV return", async () => {
     const Nav = {
       findOne: jest.fn(() =>
@@ -243,6 +279,42 @@ describe("update_GroupNAV", () => {
         new: true,
         session: "session",
       }),
+    );
+  });
+
+  test("tax changes value and NAV without changing units", async () => {
+    const Nav = {
+      findOne: jest.fn(() =>
+        createFindOneChain({
+          units: 100,
+          value: 12000,
+          nav: 120,
+        }),
+      ),
+      findOneAndUpdate: jest.fn().mockResolvedValue({ _id: "tax-nav-id" }),
+    };
+    mongoose.model.mockReturnValue(Nav);
+
+    await update_GroupNAV({
+      session: "session",
+      portfolioGroupId: "group-id",
+      userId: "user-id",
+      date: new Date("2026-06-30T00:00:00.000Z"),
+      type: "tax",
+      amount: 1000,
+    });
+
+    expect(Nav.findOneAndUpdate).toHaveBeenCalledWith(
+      expect.any(Object),
+      {
+        $set: {
+          units: 100,
+          value: 11000,
+          nav: 110,
+          message: "tax",
+        },
+      },
+      expect.objectContaining({ session: "session" }),
     );
   });
 

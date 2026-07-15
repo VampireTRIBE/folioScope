@@ -2,6 +2,9 @@ const mongoose = require("mongoose");
 const {
   normalizeToIST5PM,
 } = require("../../utils/transformData/normalizeDates");
+const {
+  calculateExternalFlowUnitUpdate,
+} = require("./fill_MissingNavs");
 
 module.exports.update_GroupNAV = async ({
   session = null,
@@ -42,11 +45,23 @@ module.exports.update_GroupNAV = async ({
     let value = 0;
 
     if (type === "deposit") {
-      units = amount / nav;
-      value = amount;
+      const flowUpdate = calculateExternalFlowUnitUpdate({
+        currentValue: value,
+        currentUnits: units,
+        amount,
+        type,
+      });
+
+      units = flowUpdate.units;
+      value = flowUpdate.value;
+      nav = flowUpdate.nav;
     } else if (type === "market") {
+      if (amount > 0) {
+        throw new Error("A group with value cannot have zero units");
+      }
+
       units = 0;
-      value = amount;
+      value = 0;
     }
 
     return await Nav.create(
@@ -79,19 +94,17 @@ module.exports.update_GroupNAV = async ({
   // =========================
   // ! APPLY EVENT
   // =========================
-  if (type === "deposit") {
-    const newUnits = amount / nav;
-    units += newUnits;
-    value += amount;
-  } else if (type === "withdrawal") {
-    const removedUnits = amount / nav;
+  if (type === "deposit" || type === "withdrawal") {
+    const flowUpdate = calculateExternalFlowUnitUpdate({
+      currentValue: value,
+      currentUnits: units,
+      amount,
+      type,
+    });
 
-    if (removedUnits > units + 0.0000001) {
-      throw new Error("Insufficient units");
-    }
-
-    units -= removedUnits;
-    value -= amount;
+    units = flowUpdate.units;
+    value = flowUpdate.value;
+    nav = flowUpdate.nav;
   } else if (type === "tax") {
     if (amount > value + 0.0000001) {
       throw new Error("Tax exceeds value");
